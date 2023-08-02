@@ -126,7 +126,7 @@ class EcuConfigurationParser(ElementParser):
             value = value == "true"
         elif value_type == 'ECUC-INTEGER-PARAM-DEF':
             value = int(value)
-        elif value_type == 'ECUC-ENUMERATION-PARAM-DEF':
+        elif value_type in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
             value = value
         else:
             value = None
