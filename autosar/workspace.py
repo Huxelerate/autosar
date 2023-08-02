@@ -7,7 +7,8 @@ import os
 import ntpath
 import collections
 import re
-#default parsers
+
+# Default parsers
 from autosar.parser.datatype_parser import (DataTypeParser, DataTypeSemanticsParser, DataTypeUnitsParser)
 from autosar.parser.portinterface_parser import (PortInterfacePackageParser,SoftwareAddressMethodParser)
 from autosar.parser.constant_parser import ConstantParser
@@ -17,7 +18,9 @@ from autosar.parser.system_parser import SystemParser
 from autosar.parser.signal_parser import SignalParser
 from autosar.parser.mode_parser import ModeDeclarationParser
 from autosar.parser.swc_implementation_parser import SwcImplementationParser
-#default writers
+from autosar.parser.ecu_config_parser import EcuConfigurationParser
+
+# Default writers
 from autosar.writer.datatype_writer import XMLDataTypeWriter, CodeDataTypeWriter
 from autosar.writer.constant_writer import XMLConstantWriter, CodeConstantWriter
 from autosar.writer.portinterface_writer import XMLPortInterfaceWriter, CodePortInterfaceWriter
@@ -477,6 +480,7 @@ class Workspace:
         parser.registerElementParser(SystemParser(self.version))
         parser.registerElementParser(SignalParser(self.version))
         parser.registerElementParser(SwcImplementationParser(self.version))
+        parser.registerElementParser(EcuConfigurationParser(self.version))
 
     def _registerDefaultElementWriters(self, writer):
         writer.registerElementWriter(XMLDataTypeWriter(self.version, self.patch))

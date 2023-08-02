@@ -15,6 +15,7 @@ import autosar.base
 import autosar.bsw.com
 import autosar.bsw.os
 import autosar.util
+import autosar.ecuc
 
 import ntpath
 import os
@@ -24,9 +25,6 @@ def workspace(version=3.0, patch = 2, schema=None, attributes=None, useDefaultWr
    if schema is None and ( (version == 3.0 and patch == 2) or (version == "3.0.2") ):
       schema = 'autosar_302_ext.xsd'
    return autosar.Workspace(version, patch, schema, attributes, useDefaultWriters)
-
-
-
 
 def splitRef(ref):
    return autosar.base.splitRef(ref)
