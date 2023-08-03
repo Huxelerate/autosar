@@ -55,6 +55,7 @@ class EcuConfigurationParser(ElementParser):
 
         return ecuConfig
  
+    @parseElementUUID
     def parseContainer(self, xmlElem, parent = None):
         name, definition = self.getMetaInformation(xmlElem)
         container = autosar.ecuc.Container(name, definition, parent)
@@ -86,6 +87,7 @@ class EcuConfigurationParser(ElementParser):
 
         return container
  
+    @parseElementUUID
     def parseSubContainer(self, xmlElem, parent = None):
         name, definition = self.getMetaInformation(xmlElem)
         subContainer = autosar.ecuc.SubContainer(name, definition, parent)
@@ -111,14 +113,17 @@ class EcuConfigurationParser(ElementParser):
     
     def parseReferenceValue(self, xmlElem):
         definition = self.parseTextNode(xmlElem.find('DEFINITION-REF'))
-        value = self.parseTextNode(xmlElem.find('VALUE-REF'))
+
+        value_node = xmlElem.find('VALUE-REF')
+        value = self.parseTextNode(value_node)
+        destination = value_node.attrib.get('DEST')
         
-        return autosar.ecuc.ReferenceValue(definition, value)
+        return autosar.ecuc.ReferenceValue(definition, value, destination)
 
     def parseParameterValue(self, xmlElem):
         definition_node = xmlElem.find('DEFINITION-REF')
 
-        definition = self.parseTextNode(definition_node)
+        definition = splitRef(self.parseTextNode(definition_node))[-1]
         value = self.parseTextNode(xmlElem.find('VALUE'))
 
         value_type = definition_node.attrib.get('DEST')
@@ -131,4 +136,4 @@ class EcuConfigurationParser(ElementParser):
         else:
             value = None
         
-        return autosar.ecuc.ReferenceValue(definition, value)
+        return autosar.ecuc.ParamValue(definition, value)

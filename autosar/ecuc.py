@@ -58,6 +58,7 @@ class ParamValue():
         self.value = value
 
 class ReferenceValue():
-    def __init__(self, definition, value):
+    def __init__(self, definition, value, destination):
         self.definition = definition
         self.value = value
+        self.destination = destination
