@@ -112,28 +112,32 @@ class EcuConfigurationParser(ElementParser):
         return subContainer
     
     def parseReferenceValue(self, xmlElem):
-        definition = self.parseTextNode(xmlElem.find('DEFINITION-REF'))
+        definition_node = xmlElem.find('DEFINITION-REF')
+        definition_content = self.parseTextNode(definition_node)
+        definition_destination = definition_node.attrib.get('DEST')
 
         value_node = xmlElem.find('VALUE-REF')
-        value = self.parseTextNode(value_node)
-        destination = value_node.attrib.get('DEST')
+        value_content = self.parseTextNode(value_node)
+        value_destination = value_node.attrib.get('DEST')
         
-        return autosar.ecuc.ReferenceValue(definition, value, destination)
+        return autosar.ecuc.ReferenceValue(definition_content, definition_destination, value_content, value_destination)
 
     def parseParameterValue(self, xmlElem):
         definition_node = xmlElem.find('DEFINITION-REF')
+        definition_content = splitRef(self.parseTextNode(definition_node))[-1]
+        definition_destination = definition_node.attrib.get('DEST')
 
-        definition = splitRef(self.parseTextNode(definition_node))[-1]
-        value = self.parseTextNode(xmlElem.find('VALUE'))
+        value_node = xmlElem.find('VALUE')
+        value_content = self.parseTextNode(value_node)
+        value_destination = value_node.attrib.get('DEST')
 
-        value_type = definition_node.attrib.get('DEST')
-        if value_type == 'ECUC-BOOLEAN-PARAM-DEF':
-            value = value == "true"
-        elif value_type == 'ECUC-INTEGER-PARAM-DEF':
-            value = int(value)
-        elif value_type in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
-            value = value
+        if definition_destination == 'ECUC-BOOLEAN-PARAM-DEF':
+            value_content = value_content == "true"
+        elif definition_destination == 'ECUC-INTEGER-PARAM-DEF':
+            value_content = int(value_content)
+        elif definition_destination in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
+            value_content = value_content
         else:
-            value = None
+            value_content = None
         
-        return autosar.ecuc.ParamValue(definition, value)
+        return autosar.ecuc.ParamValue(definition_content, definition_destination, value_content, value_destination)

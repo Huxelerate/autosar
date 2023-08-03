@@ -53,12 +53,15 @@ class SubContainer(Element):
         self.refs.append(ref)
 
 class ParamValue():
-    def __init__(self, definition, value):
+    def __init__(self, definition, definition_dest, value, value_dest):
         self.definition = definition
+        self.definition_dest = definition_dest
         self.value = value
+        self.value_dest = value_dest
 
 class ReferenceValue():
-    def __init__(self, definition, value, destination):
+    def __init__(self, definition, definition_dest, value, value_dest):
         self.definition = definition
+        self.definition_dest = definition_dest
         self.value = value
-        self.destination = destination
+        self.value_dest = value_dest
