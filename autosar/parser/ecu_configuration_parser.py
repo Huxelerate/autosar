@@ -23,7 +23,7 @@ class EcuConfigurationParser(ElementParser):
         definition_node = node.find('DEFINITION-REF')
 
         def_reference = self.parseTextNode(definition_node)
-        def_dest = self.attrib.get('DEST')
+        def_dest = definition_node.attrib.get('DEST')
 
         return def_reference, def_dest
 

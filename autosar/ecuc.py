@@ -3,10 +3,11 @@ import sys
 from autosar.element import Element
 
 class EcuConfig(Element):
-    def __init__(self, name, definition, parent=None):
+    def __init__(self, name, definition_reference, definition_dest, parent=None):
         super().__init__(name, parent)
 
-        self.definition = definition
+        self.definition_reference = definition_reference
+        self.definition_dest = definition_dest
 
         self.containers = list()
 
