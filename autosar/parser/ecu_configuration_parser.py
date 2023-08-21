@@ -18,13 +18,20 @@ class EcuConfigurationParser(ElementParser):
 
     def getSupportedTags(self):
         return self.switcher.keys()
-    
+
+    def getDefinition(self, node):
+        definition_node = node.find('DEFINITION-REF')
+
+        def_reference = self.parseTextNode(definition_node)
+        def_dest = self.attrib.get('DEST')
+
+        return def_reference, def_dest
+
     def getMetaInformation(self, node):
         name = self.parseTextNode(node.find('SHORT-NAME'))
-        definition = self.parseTextNode(node.find('DEFINITION-REF'))
-        definition = splitRef(definition)[-1] if definition is not None else None
+        def_reference, def_dest = self.getDefinition(node)
 
-        return (name, definition)
+        return (name, def_reference, def_dest)
 
     @parseElementUUID
     def parseElement(self, xmlElement, parent = None):
@@ -35,7 +42,7 @@ class EcuConfigurationParser(ElementParser):
             return None
 
     @parseElementUUID
-    def parseEcuConfiguration(self, xmlRoot, parent=None):
+    def parseEcuConfiguration(self, xmlRoot, parent = None):
         ecuConfig = None
         if xmlRoot.tag == 'ECUC-MODULE-CONFIGURATION-VALUES':
             name, definition = self.getMetaInformation(xmlRoot)
@@ -67,9 +74,9 @@ class EcuConfigurationParser(ElementParser):
             if node.tag == 'SUB-CONTAINERS':
                 xmlSubContainers = node.findall('./ECUC-CONTAINER-VALUE')
                 for xmlSubContainer in xmlSubContainers:
-                    subContainer = self.parseSubContainer(xmlSubContainer, container)
+                    subContainer = self.parseContainer(xmlSubContainer, container)
 
-                    container.appendSubContainer(subContainer)
+                    container.appendContainer(subContainer)
 
             elif node.tag == 'REFERENCE-VALUES':
                 xmlReferenceValues = node.findall('./ECUC-REFERENCE-VALUE')
@@ -86,58 +93,30 @@ class EcuConfigurationParser(ElementParser):
                     container.appendParam(paramValue)
 
         return container
- 
-    @parseElementUUID
-    def parseSubContainer(self, xmlElem, parent = None):
-        name, definition = self.getMetaInformation(xmlElem)
-        subContainer = autosar.ecuc.SubContainer(name, definition, parent)
-
-        for node in xmlElem.findall('./*'):
-            if node.tag in self.handledTags:
-                continue
-
-            if node.tag == 'REFERENCE-VALUES':
-                xmlReferenceValues = node.findall('./ECUC-REFERENCE-VALUE')
-                for xmlReferenceValue in xmlReferenceValues:
-                    refValue = self.parseReferenceValue(xmlReferenceValue)
-
-                    subContainer.appendRef(refValue)
-
-            elif node.tag == 'PARAMETER-VALUES':
-                xmlParameterValues = node.findall('./*')
-                for xmlParameterValue in xmlParameterValues:
-                    paramValue = self.parseParameterValue(xmlParameterValue)
-                    subContainer.appendParam(paramValue)
-
-        return subContainer
     
     def parseReferenceValue(self, xmlElem):
-        definition_node = xmlElem.find('DEFINITION-REF')
-        definition_content = self.parseTextNode(definition_node)
-        definition_destination = definition_node.attrib.get('DEST')
+        def_reference, def_dest = self.getDefinition(xmlElem)
 
         value_node = xmlElem.find('VALUE-REF')
         value_content = self.parseTextNode(value_node)
         value_destination = value_node.attrib.get('DEST')
         
-        return autosar.ecuc.ReferenceValue(definition_content, definition_destination, value_content, value_destination)
+        return autosar.ecuc.ReferenceValue(def_reference, def_dest, value_content, value_destination)
 
     def parseParameterValue(self, xmlElem):
-        definition_node = xmlElem.find('DEFINITION-REF')
-        definition_content = splitRef(self.parseTextNode(definition_node))[-1]
-        definition_destination = definition_node.attrib.get('DEST')
+        def_reference, def_dest = self.getDefinition(xmlElem)
 
         value_node = xmlElem.find('VALUE')
         value_content = self.parseTextNode(value_node)
         value_destination = value_node.attrib.get('DEST')
 
-        if definition_destination == 'ECUC-BOOLEAN-PARAM-DEF':
+        if def_reference == 'ECUC-BOOLEAN-PARAM-DEF':
             value_content = value_content == "true"
-        elif definition_destination == 'ECUC-INTEGER-PARAM-DEF':
+        elif def_reference == 'ECUC-INTEGER-PARAM-DEF':
             value_content = int(value_content)
-        elif definition_destination in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
+        elif def_reference in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
             value_content = value_content
         else:
             value_content = None
         
-        return autosar.ecuc.ParamValue(definition_content, definition_destination, value_content, value_destination)
+        return autosar.ecuc.ParamValue(def_reference, def_dest, value_content, value_destination)

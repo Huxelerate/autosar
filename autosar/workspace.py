@@ -7,8 +7,7 @@ import os
 import ntpath
 import collections
 import re
-
-# Default parsers
+#default parsers
 from autosar.parser.datatype_parser import (DataTypeParser, DataTypeSemanticsParser, DataTypeUnitsParser)
 from autosar.parser.portinterface_parser import (PortInterfacePackageParser,SoftwareAddressMethodParser)
 from autosar.parser.constant_parser import ConstantParser
@@ -18,9 +17,8 @@ from autosar.parser.system_parser import SystemParser
 from autosar.parser.signal_parser import SignalParser
 from autosar.parser.mode_parser import ModeDeclarationParser
 from autosar.parser.swc_implementation_parser import SwcImplementationParser
-from autosar.parser.ecu_config_parser import EcuConfigurationParser
-
-# Default writers
+from autosar.parser.ecu_configuration_parser import EcuConfigurationParser
+#default writers
 from autosar.writer.datatype_writer import XMLDataTypeWriter, CodeDataTypeWriter
 from autosar.writer.constant_writer import XMLConstantWriter, CodeConstantWriter
 from autosar.writer.portinterface_writer import XMLPortInterfaceWriter, CodePortInterfaceWriter

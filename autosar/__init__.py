@@ -26,6 +26,9 @@ def workspace(version=3.0, patch = 2, schema=None, attributes=None, useDefaultWr
       schema = 'autosar_302_ext.xsd'
    return autosar.Workspace(version, patch, schema, attributes, useDefaultWriters)
 
+
+
+
 def splitRef(ref):
    return autosar.base.splitRef(ref)
 

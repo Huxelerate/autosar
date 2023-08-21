@@ -14,20 +14,22 @@ class EcuConfig(Element):
         self.containers.append(container)
 
 class Container(Element):
-    def __init__(self, name, definition, parent=None):
+    def __init__(self, name, definition_reference, definition_dest, parent=None):
         super().__init__(name, parent)
 
         self.name = name
-        self.definition = definition
+        self.definition_reference = definition_reference
+        self.definition_dest = definition_dest
 
-        self.subContainers = list()
+        # List of children containers
+        self.containers = list()
 
         # Lists containing ParamValues and ReferenceValues
         self.params = list()
         self.refs = list()
 
-    def appendSubContainer(self, subContainer):
-        self.subContainers.append(subContainer)
+    def appendContainer(self, container):
+        self.containers.append(container)
 
     def appendParam(self, param):
         self.params.append(param)
@@ -35,33 +37,15 @@ class Container(Element):
     def appendRef(self, ref):
         self.refs.append(ref)
 
-class SubContainer(Element):
-    def __init__(self, name, definition, parent=None):
-        super().__init__(name, parent)
-
-        self.name = name
-        self.definition = definition
-
-        # Lists containing ParamValues and ReferenceValues
-        self.params = list()
-        self.refs = list()
-
-    def appendParam(self, param):
-        self.params.append(param)
-
-    def appendRef(self, ref):
-        self.refs.append(ref)
-
-class ParamValue():
-    def __init__(self, definition, definition_dest, value, value_dest):
-        self.definition = definition
+class Value():
+    def __init__(self, definition_reference, definition_dest, value, value_dest):
+        self.definition_reference = definition_reference
         self.definition_dest = definition_dest
         self.value = value
         self.value_dest = value_dest
 
-class ReferenceValue():
-    def __init__(self, definition, definition_dest, value, value_dest):
-        self.definition = definition
-        self.definition_dest = definition_dest
-        self.value = value
-        self.value_dest = value_dest
+class ParamValue(Value):
+    pass
+
+class ReferenceValue(Value):
+    pass
