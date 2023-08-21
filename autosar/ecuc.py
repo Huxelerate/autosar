@@ -14,7 +14,7 @@ class EcuConfig(Element):
         self.containers.append(container)
 
 class Container(Element):
-    def __init__(self, name, definition_reference, definition_dest, parent=None):
+    def __init__(self, name, definition_reference, definition_dest, parent = None):
         super().__init__(name, parent)
 
         self.name = name

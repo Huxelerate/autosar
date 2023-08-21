@@ -45,8 +45,8 @@ class EcuConfigurationParser(ElementParser):
     def parseEcuConfiguration(self, xmlRoot, parent = None):
         ecuConfig = None
         if xmlRoot.tag == 'ECUC-MODULE-CONFIGURATION-VALUES':
-            name, definition = self.getMetaInformation(xmlRoot)
-            ecuConfig = autosar.ecuc.EcuConfig(name, definition, parent)
+            name, def_reference, def_dest = self.getMetaInformation(xmlRoot)
+            ecuConfig = autosar.ecuc.EcuConfig(name, def_reference, def_dest, parent)
         else:
             raise NotImplementedError(xmlRoot.tag)
 
@@ -64,8 +64,8 @@ class EcuConfigurationParser(ElementParser):
  
     @parseElementUUID
     def parseContainer(self, xmlElem, parent = None):
-        name, definition = self.getMetaInformation(xmlElem)
-        container = autosar.ecuc.Container(name, definition, parent)
+        name, def_reference, def_dest = self.getMetaInformation(xmlElem)
+        container = autosar.ecuc.Container(name, def_reference, def_dest, parent)
 
         for node in xmlElem.findall('./*'):
             if node.tag in self.handledTags:
