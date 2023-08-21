@@ -64,7 +64,7 @@ class EcuConfigurationParser(ElementParser):
  
     @parseElementUUID
     def parseContainer(self, xmlElem, parent = None):
-        name, def_reference, def_dest = self.getMetaInformation(xmlElem)
+        name, def_reference, def_dest = self.finitiongetMetaInformation(xmlElem)
         container = autosar.ecuc.Container(name, def_reference, def_dest, parent)
 
         for node in xmlElem.findall('./*'):

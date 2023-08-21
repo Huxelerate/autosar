@@ -14,6 +14,9 @@ class EcuConfig(Element):
     def appendContainer(self, container):
         self.containers.append(container)
 
+    def find(self, ref):
+        return self.parent.find(ref)
+
 class Container(Element):
     def __init__(self, name, definition_reference, definition_dest, parent = None):
         super().__init__(name, parent)
@@ -38,6 +41,9 @@ class Container(Element):
     def appendRef(self, ref):
         self.refs.append(ref)
 
+    def find(self, ref):
+        return self.parent.find(ref)
+
 class Value():
     def __init__(self, definition_reference, definition_dest, value, value_dest):
         self.definition_reference = definition_reference
@@ -46,9 +52,7 @@ class Value():
         self.value_dest = value_dest
 
 class ParamValue(Value):
-    def __init__(self, definition_reference, definition_dest, value, value_dest):
-        super().__init__(definition_reference, definition_dest, value, value_dest)
+    pass
 
 class ReferenceValue(Value):
-    def __init__(self, definition_reference, definition_dest, value, value_dest):
-        super().__init__(definition_reference, definition_dest, value, value_dest)
+    pass
