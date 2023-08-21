@@ -46,7 +46,9 @@ class Value():
         self.value_dest = value_dest
 
 class ParamValue(Value):
-    pass
+    def __init__(self, definition_reference, definition_dest, value, value_dest):
+        super().__init__(definition_reference, definition_dest, value, value_dest)
 
 class ReferenceValue(Value):
-    pass
+    def __init__(self, definition_reference, definition_dest, value, value_dest):
+        super().__init__(definition_reference, definition_dest, value, value_dest)
