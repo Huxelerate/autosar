@@ -110,11 +110,11 @@ class EcuConfigurationParser(ElementParser):
         value_content = self.parseTextNode(value_node)
         value_destination = value_node.attrib.get('DEST')
 
-        if def_reference == 'ECUC-BOOLEAN-PARAM-DEF':
+        if def_dest == 'ECUC-BOOLEAN-PARAM-DEF':
             value_content = value_content == "true"
-        elif def_reference == 'ECUC-INTEGER-PARAM-DEF':
+        elif def_dest == 'ECUC-INTEGER-PARAM-DEF':
             value_content = int(value_content)
-        elif def_reference in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
+        elif def_dest in ['ECUC-ENUMERATION-PARAM-DEF', 'ECUC-TEXTUAL-PARAM-VALUE']:
             value_content = value_content
         else:
             value_content = None
