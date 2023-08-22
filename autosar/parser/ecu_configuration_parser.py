@@ -20,11 +20,8 @@ class EcuConfigurationParser(ElementParser):
     def getDefinition(self, node):
         definition_node = node.find('DEFINITION-REF')
 
-        if definition_node is None:
-            return None, None
-
         def_reference = self.parseTextNode(definition_node)
-        def_dest = definition_node.attrib.get('DEST')
+        def_dest = definition_node.attrib.get('DEST') if definition_node else None
 
         return def_reference, def_dest
 
@@ -99,7 +96,7 @@ class EcuConfigurationParser(ElementParser):
         def_reference, def_dest = self.getDefinition(xmlElem)
 
         value_node = xmlElem.find('VALUE-REF')
-        value_content = self.parseTextNode(value_node) if value_node else None
+        value_content = self.parseTextNode(value_node)
         value_destination = value_node.attrib.get('DEST') if value_node else None
         
         return autosar.ecuc.ReferenceValue(def_reference, def_dest, value_content, value_destination)
