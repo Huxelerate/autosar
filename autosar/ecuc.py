@@ -15,7 +15,16 @@ class EcuConfig(Element):
         self.containers.append(container)
 
     def find(self, ref):
-        return self.parent.find(ref)
+        if ref.startswith('/'):
+            return self.parent.find(ref)
+
+        prefix, _, suffix = ref.partition('/')
+
+        container = next(c for c in self.containers if c.name == prefix)
+        if container is not None:
+            return container.find(suffix) if suffix else container
+
+        return None
 
 class Container(Element):
     def __init__(self, name, definition_reference, definition_dest, parent = None):
@@ -42,7 +51,16 @@ class Container(Element):
         self.refs.append(ref)
 
     def find(self, ref):
-        return self.parent.find(ref)
+        if ref.startswith('/'):
+            return self.parent.find(ref)
+
+        prefix, _, suffix = ref.partition('/')
+
+        container = next(c for c in self.containers if c.name == prefix)
+        if container is not None:
+            return container.find(suffix) if suffix else container
+
+        return None
 
 class Value():
     def __init__(self, definition_reference, definition_dest, value, value_dest):
