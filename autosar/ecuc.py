@@ -1,5 +1,3 @@
-import sys
-
 from autosar.element import Element
 
 class EcuConfig(Element):
@@ -16,13 +14,13 @@ class EcuConfig(Element):
 
     def find(self, ref):
         if ref.startswith('/'):
-            return self.parent.find(ref)
+            return self.parent.find(ref) if self.parent else None
 
         prefix, _, suffix = ref.partition('/')
 
         container = next(c for c in self.containers if c.name == prefix)
         if container is not None:
-            return container.find(suffix) if suffix else container
+            return container.find(suffix) if len(suffix) > 0 else container
 
         return None
 
@@ -52,13 +50,13 @@ class Container(Element):
 
     def find(self, ref):
         if ref.startswith('/'):
-            return self.parent.find(ref)
+            return self.parent.find(ref) if self.parent else None
 
         prefix, _, suffix = ref.partition('/')
 
         container = next(c for c in self.containers if c.name == prefix)
         if container is not None:
-            return container.find(suffix) if suffix else container
+            return container.find(suffix) if len(suffix) > 0 else container
 
         return None
 
