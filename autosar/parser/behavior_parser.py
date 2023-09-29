@@ -732,7 +732,7 @@ class BehaviorParser(ElementParser):
                 raise NotImplementedError(xmlElem.tag)
         return calPrmElemPrototype
 
-    def _parseServerCallPoint(self, xmlRoot, type):
+    def _parseServerCallPoint(self, xmlRoot, callType):
         timeout=0.0
         if self.version >= 4.0:
             operationInstanceRefs=[]
@@ -760,7 +760,7 @@ class BehaviorParser(ElementParser):
                     timeout=self.parseFloatNode(xmlElem)
                 else:
                     raise NotImplementedError(xmlElem.tag)
-        retval=type(name,timeout)
+        retval=callType(name,timeout)
         retval.operationInstanceRefs=operationInstanceRefs
         return retval
     
