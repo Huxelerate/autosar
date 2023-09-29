@@ -825,8 +825,8 @@ class InternalBehaviorCommon(Element):
 
     def _createAsyncServerCallPoint(self,port,operation,runnable):
         """
-        internal function that create a AsyncServerCallPoint of the the port is a require port or
-        a DataSendPoint if the port is a provide port
+        internal function that creates an AsyncServerCallPoint named according to the AUTOSAR
+        naming convention (SC_<name of the Require Port offering the Interface>_<name of the operation>)
         """
         if isinstance(port,autosar.port.RequirePort):
             callPoint=AsyncServerCallPoint('SC_{0.name}_{1.name}'.format(port,operation))
