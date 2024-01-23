@@ -445,15 +445,15 @@ class BehaviorParser(ElementParser):
     @parseElementUUID
     def _parseLocalVariableAccess(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIABLE-ACCESS')
+        (name, variableAccess) = (None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-NAME':
-                pass
+                name = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'ACCESSED-VARIABLE':
-                return self.parseLocalAccessedVariable(xmlElem)
+                variableAccess = self.parseLocalAccessedVariable(xmlElem)
             else:
                 raise NotImplementedError(xmlElem.tag)
-            
-        assert False, "VARIABLE-ACCESS does not have the ACCESSED-VARIABLE child tag"
+        return autosar.behavior.LocalVariableAccess(name, variableAccess.localVariableRef)
 
     @parseElementUUID
     def parseParameterAccessPoint(self, xmlRoot, parent = None):
