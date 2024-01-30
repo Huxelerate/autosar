@@ -424,43 +424,21 @@ class DataConstraint(Element):
             if (isinstance(rule, InternalConstraint) and constraintType == 'internalConstraint') or (isinstance(rule, PhysicalConstraint) and constraintType == 'physicalConstraint'):
                 return rule
 
-class ImplementationDataType(Element):
-    def tag(self, version=None): return 'IMPLEMENTATION-DATA-TYPE'
-    def __init__(self, name, variantProps = None, dynamicArraySizeProfile = None, typeEmitter = None, category='VALUE', parent = None, adminData = None):
-        super().__init__(name, parent, adminData, category)
-        self.dynamicArraySizeProfile = dynamicArraySizeProfile
-        self.typeEmitter = typeEmitter
+
+class ImplementationDataTypeVariantMixin():
+
+    def __init__(self, *args, variantProps=None, **kwargs):
         self.variantProps = []
-        self.subElements = []
-        self.symbolProps = None
-        if isinstance(variantProps, (autosar.base.SwDataDefPropsConditional, autosar.base.SwPointerTargetProps)):
+        if isinstance(variantProps, (autosar.base.SwDataDefPropsConditional,
+                                     autosar.base.SwPointerTargetProps)):
             self.variantProps.append(variantProps)
         elif isinstance(variantProps, collections.abc.Iterable):
             for elem in variantProps:
-                if isinstance(elem, (autosar.base.SwDataDefPropsConditional, autosar.base.SwPointerTargetProps)):
+                if isinstance(elem, (autosar.base.SwDataDefPropsConditional,
+                                     autosar.base.SwPointerTargetProps)):
                     self.variantProps.append(elem)
                 else:
                     raise ValueError('Invalid type: ', type(elem))
-
-    def getArrayLength(self):
-        """
-        Deprecated, use arraySize property instead
-        """
-        return self.arraySize
-
-
-    def getTypeReference(self):
-        """
-        Deprecated, use implementationTypeRef property instead
-        """
-        return self.implementationTypeRef
-
-    @property
-    def arraySize(self):
-        if len(self.subElements)>0:
-            return self.subElements[0].arraySize
-        else:
-            return None
 
     @property
     def implementationTypeRef(self):
@@ -490,6 +468,37 @@ class ImplementationDataType(Element):
         else:
             raise RuntimeError('Element has no variantProps set')
 
+class ImplementationDataType(Element, ImplementationDataTypeVariantMixin):
+
+    def tag(self, version=None):
+        return 'IMPLEMENTATION-DATA-TYPE'
+
+    def __init__(self,
+                 name,
+                 dynamicArraySizeProfile=None,
+                 typeEmitter=None,
+                 category='VALUE',
+                 parent=None,
+                 adminData=None,
+                 *args,
+                 **kwargs):
+        super().__init__(name, parent, adminData, category)
+        self.dynamicArraySizeProfile = dynamicArraySizeProfile
+        self.typeEmitter = typeEmitter
+        self.subElements = []
+        self.symbolProps = None
+        ImplementationDataTypeVariantMixin.__init__(self, name,
+                                                    dynamicArraySizeProfile,
+                                                    typeEmitter, category,
+                                                    parent, adminData, *args,
+                                                    **kwargs)
+
+    def getTypeReference(self):
+        """
+        Deprecated, use implementationTypeRef property instead
+        """
+        return self.implementationTypeRef
+
     def setSymbolProps(self, name, symbol):
         """
         Sets SymbolProps for this data type
@@ -508,13 +517,23 @@ class SwBaseType(Element):
         self.nativeDeclaration = nativeDeclaration
         self.typeEncoding = typeEncoding
 
-class ImplementationDataTypeElement(Element):
-    def tag(self, version=None): return 'IMPLEMENTATION-DATA-TYPE-ELEMENT'
 
-    def __init__(self, name, category = None, arraySize = None, arraySizeSemantics = None, variantProps = None, parent = None, adminData = None):
+class ImplementationDataTypeElement(Element,
+                                    ImplementationDataTypeVariantMixin):
+
+
+    def __init__(self,
+                 name,
+                 category=None,
+                 arraySize=None,
+                 arraySizeSemantics=None,
+                 parent=None,
+                 adminData=None,
+                 *args,
+                 **kwargs):
         super().__init__(name, parent, adminData, category)
         self.arraySize = arraySize
-        self.variantProps = []
+        self.subElements = []
         if arraySize is not None:
             if arraySizeSemantics is not None:
                 self.arraySizeSemantics = arraySizeSemantics
@@ -522,15 +541,11 @@ class ImplementationDataTypeElement(Element):
                 self.arraySizeSemantics = 'FIXED-SIZE'
         else:
             self.arraySizeSemantics = None
-        if variantProps is not None:
-            if isinstance(variantProps, (autosar.base.SwDataDefPropsConditional, autosar.base.SwPointerTargetProps)):
-                self.variantProps.append(variantProps)
-            elif isinstance(variantProps, collections.abc.Iterable):
-                for elem in variantProps:
-                    if isinstance(elem, (autosar.base.SwDataDefPropsConditional, autosar.base.SwPointerTargetProps)):
-                        self.variantProps.append(elem)
-                    else:
-                        raise ValueError('Invalid type: ', type(elem))
+        ImplementationDataTypeVariantMixin.__init__(self, name, category,
+                                                    arraySize,
+                                                    arraySizeSemantics, parent,
+                                                    adminData, *args, **kwargs)
+
 
 class ApplicationDataType(Element):
     """

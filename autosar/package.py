@@ -1007,7 +1007,12 @@ class Package(object):
 
         targetProps = autosar.base.SwPointerTargetProps(targetCategory, autosar.base.SwDataDefPropsConditional(baseTypeRef = baseTypeRef, swImplPolicy=swImplPolicy))
         variantProps =  autosar.base.SwDataDefPropsConditional(swPointerTargetProps = targetProps)
-        implementationDataType = autosar.datatype.ImplementationDataType(name, variantProps, category = category, parent = self, adminData = adminDataObj)
+        implementationDataType = autosar.datatype.ImplementationDataType(
+            name,
+            variantProps=variantProps,
+            category=category,
+            parent=self,
+            adminData=adminDataObj)
         self.append(implementationDataType)
         return implementationDataType
 
@@ -1118,13 +1123,20 @@ class Package(object):
         compuMethodRef = None if compuMethodObj is None else compuMethodObj.ref
         dataConstraintRef = None if dataConstraintObj is None else dataConstraintObj.ref
 
-        variantProps = autosar.base.SwDataDefPropsConditional(swCalibrationAccess = swCalibrationAccess,
-                                                              compuMethodRef = compuMethodRef,
-                                                              dataConstraintRef = dataConstraintRef,
-                                                              baseTypeRef = baseTypeRef,
-                                                              implementationTypeRef = implementationTypeRef,
-                                                              unitRef = unitRef)
-        implementationDataType = autosar.datatype.ImplementationDataType(name, variantProps, typeEmitter=typeEmitter, category = category, parent = self, adminData = adminDataObj)
+        variantProps = autosar.base.SwDataDefPropsConditional(
+            swCalibrationAccess=swCalibrationAccess,
+            compuMethodRef=compuMethodRef,
+            dataConstraintRef=dataConstraintRef,
+            baseTypeRef=baseTypeRef,
+            implementationTypeRef=implementationTypeRef,
+            unitRef=unitRef)
+        implementationDataType = autosar.datatype.ImplementationDataType(
+            name,
+            variantProps=variantProps,
+            typeEmitter=typeEmitter,
+            category=category,
+            parent=self,
+            adminData=adminDataObj)
         self.append(implementationDataType)
         return implementationDataType
 
@@ -1143,7 +1155,11 @@ class Package(object):
             variantProps = autosar.base.SwDataDefPropsConditional(swCalibrationAccess = swCalibrationAccess)
         else:
             variantProps = None
-        dataType = autosar.datatype.ImplementationDataType(name, variantProps, category = category, adminData = adminData)
+        dataType = autosar.datatype.ImplementationDataType(
+            name,
+            variantProps=variantProps,
+            category=category,
+            adminData=adminData)
         for element in elements:
             if not isinstance(element, tuple):
                 raise ValueError('element must be a tuple')
