@@ -664,6 +664,9 @@ class InternalBehaviorCommon(Element):
         self.perInstanceMemories = []
         self.implicitVariables = []
         self.explicitVariables = []
+
+        # List of data type sets. Each data type set is itself a list containing data type references
+        self.included_datatype_sets = []
         self.swc = None
 
 

@@ -204,6 +204,11 @@ class BehaviorParser(ElementParser):
                     pass #implement later
                 elif xmlElem.tag == 'STATIC-MEMORYS':
                     pass #implement later
+                elif xmlElem.tag == 'INCLUDED-DATA-TYPE-SETS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'INCLUDED-DATA-TYPE-SET':
+                            type_refs = self.parseIncludedDataTypeSet(xmlChild)
+                            internalBehavior.included_datatype_sets.append(type_refs)
                 else:
                     raise NotImplementedError(xmlElem.tag)
             return internalBehavior
@@ -1122,3 +1127,16 @@ class BehaviorParser(ElementParser):
                 else:
                     raise NotImplementedError(xmlElem.tag)
             return descriptor
+
+    @parseElementUUID
+    def parseIncludedDataTypeSet(self, xmlRoot):
+        """Returns a list of data type references"""
+
+        assert xmlRoot.tag == 'INCLUDED-DATA-TYPE-SET'
+        data_type_refs = xmlRoot.find('DATA-TYPE-REFS')
+
+        dt_refs = []
+        for dt_ref in data_type_refs.findall('./*'):
+            dt_refs.append(dt_ref.text)
+
+        return dt_refs
