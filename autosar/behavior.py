@@ -1235,7 +1235,8 @@ class SwcInternalBehavior(InternalBehaviorCommon):
     def __init__(self,name, componentRef, multipleInstance=False,parent=None):
         super().__init__(name, componentRef, multipleInstance, parent)
         self.serviceDependencies = [] #list of SwcServiceDependency objects
-        self.parameterDataPrototype = [] #list of ParameterDataPrototye objects
+        self.sharedParameterDataPrototype = [] #list of ParameterDataPrototye objects
+        self.perInstanceParameterDataPrototype = []  #list of ParameterDataPrototye objects
         self.dataTypeMappingRefs = [] #list of strings
 
     def tag(self, version): return "SWC-INTERNAL-BEHAVIOR"
@@ -1248,7 +1249,11 @@ class SwcInternalBehavior(InternalBehaviorCommon):
             ref=ref.partition('/')
             name=ref[0]
             foundElem = None
-            for elem in self.parameterDataPrototype:
+            for elem in self.sharedParameterDataPrototype:
+                if elem.name == name:
+                    foundElem = elem
+                    break
+            for elem in self.perInstanceParameterDataPrototype:
                 if elem.name == name:
                     foundElem = elem
                     break
@@ -1287,7 +1292,20 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         if dataType is None:
             raise ValueError('invalid reference: '+implementationTypeRef)
         parameter = autosar.element.ParameterDataPrototype(name, dataType.ref, swAddressMethodRef = swAddressMethodRef, swCalibrationAccess=swCalibrationAccess, initValue=initValue, parent=self)
-        self.parameterDataPrototype.append(parameter)
+        self.sharedParameterDataPrototype.append(parameter)
+        return parameter
+
+    def createPerInstanceDataParameter(self, name, implementationTypeRef, swAddressMethodRef = None, swCalibrationAccess = None, initValue = None):
+        """
+        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal parameterDataPrototype list
+        """
+        self._initSWC()
+        ws = self.rootWS()
+        dataType = ws.find(implementationTypeRef, role='DataType')
+        if dataType is None:
+            raise ValueError('invalid reference: '+implementationTypeRef)
+        parameter = autosar.element.ParameterDataPrototype(name, dataType.ref, swAddressMethodRef = swAddressMethodRef, swCalibrationAccess=swCalibrationAccess, initValue=initValue, parent=self)
+        self.perInstanceParameterDataPrototype.append(parameter)
         return parameter
 
     def createNvmBlock(self, name, portName, perInstanceMemoryName, nvmBlockConfig = None, defaultValueName = None, perInstanceMemoryRole='ramBlock', defaultValueRole = 'defaultValue', blockAdminData = None):
@@ -1320,7 +1338,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         else:
             raise ValueError('%s: No per-instance-memory found with name "%s"'%(self.swc.name, perInstanceMemoryName))
         if defaultValueName is not None:
-            for param in self.parameterDataPrototype:
+            for param in self.sharedParameterDataPrototype:
                 if param.name == defaultValueName:
                     serviceDependency.roleBasedDataAssignments.append(RoleBasedDataAssignment(defaultValueRole, localParameterRef = param.ref))
                     break
@@ -1385,9 +1403,9 @@ class SwcInternalBehavior(InternalBehaviorCommon):
             raise RuntimeError('Runnable {0.name} must have at least one mode switch point'.format(sourceRunnable))
         if len(ref[1])==0:
             #No '/' delimiter was used. This is OK only when the source runnable has only one modeSwitchPoint (no ambiguity)
-                if len(sourceRunnable.modeSwitchPoints) > 1:
-                    raise ValueError('Ambiguous use of modeSwitchSource "{}". Please use pattern "RunnableName/PortName" in modeSwitchSource argument')
-                sourceModeSwitchPoint = sourceRunnable.modeSwitchPoints[0]
+            if len(sourceRunnable.modeSwitchPoints) > 1:
+                raise ValueError('Ambiguous use of modeSwitchSource "{}". Please use pattern "RunnableName/PortName" in modeSwitchSource argument')
+            sourceModeSwitchPoint = sourceRunnable.modeSwitchPoints[0]
         else:
             #Search through all modeSwitchPoints to find port name that matches second half of the partition split
             modePortName = ref[2]
