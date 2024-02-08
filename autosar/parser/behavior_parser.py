@@ -1137,6 +1137,6 @@ class BehaviorParser(ElementParser):
 
         dt_refs = []
         for dt_ref in data_type_refs.findall('./*'):
-            dt_refs.append(dt_ref.text)
+            dt_refs.append(self.parseTextNode(dt_ref))
 
         return dt_refs
