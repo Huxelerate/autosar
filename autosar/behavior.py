@@ -1882,7 +1882,10 @@ class WrittenReadNvData(AutosarVariableRef):
     def tag(self,version):
         return "WRITTEN-READ-NV-DATA"
     
-class IncludedDataTypeSet:
+class IncludedDataTypeSet(object):
+
+    def tag(self, version=None): return 'INCLUDED-DATA-TYPE-SET'
+
     def __init__(self, dataTypeRefs = [], literalPrefix = None):
 
         self.dataTypeRefs = dataTypeRefs
