@@ -1133,10 +1133,17 @@ class BehaviorParser(ElementParser):
         """Returns a list of data type references"""
 
         assert xmlRoot.tag == 'INCLUDED-DATA-TYPE-SET'
-        data_type_refs = xmlRoot.find('DATA-TYPE-REFS')
+        (dataTypeRefs, literalPrefix) = ([], None)
 
-        dt_refs = []
-        for dt_ref in data_type_refs.findall('./*'):
-            dt_refs.append(self.parseTextNode(dt_ref))
+        for item in xmlRoot.findall("./*"):
+            tag = item.tag
 
-        return dt_refs
+            if tag == "DATA-TYPE-REFS":
+                for dtrItem in item.findall("./*"):
+                    dataTypeRefs.append(self.parseTextNode(dtrItem))
+            elif tag == "LITERAL-PREFIX":
+                literalPrefix = self.parseTextNode(item)
+            else:
+                raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the INCLUDED-DATA-TYPE-SET element")
+
+        return autosar.behavior.IncludedDataTypeSet(dataTypeRefs=dataTypeRefs, literalPrefix=literalPrefix)
