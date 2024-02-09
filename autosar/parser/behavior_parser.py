@@ -1140,7 +1140,11 @@ class BehaviorParser(ElementParser):
 
             if tag == "DATA-TYPE-REFS":
                 for dtrItem in item.findall("./*"):
-                    dataTypeRefs.append(self.parseTextNode(dtrItem))
+                    if dtrItem.tag == "DATA-TYPE-REF":
+                        dataTypeRefs.append(self.parseTextNode(dtrItem))
+                    else: 
+                        raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the DATA-TYPE-REFS element")
+
             elif tag == "LITERAL-PREFIX":
                 literalPrefix = self.parseTextNode(item)
             else:
