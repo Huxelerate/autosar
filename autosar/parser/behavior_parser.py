@@ -1130,7 +1130,7 @@ class BehaviorParser(ElementParser):
 
     @parseElementUUID
     def parseIncludedDataTypeSet(self, xmlRoot):
-        """Returns a list of data type references"""
+        """parses <INCLUDED-DATA-TYPE-SET>"""
 
         assert xmlRoot.tag == 'INCLUDED-DATA-TYPE-SET'
         (dataTypeRefs, literalPrefix) = ([], None)
