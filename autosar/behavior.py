@@ -667,7 +667,7 @@ class InternalBehaviorCommon(Element):
 
         # List of data type sets.
         # Each data type set is an object containing data type references and an optional literal prefix
-        self.included_datatype_sets = []
+        self.includedDataTypeSets = []
         self.swc = None
 
 

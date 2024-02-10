@@ -207,8 +207,8 @@ class BehaviorParser(ElementParser):
                 elif xmlElem.tag == 'INCLUDED-DATA-TYPE-SETS':
                     for xmlChild in xmlElem.findall('./*'):
                         if xmlChild.tag == 'INCLUDED-DATA-TYPE-SET':
-                            type_refs = self.parseIncludedDataTypeSet(xmlChild)
-                            internalBehavior.included_datatype_sets.append(type_refs)
+                            includedDataTypeSet = self.parseIncludedDataTypeSet(xmlChild)
+                            internalBehavior.includedDataTypeSets.append(includedDataTypeSet)
                 else:
                     raise NotImplementedError(xmlElem.tag)
             return internalBehavior
