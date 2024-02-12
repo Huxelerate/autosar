@@ -424,7 +424,6 @@ class DataConstraint(Element):
             if (isinstance(rule, InternalConstraint) and constraintType == 'internalConstraint') or (isinstance(rule, PhysicalConstraint) and constraintType == 'physicalConstraint'):
                 return rule
 
-
 class ImplementationDataTypeBase(Element):
 
     def __init__(self, name, parent, adminData, category, variantProps=None):

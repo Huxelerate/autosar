@@ -1408,9 +1408,9 @@ class SwcInternalBehavior(InternalBehaviorCommon):
             raise RuntimeError('Runnable {0.name} must have at least one mode switch point'.format(sourceRunnable))
         if len(ref[1])==0:
             #No '/' delimiter was used. This is OK only when the source runnable has only one modeSwitchPoint (no ambiguity)
-            if len(sourceRunnable.modeSwitchPoints) > 1:
-                raise ValueError('Ambiguous use of modeSwitchSource "{}". Please use pattern "RunnableName/PortName" in modeSwitchSource argument')
-            sourceModeSwitchPoint = sourceRunnable.modeSwitchPoints[0]
+                if len(sourceRunnable.modeSwitchPoints) > 1:
+                    raise ValueError('Ambiguous use of modeSwitchSource "{}". Please use pattern "RunnableName/PortName" in modeSwitchSource argument')
+                sourceModeSwitchPoint = sourceRunnable.modeSwitchPoints[0]
         else:
             #Search through all modeSwitchPoints to find port name that matches second half of the partition split
             modePortName = ref[2]

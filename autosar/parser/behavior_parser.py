@@ -373,7 +373,7 @@ class BehaviorParser(ElementParser):
                     runnableEntity.dataReadAccess.append(variableAccess)
                 else:
                     raise NotImplementedError(xmlElem.tag)
-
+        
         if xmlDataWriteAccess is not None:
             for xmlElem in xmlDataWriteAccess.findall('./*'):
                 if xmlElem.tag == 'VARIABLE-ACCESS':
@@ -391,7 +391,7 @@ class BehaviorParser(ElementParser):
                     runnableEntity.dataLocalReadAccess.append(variableAccess)
                 else:
                     raise NotImplementedError(xmlElem.tag)
-
+        
         if xmlLocalDataWriteAccess is not None:
             for xmlElem in xmlLocalDataWriteAccess.findall('./*'):
                 if xmlElem.tag == 'VARIABLE-ACCESS':
@@ -400,7 +400,7 @@ class BehaviorParser(ElementParser):
                     runnableEntity.dataLocalWriteAccess.append(variableAccess)
                 else:
                     raise NotImplementedError(xmlElem.tag)
-
+        
         if runnableEntity is not None:
             runnableEntity.adminData = adminData
         return runnableEntity
@@ -822,7 +822,7 @@ class BehaviorParser(ElementParser):
         retval=callType(name,timeout)
         retval.operationInstanceRefs=operationInstanceRefs
         return retval
-
+    
     def parseAsyncServerCallPoint(self, xmlRoot):
         """
         parses <ASYNCHRONOUS-SERVER-CALL-POINT>
