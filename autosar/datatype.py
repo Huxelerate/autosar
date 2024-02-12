@@ -504,11 +504,10 @@ class SwBaseType(Element):
         self.nativeDeclaration = nativeDeclaration
         self.typeEncoding = typeEncoding
 
-
 class ImplementationDataTypeElement(ImplementationDataTypeBase):
     def tag(self, version=None): return 'IMPLEMENTATION-DATA-TYPE-ELEMENT'
 
-    def __init__(self, name, category = None, arraySize = None, arraySizeSemantics = None, variantProps = None, parent = None, adminData = None)
+    def __init__(self, name, category = None, arraySize = None, arraySizeSemantics = None, variantProps = None, parent = None, adminData = None):
         super().__init__(name, parent, adminData, category, variantProps)
         self.arraySize = arraySize
         self.subElements = []
