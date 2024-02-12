@@ -1,4 +1,5 @@
 import copy
+import itertools
 import autosar.component
 import autosar.portinterface
 import autosar.base
@@ -1288,7 +1289,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
 
     def createSharedDataParameter(self, name, implementationTypeRef, swAddressMethodRef = None, swCalibrationAccess = None, initValue = None):
         """
-        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal parameterDataPrototype list
+        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal sharedParameterDataPrototype list
         """
         self._initSWC()
         ws = self.rootWS()
@@ -1301,7 +1302,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
 
     def createPerInstanceDataParameter(self, name, implementationTypeRef, swAddressMethodRef = None, swCalibrationAccess = None, initValue = None):
         """
-        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal parameterDataPrototype list
+        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal perInstanceParameterDataPrototype list
         """
         self._initSWC()
         ws = self.rootWS()
@@ -1342,12 +1343,12 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         else:
             raise ValueError('%s: No per-instance-memory found with name "%s"'%(self.swc.name, perInstanceMemoryName))
         if defaultValueName is not None:
-            for param in self.sharedParameterDataPrototype:
+            for param in itertools.chain(self.sharedParameterDataPrototype, self.perInstanceParameterDataPrototype):
                 if param.name == defaultValueName:
                     serviceDependency.roleBasedDataAssignments.append(RoleBasedDataAssignment(defaultValueRole, localParameterRef = param.ref))
                     break
             else:
-                raise ValueError('%s: No shared data parameter found with name "%s"'%(self.swc.name, defaultValueName))
+                raise ValueError('%s: No data parameter found with name "%s"'%(self.swc.name, defaultValueName))
 
         self.serviceDependencies.append(serviceDependency)
         return serviceDependency

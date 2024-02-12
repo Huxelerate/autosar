@@ -425,9 +425,10 @@ class DataConstraint(Element):
                 return rule
 
 
-class ImplementationDataTypeVariantMixin():
+class ImplementationDataTypeBase(Element):
 
-    def __init__(self, *args, variantProps=None, **kwargs):
+    def __init__(self, name, parent, adminData, category, variantProps=None):
+        super().__init__(name, parent, adminData, category)
         self.variantProps = []
         if isinstance(variantProps, (autosar.base.SwDataDefPropsConditional,
                                      autosar.base.SwPointerTargetProps)):
@@ -468,30 +469,16 @@ class ImplementationDataTypeVariantMixin():
         else:
             raise RuntimeError('Element has no variantProps set')
 
-class ImplementationDataType(Element, ImplementationDataTypeVariantMixin):
+class ImplementationDataType(ImplementationDataTypeBase):
 
-    def tag(self, version=None):
-        return 'IMPLEMENTATION-DATA-TYPE'
+    def tag(self, version=None): return 'IMPLEMENTATION-DATA-TYPE'
 
-    def __init__(self,
-                 name,
-                 dynamicArraySizeProfile=None,
-                 typeEmitter=None,
-                 category='VALUE',
-                 parent=None,
-                 adminData=None,
-                 *args,
-                 **kwargs):
-        super().__init__(name, parent, adminData, category)
+    def __init__(self, name, variantProps = None, dynamicArraySizeProfile = None, typeEmitter = None, category='VALUE', parent = None, adminData = None):
+        super().__init__(name, parent, adminData, category, variantProps)
         self.dynamicArraySizeProfile = dynamicArraySizeProfile
         self.typeEmitter = typeEmitter
         self.subElements = []
         self.symbolProps = None
-        ImplementationDataTypeVariantMixin.__init__(self, name,
-                                                    dynamicArraySizeProfile,
-                                                    typeEmitter, category,
-                                                    parent, adminData, *args,
-                                                    **kwargs)
 
     def getTypeReference(self):
         """
@@ -518,20 +505,11 @@ class SwBaseType(Element):
         self.typeEncoding = typeEncoding
 
 
-class ImplementationDataTypeElement(Element,
-                                    ImplementationDataTypeVariantMixin):
+class ImplementationDataTypeElement(ImplementationDataTypeBase):
+    def tag(self, version=None): return 'IMPLEMENTATION-DATA-TYPE-ELEMENT'
 
-
-    def __init__(self,
-                 name,
-                 category=None,
-                 arraySize=None,
-                 arraySizeSemantics=None,
-                 parent=None,
-                 adminData=None,
-                 *args,
-                 **kwargs):
-        super().__init__(name, parent, adminData, category)
+    def __init__(self, name, category = None, arraySize = None, arraySizeSemantics = None, variantProps = None, parent = None, adminData = None)
+        super().__init__(name, parent, adminData, category, variantProps)
         self.arraySize = arraySize
         self.subElements = []
         if arraySize is not None:
@@ -541,10 +519,6 @@ class ImplementationDataTypeElement(Element,
                 self.arraySizeSemantics = 'FIXED-SIZE'
         else:
             self.arraySizeSemantics = None
-        ImplementationDataTypeVariantMixin.__init__(self, name, category,
-                                                    arraySize,
-                                                    arraySizeSemantics, parent,
-                                                    adminData, *args, **kwargs)
 
 
 class ApplicationDataType(Element):
