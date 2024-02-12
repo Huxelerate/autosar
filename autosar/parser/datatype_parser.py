@@ -219,14 +219,7 @@ class DataTypeParser(ElementParser):
                 subElementsXML = xmlElem
             else:
                 self.defaultHandler(xmlElem)
-        elem = autosar.datatype.ImplementationDataTypeElement(
-            self.name,
-            category=self.category,
-            arraySize=arraySize,
-            arraySizeSemantics=arraySizeSemantics,
-            parent=parent,
-            adminData=self.adminData,
-            variantProps=variants)
+        elem = autosar.datatype.ImplementationDataTypeElement(self.name, self.category, arraySize, arraySizeSemantics, variants, parent, self.adminData)
         if subElementsXML is not None:
             elem.subElements = self.parseImplementationDataTypeSubElements(
                 subElementsXML, elem)
