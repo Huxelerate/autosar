@@ -1,4 +1,5 @@
 import copy
+import itertools
 import autosar.component
 import autosar.portinterface
 import autosar.base
@@ -664,6 +665,10 @@ class InternalBehaviorCommon(Element):
         self.perInstanceMemories = []
         self.implicitVariables = []
         self.explicitVariables = []
+
+        # List of data type sets.
+        # Each data type set is an object containing data type references and an optional literal prefix
+        self.includedDataTypeSets = []
         self.swc = None
 
 
@@ -1235,7 +1240,8 @@ class SwcInternalBehavior(InternalBehaviorCommon):
     def __init__(self,name, componentRef, multipleInstance=False,parent=None):
         super().__init__(name, componentRef, multipleInstance, parent)
         self.serviceDependencies = [] #list of SwcServiceDependency objects
-        self.parameterDataPrototype = [] #list of ParameterDataPrototye objects
+        self.sharedParameterDataPrototype = [] #list of ParameterDataPrototye objects
+        self.perInstanceParameterDataPrototype = []  #list of ParameterDataPrototye objects
         self.dataTypeMappingRefs = [] #list of strings
 
     def tag(self, version): return "SWC-INTERNAL-BEHAVIOR"
@@ -1248,7 +1254,11 @@ class SwcInternalBehavior(InternalBehaviorCommon):
             ref=ref.partition('/')
             name=ref[0]
             foundElem = None
-            for elem in self.parameterDataPrototype:
+            for elem in self.sharedParameterDataPrototype:
+                if elem.name == name:
+                    foundElem = elem
+                    break
+            for elem in self.perInstanceParameterDataPrototype:
                 if elem.name == name:
                     foundElem = elem
                     break
@@ -1279,7 +1289,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
 
     def createSharedDataParameter(self, name, implementationTypeRef, swAddressMethodRef = None, swCalibrationAccess = None, initValue = None):
         """
-        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal parameterDataPrototype list
+        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal sharedParameterDataPrototype list
         """
         self._initSWC()
         ws = self.rootWS()
@@ -1287,7 +1297,20 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         if dataType is None:
             raise ValueError('invalid reference: '+implementationTypeRef)
         parameter = autosar.element.ParameterDataPrototype(name, dataType.ref, swAddressMethodRef = swAddressMethodRef, swCalibrationAccess=swCalibrationAccess, initValue=initValue, parent=self)
-        self.parameterDataPrototype.append(parameter)
+        self.sharedParameterDataPrototype.append(parameter)
+        return parameter
+
+    def createPerInstanceDataParameter(self, name, implementationTypeRef, swAddressMethodRef = None, swCalibrationAccess = None, initValue = None):
+        """
+        AUTOSAR4: Creates a ParameterDataPrototype object and appends it to the internal perInstanceParameterDataPrototype list
+        """
+        self._initSWC()
+        ws = self.rootWS()
+        dataType = ws.find(implementationTypeRef, role='DataType')
+        if dataType is None:
+            raise ValueError('invalid reference: '+implementationTypeRef)
+        parameter = autosar.element.ParameterDataPrototype(name, dataType.ref, swAddressMethodRef = swAddressMethodRef, swCalibrationAccess=swCalibrationAccess, initValue=initValue, parent=self)
+        self.perInstanceParameterDataPrototype.append(parameter)
         return parameter
 
     def createNvmBlock(self, name, portName, perInstanceMemoryName, nvmBlockConfig = None, defaultValueName = None, perInstanceMemoryRole='ramBlock', defaultValueRole = 'defaultValue', blockAdminData = None):
@@ -1320,12 +1343,12 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         else:
             raise ValueError('%s: No per-instance-memory found with name "%s"'%(self.swc.name, perInstanceMemoryName))
         if defaultValueName is not None:
-            for param in self.parameterDataPrototype:
+            for param in itertools.chain(self.sharedParameterDataPrototype, self.perInstanceParameterDataPrototype):
                 if param.name == defaultValueName:
                     serviceDependency.roleBasedDataAssignments.append(RoleBasedDataAssignment(defaultValueRole, localParameterRef = param.ref))
                     break
             else:
-                raise ValueError('%s: No shared data parameter found with name "%s"'%(self.swc.name, defaultValueName))
+                raise ValueError('%s: No data parameter found with name "%s"'%(self.swc.name, defaultValueName))
 
         self.serviceDependencies.append(serviceDependency)
         return serviceDependency
@@ -1877,3 +1900,12 @@ class WrittenReadNvData(AutosarVariableRef):
 
     def tag(self,version):
         return "WRITTEN-READ-NV-DATA"
+    
+class IncludedDataTypeSet(object):
+
+    def tag(self, version=None): return 'INCLUDED-DATA-TYPE-SET'
+
+    def __init__(self, dataTypeRefs = [], literalPrefix = None):
+
+        self.dataTypeRefs = dataTypeRefs
+        self.literalPrefix = literalPrefix

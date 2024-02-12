@@ -174,7 +174,7 @@ class BehaviorParser(ElementParser):
                         if xmlChildElem.tag == 'PARAMETER-DATA-PROTOTYPE':
                             tmp = self.parseParameterDataPrototype(xmlChildElem, internalBehavior)
                             if tmp is not None:
-                                internalBehavior.parameterDataPrototype.append(tmp)
+                                internalBehavior.sharedParameterDataPrototype.append(tmp)
                         else:
                             raise NotImplementedError(xmlChildElem.tag)
                 elif xmlElem.tag == 'EXCLUSIVE-AREAS':
@@ -185,7 +185,15 @@ class BehaviorParser(ElementParser):
                         else:
                             raise NotImplementedError(xmlChild.tag)
                 elif xmlElem.tag == 'PER-INSTANCE-PARAMETERS':
-                    pass #implement later
+                    for xmlChildElem in xmlElem.findall('./*'):
+                        if xmlChildElem.tag == 'PARAMETER-DATA-PROTOTYPE':
+                            tmp = self.parseParameterDataPrototype(
+                                xmlChildElem, internalBehavior)
+                            if tmp is not None:
+                                internalBehavior.perInstanceParameterDataPrototype.append(
+                                    tmp)
+                        else:
+                            raise NotImplementedError(xmlChildElem.tag)
                 elif xmlElem.tag == 'EXPLICIT-INTER-RUNNABLE-VARIABLES':
                     for xmlChild in xmlElem.findall('./*'):
                         if xmlChild.tag == 'VARIABLE-DATA-PROTOTYPE':
@@ -204,6 +212,11 @@ class BehaviorParser(ElementParser):
                     pass #implement later
                 elif xmlElem.tag == 'STATIC-MEMORYS':
                     pass #implement later
+                elif xmlElem.tag == 'INCLUDED-DATA-TYPE-SETS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'INCLUDED-DATA-TYPE-SET':
+                            includedDataTypeSet = self.parseIncludedDataTypeSet(xmlChild)
+                            internalBehavior.includedDataTypeSets.append(includedDataTypeSet)
                 else:
                     raise NotImplementedError(xmlElem.tag)
             return internalBehavior
@@ -1122,3 +1135,27 @@ class BehaviorParser(ElementParser):
                 else:
                     raise NotImplementedError(xmlElem.tag)
             return descriptor
+
+    @parseElementUUID
+    def parseIncludedDataTypeSet(self, xmlRoot):
+        """parses <INCLUDED-DATA-TYPE-SET>"""
+
+        assert xmlRoot.tag == 'INCLUDED-DATA-TYPE-SET'
+        (dataTypeRefs, literalPrefix) = ([], None)
+
+        for item in xmlRoot.findall("./*"):
+            tag = item.tag
+
+            if tag == "DATA-TYPE-REFS":
+                for dtrItem in item.findall("./*"):
+                    if dtrItem.tag == "DATA-TYPE-REF":
+                        dataTypeRefs.append(self.parseTextNode(dtrItem))
+                    else: 
+                        raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the DATA-TYPE-REFS element")
+
+            elif tag == "LITERAL-PREFIX":
+                literalPrefix = self.parseTextNode(item)
+            else:
+                raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the INCLUDED-DATA-TYPE-SET element")
+
+        return autosar.behavior.IncludedDataTypeSet(dataTypeRefs=dataTypeRefs, literalPrefix=literalPrefix)
