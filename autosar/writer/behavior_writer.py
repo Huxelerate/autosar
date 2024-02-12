@@ -88,6 +88,11 @@ class XMLBehaviorWriter(ElementWriter):
             for elem in internalBehavior.sharedParameterDataPrototype:
                 lines.extend(self.indent(self._writeParameterDataPrototype(ws, elem),2))
             lines.append(self.indent('</SHARED-PARAMETERS>',1))
+        if isinstance(internalBehavior, autosar.behavior.SwcInternalBehavior) and len(internalBehavior.perInstanceParameterDataPrototype)>0:
+            lines.append(self.indent('<PER-INSTANCE-PARAMETERS>',1))
+            for elem in internalBehavior.perInstanceParameterDataPrototype:
+                lines.extend(self.indent(self._writeParameterDataPrototype(ws, elem),2))
+            lines.append(self.indent('</PER-INSTANCE-PARAMETERS>',1))
         elif isinstance(internalBehavior, autosar.behavior.InternalBehavior) and len(internalBehavior.sharedCalParams)>0:
             lines.append(self.indent('<SHARED-CALPRMS>',1))
             for elem in internalBehavior.sharedCalParams:
