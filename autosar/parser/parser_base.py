@@ -434,10 +434,10 @@ class BaseParser:
             return dataElement
         else:
             self.pop()
-            if (self.name is None):
+            if self.name is None:
                 raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME and TYPE-TREF must not be None')
             else:
-                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: TYPE-TREF not defined for SHORT-NAME {self.name}')
+                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: TYPE-TREF not defined for element with SHORT-NAME "{self.name}"')
         
     
     def parseSymbolProps(self, xmlRoot):
