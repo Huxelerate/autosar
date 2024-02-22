@@ -275,10 +275,10 @@ class BaseParser:
             elif xmlItem.tag == 'SW-CALPRM-AXIS-SET':
                 swCalprmAxisSet = self.parseSwCalprmAxisSet(xmlItem)
             elif xmlItem.tag == 'SW-VALUE-BLOCK-SIZE':
-                swValueBlockSize = self.parseTextNode(xmlItem)
+                swValueBlockSize = int(self.parseTextNode(xmlItem))
             elif xmlItem.tag == 'SW-VALUE-BLOCK-SIZE-MULTS':
                 for sizeItem in xmlItem.findall('./*'):
-                    swValueBlockSizeMults.append(self.parseTextNode(sizeItem))
+                    swValueBlockSizeMults.append(int(self.parseTextNode(sizeItem)))
             elif xmlItem.tag == 'ADDITIONAL-NATIVE-TYPE-QUALIFIER':
                 pass #implement later
             elif xmlItem.tag == 'INVALID-VALUE':
