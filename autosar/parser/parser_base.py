@@ -247,6 +247,8 @@ class BaseParser:
          compuMethodRef, dataConstraintRef, swPointerTargetPropsXML,
          swImplPolicy, swAddressMethodRef, unitRef, valueAxisDataTypeRef,
          swRecordLayoutRef, swCalprmAxisSet, swValueBlockSize) = (None,) * 13
+        
+        swValueBlockSizeMults = []
         for xmlItem in xmlRoot.findall('./*'):
             if xmlItem.tag == 'BASE-TYPE-REF':
                 baseTypeRef = self.parseTextNode(xmlItem)
@@ -274,6 +276,9 @@ class BaseParser:
                 swCalprmAxisSet = self.parseSwCalprmAxisSet(xmlItem)
             elif xmlItem.tag == 'SW-VALUE-BLOCK-SIZE':
                 swValueBlockSize = self.parseTextNode(xmlItem)
+            elif xmlItem.tag == 'SW-VALUE-BLOCK-SIZE-MULTS':
+                for sizeItem in xmlItem.findall('./*'):
+                    swValueBlockSizeMults.append(self.parseTextNode(sizeItem))
             elif xmlItem.tag == 'ADDITIONAL-NATIVE-TYPE-QUALIFIER':
                 pass #implement later
             elif xmlItem.tag == 'INVALID-VALUE':
@@ -298,7 +303,8 @@ class BaseParser:
             valueAxisDataTypeRef=valueAxisDataTypeRef,
             swRecordLayoutRef=swRecordLayoutRef,
             swCalprmAxisSet=swCalprmAxisSet,
-            swValueBlockSize=swValueBlockSize
+            swValueBlockSize=swValueBlockSize,
+            swValueBlockSizeMults=swValueBlockSizeMults
         )
         if swPointerTargetPropsXML is not None:
             variant.swPointerTargetProps = self.parseSwPointerTargetProps(swPointerTargetPropsXML, variant)
