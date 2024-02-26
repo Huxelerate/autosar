@@ -1,6 +1,5 @@
 import abc
 from collections import deque
-from autosar import autosar
 from autosar.base import (AdminData, SpecialDataGroup, SpecialData,
                           SwDataDefPropsConditional, SwCalprmAxis,
                           SwAxisIndividual, SwAxisGrouped,
