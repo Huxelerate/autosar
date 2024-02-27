@@ -422,27 +422,6 @@ class BaseParser:
             accessedParameter=accessedParameter
         )
 
-    def parseParameterInstanceRef(self, xmlRoot):
-        """parses <AUTOSAR-PARAMETER-IREF>"""
-        assert(xmlRoot.tag == 'AUTOSAR-PARAMETER-IREF')
-        (portRef, parameterDataRef, rootParameterDataRef, contextDataRef) = (None, None, None, None)
-
-        for itemXML in xmlRoot.findall("./*"):
-            tag = itemXML.tag
-
-            if tag == "PORT-PROTOTYPE-REF":
-                portRef = self.parseTextNode(itemXML)
-            elif tag == "TARGET-DATA-PROTOTYPE-REF":
-                parameterDataRef = self.parseTextNode(itemXML)
-            elif tag == "ROOT-PARAMETER-DATA-PROTOTYPE-REF":
-                rootParameterDataRef = self.parseTextNode(itemXML)
-            elif tag == "CONTEXT-DATA-PROTOTYPE-REF":
-                contextDataRef = self.parseTextNode(itemXML)
-            else:
-                raise RuntimeError(f"ERROR: Tag {tag} not recognized")
-
-        return autosar.behavior.ParameterInstanceRef(portRef, parameterDataRef, rootParameterDataRef, contextDataRef)
-
     def parseSwPointerTargetProps(self, rootXML, parent = None):
         assert (rootXML.tag == 'SW-POINTER-TARGET-PROPS')
         props = SwPointerTargetProps()
