@@ -403,6 +403,9 @@ class BaseParser:
             elif tag == "SW-AXIS-INDEX":
                 swAxisIndex = self.parseTextNode(itemXML)
             elif tag == "AR-PARAMETER":
+                # TODO: from specification, the <AR-PARAMETER> tag should also be supported
+                #       for the <SW-DATA-DEPENDENCY-ARGS> element which is defined as a descendent
+                #       of <SW-DATA-DEF-PROPS>
                 for xmlChild in itemXML.findall('./*'):
                     if xmlChild.tag == 'AUTOSAR-PARAMETER-IREF':
                         accessedParameter = self.parseParameterInstanceRef(xmlChild)
@@ -422,9 +425,23 @@ class BaseParser:
     def parseParameterInstanceRef(self, xmlRoot):
         """parses <AUTOSAR-PARAMETER-IREF>"""
         assert(xmlRoot.tag == 'AUTOSAR-PARAMETER-IREF')
-        portRef = self.parseTextNode(xmlRoot.find('PORT-PROTOTYPE-REF'))
-        parameterDataRef = self.parseTextNode(xmlRoot.find('TARGET-DATA-PROTOTYPE-REF'))
-        return autosar.behavior.ParameterInstanceRef(portRef, parameterDataRef)
+        (portRef, parameterDataRef, rootParameterDataRef, contextDataRef) = (None, None, None, None)
+
+        for itemXML in xmlRoot.findall("./*"):
+            tag = itemXML.tag
+
+            if tag == "PORT-PROTOTYPE-REF":
+                portRef = self.parseTextNode(itemXML)
+            elif tag == "TARGET-DATA-PROTOTYPE-REF":
+                parameterDataRef = self.parseTextNode(itemXML)
+            elif tag == "ROOT-PARAMETER-DATA-PROTOTYPE-REF":
+                rootParameterDataRef = self.parseTextNode(itemXML)
+            elif tag == "CONTEXT-DATA-PROTOTYPE-REF":
+                contextDataRef = self.parseTextNode(itemXML)
+            else:
+                raise RuntimeError(f"ERROR: Tag {tag} not recognized")
+
+        return autosar.behavior.ParameterInstanceRef(portRef, parameterDataRef, rootParameterDataRef, contextDataRef)
 
     def parseSwPointerTargetProps(self, rootXML, parent = None):
         assert (rootXML.tag == 'SW-POINTER-TARGET-PROPS')
