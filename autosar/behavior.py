@@ -1243,6 +1243,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         self.sharedParameterDataPrototype = [] #list of ParameterDataPrototye objects
         self.perInstanceParameterDataPrototype = []  #list of ParameterDataPrototye objects
         self.dataTypeMappingRefs = [] #list of strings
+        self.constantMemories = [] #list of ParameterDataPrototye objects
 
     def tag(self, version): return "SWC-INTERNAL-BEHAVIOR"
 
