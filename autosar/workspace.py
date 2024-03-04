@@ -182,15 +182,24 @@ class Workspace:
     def openParsedXML(self, xml: ElementTree.ElementTree):
         self._openXML(xml.getroot())
 
-    def loadXML(self, filename, roles=None):
+    def _loadXML(self, roles=None):
         global _validWSRoles
-        self.openXML(filename)
         self.loadPackage('*')
         if roles is not None:
             if not isinstance(roles, collections.abc.Mapping):
                 raise ValueError('roles parameter must be a dictionary or Mapping')
             for ref,role in roles.items():
                 self.setRole(ref,role)
+    
+    def loadXML(self, filename, roles=None):
+        global _validWSRoles
+        self.openXML(filename)
+        self._loadXML(roles)
+
+    def loadParsedXML(self, xml: ElementTree.ElementTree, roles=None):
+        global _validWSRoles
+        self.openParsedXML(xml)
+        self._loadXML(roles)
 
     def loadPackage(self, packagename, role=None):
         found=False
