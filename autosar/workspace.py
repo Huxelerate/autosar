@@ -177,7 +177,7 @@ class Workspace:
     
     def openXML(self, filename):
         xmlroot = parseXMLFile(filename)
-        self.openXML(xmlroot)
+        self._openXML(xmlroot)
     
     def openParsedXML(self, xml: ElementTree.ElementTree):
         self._openXML(xml.getroot())
