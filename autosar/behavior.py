@@ -1328,7 +1328,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         if dataType is None:
             raise ValueError('invalid reference: '+implementationTypeRef)
         parameter = autosar.element.ParameterDataPrototype(name, dataType.ref, swAddressMethodRef = swAddressMethodRef, swCalibrationAccess=swCalibrationAccess, initValue=initValue, parent=self)
-        self.perInstanceParameterDataPrototype.append(parameter)
+        self.constantMemories.append(parameter)
         return parameter
 
     def createNvmBlock(self, name, portName, perInstanceMemoryName, nvmBlockConfig = None, defaultValueName = None, perInstanceMemoryRole='ramBlock', defaultValueRole = 'defaultValue', blockAdminData = None):
