@@ -1263,6 +1263,10 @@ class SwcInternalBehavior(InternalBehaviorCommon):
                 if elem.name == name:
                     foundElem = elem
                     break
+            for elem in self.constantMemories:
+                if elem.name == name:
+                    foundElem = elem
+                    break
             if foundElem is not None:
                 if len(ref[2])>0:
                     return foundElem.find(ref[2])
