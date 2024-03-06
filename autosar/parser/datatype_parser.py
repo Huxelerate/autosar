@@ -326,7 +326,7 @@ class DataTypeParser(ElementParser):
     @parseElementUUID
     def parseApplicationArrayElement(self, xmlRoot):
         assert (xmlRoot.tag == 'ELEMENT')
-        (typeRef, arraySize, sizeHandling, sizeSemantics, arraySizeHandling) = (None, None, None, None, None)
+        (typeRef, arraySize, sizeHandling, sizeSemantics) = (None, None, None, None)
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'TYPE-TREF':
@@ -412,7 +412,7 @@ class DataTypeParser(ElementParser):
         for literal in autosar.datatype.ArraySizeHandlingEnum:
             if literal.value == text:
                 return literal
-        raise ValueError(f"Invalid value for ArraySizeHandling field: {text}")
+        raise ValueError(f"Invalid value for ArraySizeHandling field: '{text}'")
 
 class DataTypeSemanticsParser(ElementParser):
     def __init__(self,version=3.0):
