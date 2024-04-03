@@ -1198,7 +1198,6 @@ class BehaviorParser(ElementParser):
 
         for item in xmlRoot.findall("./*"):
             tag = item.tag
-            binding_time = item.get("BINDING-TIME")
             
             if tag == "SHORT-NAME":
                 name = self.parseTextNode(item)
@@ -1206,6 +1205,7 @@ class BehaviorParser(ElementParser):
                 category = self.parseTextNode(item)
             elif tag == "CONDITION-ACCESS":
                 # TODO: Implement
+                binding_time = item.get("BINDING-TIME")
                 condition_access = ''.join(item.itertext())
             elif tag == "IMPLEMENTATION-DATA-TYPE-REF":
                 # TODO: Implement
