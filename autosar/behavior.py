@@ -1256,7 +1256,12 @@ class SwcInternalBehavior(InternalBehaviorCommon):
             ref=ref.partition('/')
             name=ref[0]
             foundElem = None
-            for elem in itertools.chain(self.serviceDependencies, self.sharedParameterDataPrototype, self.perInstanceParameterDataPrototype, self.dataTypeMappingRefs, self.constantMemories, self.variationPointProxies):
+            for elem in itertools.chain(
+                self.serviceDependencies,
+                self.sharedParameterDataPrototype,
+                self.perInstanceParameterDataPrototype,
+                self.constantMemories,
+                self.variationPointProxies):
                 if elem.name == name:
                     foundElem = elem
                     break
