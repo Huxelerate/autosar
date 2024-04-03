@@ -1196,27 +1196,44 @@ class BehaviorParser(ElementParser):
         assert xmlRoot.tag == 'VARIATION-POINT-PROXY'
         (name, category, binding_time, condition_access) = (None, None, None, None)
 
+        category_items = xmlRoot.findall("./CATEGORY")
+        assert len(category_items) == 1, "Only one CATEGORY element is allowed in the VARIATION-POINT-PROXY element"
+
+        category = self.parseTextNode(category_items[0])
+        assert category in ("CONDITION", "VALUE"), f"Category '{category}' is not supported in the AUTOSAR specification for the VARIATION-POINT-PROXY element"
+
         for item in xmlRoot.findall("./*"):
             tag = item.tag
             
             if tag == "SHORT-NAME":
                 name = self.parseTextNode(item)
             elif tag == "CATEGORY":
-                category = self.parseTextNode(item)
+                continue # Already evaluated
             elif tag == "CONDITION-ACCESS":
-                # TODO: Implement
+                if category != "CONDITION":
+                    raise RuntimeError("CONDITION-ACCESS is only allowed when the category is 'CONDITION'")
                 binding_time = item.get("BINDING-TIME")
+                # TODO: Implement condition by formula parsing
                 condition_access = ''.join(item.itertext())
+            elif tag == "VALUE-ACCESS":
+                if category != "VALUE":
+                    raise RuntimeError("VALUE-ACCESS is only allowed when the category is 'VALUE'")
+                binding_time = item.get("BINDING-TIME")
+                # TODO: Implement
+                raise NotImplementedError(tag)
             elif tag == "IMPLEMENTATION-DATA-TYPE-REF":
+                if category != "VALUE":
+                    raise RuntimeError("IMPLEMENTATION-DATA-TYPE-REF is only allowed when the category is 'VALUE'")
                 # TODO: Implement
                 raise NotImplementedError(tag)
             elif tag == "POST-BUILD-VALUE-ACCESS-REF":
+                if category != "VALUE":
+                    raise RuntimeError("POST-BUILD-VALUE-ACCESS-REF is only allowed when the category is 'VALUE'")
                 # TODO: Implement
                 raise NotImplementedError(tag)
             elif tag == "POST-BUILD-VARIANT-CONDITIONS":
-                # TODO: Implement
-                raise NotImplementedError(tag)
-            elif tag == "VALUE-ACCESS":
+                if category != "CONDITION":
+                    raise RuntimeError("POST-BUILD-VARIANT-CONDITIONS is only allowed when the category is 'CONDITION'")
                 # TODO: Implement
                 raise NotImplementedError(tag)
             else:
