@@ -1946,6 +1946,8 @@ class VariationPointProxy(Element):
     def __init__(self, name, category, binding_time, condition_access, parent=None, adminData=None):
         super().__init__(name, parent, adminData)
         self.category = category
+        if category in ['VALUE', 'CONDITION'] and binding_time is None:
+            raise ValueError(f'For the variation point {name}, a "BINDING-TIME" must be provided')
         self.binding_time = binding_time
         self.condition_access = condition_access
 

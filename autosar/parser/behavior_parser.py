@@ -1200,7 +1200,6 @@ class BehaviorParser(ElementParser):
         assert len(category_items) == 1, "Only one CATEGORY element is allowed in the VARIATION-POINT-PROXY element"
 
         category = self.parseTextNode(category_items[0])
-        assert category in ("CONDITION", "VALUE"), f"Category '{category}' is not supported in the AUTOSAR specification for the VARIATION-POINT-PROXY element"
 
         for item in xmlRoot.findall("./*"):
             tag = item.tag
