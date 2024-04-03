@@ -225,6 +225,13 @@ class BehaviorParser(ElementParser):
                                 internalBehavior.constantMemories.append(tmp)
                         else:
                             raise NotImplementedError(xmlChild.tag)
+                elif xmlElem.tag == 'VARIATION-POINT-PROXYS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'VARIATION-POINT-PROXY':
+                            variationPointProxy = self.parseVariationPointProxy(xmlChild, internalBehavior)
+                            internalBehavior.variationPointProxies.append(variationPointProxy)
+                        else:
+                            raise NotImplementedError(xmlChild.tag)
                 else:
                     raise NotImplementedError(xmlElem.tag)
             return internalBehavior
@@ -1181,3 +1188,38 @@ class BehaviorParser(ElementParser):
                 raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the INCLUDED-DATA-TYPE-SET element")
 
         return autosar.behavior.IncludedDataTypeSet(dataTypeRefs=dataTypeRefs, literalPrefix=literalPrefix)
+
+    @parseElementUUID
+    def parseVariationPointProxy(self, xmlRoot, parent):
+        """parses <VARIATION-POINT-PROXY>"""
+
+        assert xmlRoot.tag == 'VARIATION-POINT-PROXY'
+        (name, category, binding_time, condition_access) = (None, None, None, None)
+
+        for item in xmlRoot.findall("./*"):
+            tag = item.tag
+            binding_time = item.get("BINDING-TIME")
+            
+            if tag == "SHORT-NAME":
+                name = self.parseTextNode(item)
+            elif tag == "CATEGORY":
+                category = self.parseTextNode(item)
+            elif tag == "CONDITION-ACCESS":
+                # TODO: Implement
+                condition_access = ''.join(item.itertext())
+            elif tag == "IMPLEMENTATION-DATA-TYPE-REF":
+                # TODO: Implement
+                raise NotImplementedError(tag)
+            elif tag == "POST-BUILD-VALUE-ACCESS-REF":
+                # TODO: Implement
+                raise NotImplementedError(tag)
+            elif tag == "POST-BUILD-VARIANT-CONDITIONS":
+                # TODO: Implement
+                raise NotImplementedError(tag)
+            elif tag == "VALUE-ACCESS":
+                # TODO: Implement
+                raise NotImplementedError(tag)
+            else:
+                raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the VARIATION-POINT-PROXY element")
+
+        return autosar.behavior.VariationPointProxy(name=name, category=category, binding_time=binding_time, condition_access=condition_access, parent=parent)
