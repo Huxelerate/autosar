@@ -1072,11 +1072,12 @@ class CodeBehaviorWriter(ElementWriter):
         lines = []
         lines.append('<%s>'%variationPointProxy.tag(self.version))
         lines.append(self.indent('<SHORT-NAME>%s</SHORT-NAME>'%variationPointProxy.name,1))
+        binding_time = f" BINDING-TIME=\"{variationPointProxy.binding_time}\"" if variationPointProxy.binding_time is not None else ""    
         if variationPointProxy.adminData is not None:
             lines.extend(self.indent(self.writeAdminDataXML(variationPointProxy.adminData),1))
         if variationPointProxy.category is not None:
             lines.append(self.indent(f'<CATEGORY>{variationPointProxy.category}</CATEGORY>',1))
         if variationPointProxy.condition_access is not None:
-            lines.append(self.indent(f'<CONDITION-ACCESS{f' BINDING-TIME=\"{variationPointProxy.binding_time}\"' if variationPointProxy.binding_time is not None else ''}>{variationPointProxy.condition_access}</CONDITION-ACCESS>',1))
+            lines.append(self.indent(f"<CONDITION-ACCESS{binding_time}>{variationPointProxy.condition_access}</CONDITION-ACCESS>",1))
         lines.append('</%s>'%variationPointProxy.tag(self.version))
         return lines
