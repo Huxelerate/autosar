@@ -184,12 +184,19 @@ class ProvideModeGroupInstanceRef(ModeGroupInstanceRef):
             raise RuntimeError('Not supported in v%.1f'%version)
 
 class PortAPIOption():
-    def __init__(self,portRef,takeAddress=False,indirectAPI=False):
+    def __init__(self,portRef,takeAddress=False,indirectAPI=False,portArgValues=None):
         self.portRef = portRef
         self.takeAddress = bool(takeAddress)
         self.indirectAPI = bool(indirectAPI)
+        self.portArgValues = portArgValues
     def asdict(self):
-        data={'type': self.__class__.__name__,'takeAddress':self.takeAddress, 'indirectAPI':self.indirectAPI, 'portRef':self.portRef}
+        data={
+            'type': self.__class__.__name__,
+            'takeAddress':self.takeAddress,
+            'indirectAPI':self.indirectAPI,
+            'portRef':self.portRef,
+            'portArgValues':self.portArgValues
+        }
         return data
 
     def tag(self,version=None): return "PORT-API-OPTION"

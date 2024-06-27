@@ -292,3 +292,12 @@ class SwAxisCont:
                 self.values = list(values)
             else:
                 self.values = values
+
+class PortDefinedArgumentValue:
+    def tag(self, version): return 'PORT-DEFINED-ARGUMENT-VALUE'
+
+    def __init__(self, value, valueTypeRef):
+        self.value = value
+        if value is not None:
+            value.parent = self
+        self.valueTypeRef = valueTypeRef
