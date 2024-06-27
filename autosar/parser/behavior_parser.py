@@ -152,12 +152,12 @@ class BehaviorParser(ElementParser):
                         enableTakeAddress = self.parseBooleanNode(xmlOption.find('ENABLE-TAKE-ADDRESS'))
                         indirectApi = self.parseBooleanNode(xmlOption.find('INDIRECT-API'))
                         portRef = self.parseTextNode(xmlOption.find('PORT-REF'))
-                        portAPIOption = autosar.behavior.PortAPIOption(portRef, enableTakeAddress, indirectApi)
                         
                         portArgValues = []
                         for xmlPortDefinedArgumentValue in xmlOption.findall('./PORT-ARG-VALUES/PORT-DEFINED-ARGUMENT-VALUE'):
                             portArgValues.append(self.constantParser.parsePortDefinedArgumentValue(xmlPortDefinedArgumentValue))
-                        portAPIOption.portArgValues = portArgValues
+
+                        portAPIOption = autosar.behavior.PortAPIOption(portRef, enableTakeAddress, indirectApi, portArgValues)
                         
                         if portAPIOption is not None: internalBehavior.portAPIOptions.append(portAPIOption)
                 elif xmlElem.tag == 'RUNNABLES':
