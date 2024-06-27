@@ -195,8 +195,9 @@ class PortAPIOption():
             'takeAddress':self.takeAddress,
             'indirectAPI':self.indirectAPI,
             'portRef':self.portRef,
-            'portArgValues':self.portArgValues
         }
+        if self.portArgValues is not None:
+            data['portArgValues']=[x.asdict() for x in self.portArgValues]
         return data
 
     def tag(self,version=None): return "PORT-API-OPTION"
