@@ -119,11 +119,9 @@ class ParameterInterface(PortInterface):
         """
         adds elem to the self.parameters list and sets elem.parent to self (the port interface)
         """
-        if (
-            not isinstance(elem, autosar.element.AutosarDataPrototype)
-            or elem.role is not autosar.element.AutosarDataPrototype.Role.Parameter
-        ):
+        if not isinstance(elem, AutosarDataPrototype) or elem.role is not AutosarDataPrototype.Role.Parameter:
             raise ValueError("Expected elem variable to be of type AutosarDataPrototype (Parameter)")
+
         self.parameters.append(elem)
         elem.parent=self
 

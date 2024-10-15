@@ -84,7 +84,9 @@ class AutosarDataPrototype(Element):
 
     def tag(self,version):
         return self.role if version >= 4.0 else AutosarDataPrototype._AR4_TO_AR3_ROLE_MAP[self.role]
+
     def __init__(
+
         self,
         role: Role,
         name,

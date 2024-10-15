@@ -1,4 +1,4 @@
-import autosar.element
+from autosar.element import AutosarDataPrototype
 from autosar.writer.writer_base import ElementWriter
 import autosar.portinterface
 
@@ -93,7 +93,8 @@ class XMLPortInterfaceWriter(ElementWriter):
         return lines
 
     def writeCalParamElementXML(self,elem):
-        assert(isinstance(elem,autosar.element.AutosarDataPrototype) and elem.role is autosar.element.AutosarDataPrototype.Role.Parameter)
+        assert(isinstance(elem, AutosarDataPrototype) and elem.role is AutosarDataPrototype.Role.Parameter)
+
         lines=[]
         lines.append('<CALPRM-ELEMENT-PROTOTYPE>')
         lines.append(self.indent('<SHORT-NAME>%s</SHORT-NAME>'%elem.name,1))
