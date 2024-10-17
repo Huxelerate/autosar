@@ -306,6 +306,8 @@ class BehaviorParser(ElementParser):
                     xmlCanEnterExclusiveAreas=xmlElem
                 elif xmlElem.tag == 'MINIMUM-START-INTERVAL':
                     minStartInterval = self.parseNumberNode(xmlElem)
+                elif xmlElem.tag =='ADMIN-DATA':
+                    adminData=self.parseAdminDataNode(xmlElem)
                 elif xmlElem.tag == 'PARAMETER-ACCESSS':
                     xmlParameterAccessPoints = xmlElem
                 elif xmlElem.tag == 'MODE-SWITCH-POINTS':
