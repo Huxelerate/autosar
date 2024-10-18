@@ -515,10 +515,13 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                     if xmlChild.tag == 'CONSTANT-REFERENCE':
                         specializedAutosarDataPrototype.initValueRef = self.parseTextNode(xmlChild.find('./CONSTANT-REF'))
                     else:
-                        values = self.constantParser.parseValueV4(xmlElem, specializedAutosarDataPrototype)
-                        if len(values) != 1:
-                            raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
-                        specializedAutosarDataPrototype.initValue = values[0]
+                        try:
+                            values = self.constantParser.parseValueV4(xmlElem, specializedAutosarDataPrototype)
+                            if len(values) != 1:
+                                raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
+                            specializedAutosarDataPrototype.initValue = values[0]
+                        except NotImplementedError as e:
+                            print(f"WARNING: <{e.args[0]}> is not currently supported and will be considered as 0 (defined in entity named '{self.name}')")
 
             if (props_variants is not None) and len(props_variants) > 0:
                 specializedAutosarDataPrototype.setProps(props_variants[0])
