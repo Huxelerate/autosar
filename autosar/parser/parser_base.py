@@ -488,16 +488,22 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
         dataPrototypeRole = autosar.element.AutosarDataPrototype.TAG_TO_ROLE_MAP.get(xmlRoot.tag)
         if dataPrototypeRole is None:
             raise NotImplementedError(xmlRoot.tag)
-        (typeRef, props_variants, isQueued) = (None, None, False)
+        (typeRef, props_variants, isQueued, initValue, initValueRef) = (None, None, False, None, None)
         self.push()
-        initValueElement = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'TYPE-TREF':
                 typeRef = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'SW-DATA-DEF-PROPS':
                 props_variants = self.parseSwDataDefProps(xmlElem)
             elif xmlElem.tag == 'INIT-VALUE':
-                initValueElement = xmlElem
+                for xmlChild in xmlElem.findall('./*'):
+                    if xmlChild.tag == 'CONSTANT-REFERENCE':
+                        initValueRef = self.parseTextNode(xmlChild.find('./CONSTANT-REF'))
+                    else:
+                        values = self.constantParser.parseValueV4(xmlElem, None)
+                        if len(values) != 1:
+                            raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
+                        initValue = values[0]
             else:
                 self.defaultHandler(xmlElem)
         if (self.name is not None) and (typeRef is not None):
@@ -506,20 +512,12 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                 self.name,
                 typeRef,
                 isQueued,
+                initValue = initValue,
+                initValueRef = initValueRef,
                 category = self.category,
                 parent = parent,
                 adminData = self.adminData
             )
-            if initValueElement is not None:
-                for xmlChild in initValueElement.findall('./*'):
-                    if xmlChild.tag == 'CONSTANT-REFERENCE':
-                        specializedAutosarDataPrototype.initValueRef = self.parseTextNode(xmlChild.find('./CONSTANT-REF'))
-                    else:
-                        values = self.constantParser.parseValueV4(xmlElem, specializedAutosarDataPrototype)
-                        if len(values) != 1:
-                            raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
-                        specializedAutosarDataPrototype.initValue = values[0]
-
             if (props_variants is not None) and len(props_variants) > 0:
                 specializedAutosarDataPrototype.setProps(props_variants[0])
             self.pop(specializedAutosarDataPrototype)

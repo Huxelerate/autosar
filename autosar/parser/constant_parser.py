@@ -123,17 +123,7 @@ class ConstantParser(ElementParser):
             elif xmlElem.tag == 'APPLICATION-VALUE-SPECIFICATION':
                 result.append(self._parseApplicationValueSpecification(xmlElem, parent))
             else:
-                #TODO: Implement remaining VALUE-SPECIFICATION
-                warning_cause = (
-                    f" (parent name: {parent.name})"
-                    if parent is not None 
-                        and hasattr(parent, 'name') 
-                        and parent.name is not None 
-                        and len(str(parent.name)) > 0 
-                    else ''
-                )
-                print(f"WARNING: <{xmlElem.tag}> is not currently supported and will be considered as 0{warning_cause}")
-                result.append(autosar.constant.NumericalValue(None, 0, parent))
+                raise NotImplementedError(xmlElem.tag)
         return result
 
     def _parseTextValueSpecification(self, xmlValue, parent):
