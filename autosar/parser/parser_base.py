@@ -521,7 +521,7 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                                 raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
                             specializedAutosarDataPrototype.initValue = values[0]
                         except NotImplementedError as e:
-                            print(f"WARNING: <{e.args[0]}> is not currently supported and will be considered as 0 (defined in entity named '{self.name}')")
+                            print(f"WARNING: <{e.args[0]}> (defined in entity named '{self.name}') is not currently supported and will be ignored")
 
             if (props_variants is not None) and len(props_variants) > 0:
                 specializedAutosarDataPrototype.setProps(props_variants[0])
