@@ -1,7 +1,7 @@
 import sys
 from autosar.parser.parser_base import EntityParser, parseElementUUID
 import autosar.datatype
-from autosar.util.errorHandler import handleNotImplementedError
+from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 class DataTypeParser(EntityParser):
     def __init__(self,version=3.0):
@@ -413,7 +413,7 @@ class DataTypeParser(EntityParser):
         for literal in autosar.datatype.ArraySizeHandlingEnum:
             if literal.value == text:
                 return literal
-        raise ValueError(f"Invalid value for ArraySizeHandling field: '{text}'")
+        handleValueError(f"Invalid value for ArraySizeHandling field: '{text}'")
 
 class DataTypeSemanticsParser(EntityParser):
     def __init__(self,version=3.0):

@@ -3,6 +3,8 @@ import autosar.datatype
 import collections
 import sys
 
+from autosar.util.errorHandler import handleNotImplementedError
+
 class ValueBuilder:
     """
     Builds AUTOSAR 4 value specifications from python data

@@ -5,6 +5,7 @@ import sys
 from autosar.base import splitRef, hasAdminData, parseAdminDataNode
 import autosar.component
 from autosar.parser.parser_base import EntityParser, parseElementUUID
+from autosar.util.errorHandler import handleNotImplementedError
 
 class SwcImplementationParser(EntityParser):
     """

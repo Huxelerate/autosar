@@ -3,7 +3,7 @@ from autosar.base import splitRef, hasAdminData, parseAdminDataNode
 import autosar.component
 from autosar.parser.behavior_parser import BehaviorParser
 from autosar.parser.parser_base import EntityParser, parseElementUUID
-from autosar.util.errorHandler import handleNotImplementedError
+from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 def _getDataElemNameFromComSpec(xmlElem,portInterfaceRef):
     if xmlElem.find('./DATA-ELEMENT-REF') is not None:
@@ -119,7 +119,7 @@ class ComponentTypeParser(EntityParser):
                 elif xmlElem.tag == 'INTERNAL-BEHAVIORS':
                     behaviors = xmlElem.findall('./SWC-INTERNAL-BEHAVIOR')
                     if len(behaviors)>1:
-                        raise ValueError('%s: an SWC cannot have multiple internal behaviors'%(componentType))
+                        handleValueError('%s: an SWC cannot have multiple internal behaviors'%(componentType))
                     elif len(behaviors) == 1:
                         componentType.behavior = self.behavior_parser.parseSWCInternalBehavior(behaviors[0], componentType)
                 elif xmlElem.tag == 'NV-BLOCK-DESCRIPTORS' and isinstance(componentType, autosar.component.NvBlockComponent):
@@ -439,6 +439,7 @@ class ComponentTypeParser(EntityParser):
             else:
                 values = self.constantParser.parseValueV4(xmlElem, None)
                 if len(values) != 1:
-                    raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
-                initValue = values[0]
+                    handleValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
+                else:
+                    initValue = values[0]
         return (initValue, initValueRef)

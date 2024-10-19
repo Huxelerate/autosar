@@ -1,5 +1,6 @@
 import autosar.datatype
 import copy
+from autosar.util.errorHandler import handleNotImplementedError
 import cfile as C
 
 #PortInstance = namedtuple('PortRef', 'component port')

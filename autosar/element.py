@@ -2,6 +2,7 @@ from enum import Enum
 import itertools
 from types import MappingProxyType
 import autosar.base
+from autosar.util.errorHandler import handleNotImplementedError
 
 class Element:
     def __init__(self, name, parent = None, adminData = None, category = None, uuid = None):

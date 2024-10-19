@@ -4,6 +4,7 @@ import autosar.base
 import autosar.element
 import autosar.mode
 from autosar.parser.parser_base import EntityParser, parseElementUUID
+from autosar.util.errorHandler import handleNotImplementedError
 
 class PortInterfacePackageParser(EntityParser):
     def __init__(self, version=3.0):

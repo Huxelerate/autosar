@@ -8,7 +8,7 @@ import autosar.element
 import xml
 from functools import wraps
 
-from autosar.util.errorHandler import handleNotImplementedError
+from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 def _parseBoolean(value):
     if value is None:
@@ -16,7 +16,7 @@ def _parseBoolean(value):
     if isinstance(value,str):
         if value == 'true': return True
         elif value =='false': return False
-    raise ValueError(value)
+    handleValueError(value)
 
 def parseElementUUID(parser_func):
     """
@@ -504,8 +504,9 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                     else:
                         values = self.constantParser.parseValueV4(xmlElem, None)
                         if len(values) != 1:
-                            raise ValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
-                        initValue = values[0]
+                            handleValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
+                        else:
+                            initValue = values[0]
             else:
                 self.defaultHandler(xmlElem)
         if (self.name is not None) and (typeRef is not None):

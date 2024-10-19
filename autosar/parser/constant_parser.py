@@ -2,7 +2,7 @@ from autosar.element import Element
 import autosar.constant
 from autosar.base import hasAdminData,parseAdminDataNode
 from autosar.parser.parser_base import ElementParser, parseElementUUID
-from autosar.util.errorHandler import handleNotImplementedError
+from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 class ConstantParser(ElementParser):
     """
@@ -43,7 +43,7 @@ class ConstantParser(ElementParser):
             elif xmlValueSpec is not None:
                 values = self.parseValueV4(xmlValueSpec, constant)
                 if len(values) != 1:
-                    raise ValueError('A value specification must contain exactly one element')
+                    handleValueError('A value specification must contain exactly one element')
                 constant.value = values[0]
             retval = constant
         else:
@@ -60,14 +60,14 @@ class ConstantParser(ElementParser):
         for xmlElem in xmlElem.findall('./*'):
             if xmlElem.tag == 'VALUE':
                 if value is not None:
-                    raise ValueError('PortDefinedArgumentValue must not contain more than one <VALUE> element')
+                    handleValueError('PortDefinedArgumentValue must not contain more than one <VALUE> element')
                 values = self.parseValueV4(xmlElem, parent)
                 if len(values) != 1:
-                    raise ValueError('A value specification must contain exactly one element')
+                    handleValueError('A value specification must contain exactly one element')
                 value = values[0]
             elif xmlElem.tag == 'VALUE-TYPE-TREF':
                 if valueTypeRef is not None:
-                    raise ValueError('PortDefinedArgumentValue must not contain more than one <VALUE-TYPE-TREF> element')
+                    handleValueError('PortDefinedArgumentValue must not contain more than one <VALUE-TYPE-TREF> element')
                 valueTypeRef = self.parseTextNode(xmlElem)
             else:
                 self.defaultHandler(xmlElem)

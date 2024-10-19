@@ -1,6 +1,6 @@
 import autosar.behavior, autosar.element
 from autosar.parser.parser_base import EntityParser, parseElementUUID
-from autosar.util.errorHandler import handleNotImplementedError
+from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 class BehaviorParser(EntityParser):
     def __init__(self,version=3.0):
@@ -59,7 +59,7 @@ class BehaviorParser(EntityParser):
                         if event is not None:
                             internalBehavior.events.append(event)
                         else:
-                            raise ValueError('event')
+                            handleValueError('event')
                 elif xmlNode.tag == 'PORT-API-OPTIONS':
                     for xmlOption in xmlNode.findall('./PORT-API-OPTION'):
                         portAPIOption = autosar.behavior.PortAPIOption(self.parseTextNode(xmlOption.find('PORT-REF')),self.parseBooleanNode(xmlOption.find('ENABLE-TAKE-ADDRESS')),self.parseBooleanNode(xmlOption.find('INDIRECT-API')))
@@ -1098,19 +1098,19 @@ class BehaviorParser(EntityParser):
                             localVariableRef, portPrototypeRef, targetDataPrototypeRef = self.parseAutosarVariableRefXML(xmlData)
                             if xmlData.tag == 'NV-RAM-BLOCK-ELEMENT':
                                 if localVariableRef is None:
-                                    raise ValueError('Cannot find needed LOCAL-VARIABLE-REF for NV-RAM-BLOCK-ELEMENT in {0}'.format(descriptor.name))
+                                    handleValueError('Cannot find needed LOCAL-VARIABLE-REF for NV-RAM-BLOCK-ELEMENT in {0}'.format(descriptor.name))
                                 dataMapping.nvRamBlockElement = autosar.behavior.NvRamBlockElement(dataMapping, localVariableRef=localVariableRef)
                             elif xmlData.tag == 'READ-NV-DATA':
                                 if portPrototypeRef is None and targetDataPrototypeRef is None:
-                                    raise ValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for READ-NV-DATA in {0}'.format(descriptor.name))
+                                    handleValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for READ-NV-DATA in {0}'.format(descriptor.name))
                                 dataMapping.readNvData = autosar.behavior.ReadNvData(dataMapping, autosarVariablePortRef=portPrototypeRef, autosarVariableElementRef=targetDataPrototypeRef)
                             elif xmlData.tag == 'WRITTEN-NV-DATA':
                                 if portPrototypeRef is None and targetDataPrototypeRef is None:
-                                    raise ValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for WRITTEN-NV-DATA in {0}'.format(descriptor.name))
+                                    handleValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for WRITTEN-NV-DATA in {0}'.format(descriptor.name))
                                 dataMapping.writtenNvData = autosar.behavior.WrittenNvData(dataMapping, autosarVariablePortRef=portPrototypeRef, autosarVariableElementRef=targetDataPrototypeRef)
                             elif xmlData.tag == 'WRITTEN-READ-NV-DATA':
                                 if portPrototypeRef is None and targetDataPrototypeRef is None:
-                                    raise ValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for WRITTEN-READ-NV-DATA in {0}'.format(descriptor.name))
+                                    handleValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for WRITTEN-READ-NV-DATA in {0}'.format(descriptor.name))
                                 dataMapping.writtenReadNvData = autosar.behavior.WrittenReadNvData(dataMapping, autosarVariablePortRef=portPrototypeRef, autosarVariableElementRef=targetDataPrototypeRef)
                             else:
                                 handleNotImplementedError(xmlData.tag)
@@ -1145,7 +1145,7 @@ class BehaviorParser(EntityParser):
                         parts = parts[2].partition('/')
 
                     if timingEvent is None:
-                        raise ValueError('Cannot find timing event {0}'.format(timingRef))
+                        handleValueError('Cannot find timing event {0}'.format(timingRef))
                     descriptor.timingEventRef = timingEvent.name
                 else:
                     handleNotImplementedError(xmlElem.tag)
