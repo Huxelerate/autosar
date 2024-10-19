@@ -31,7 +31,7 @@ class Element:
             return self.parent.rootWS()
 
     def __deepcopy__(self,memo):
-        raise NotImplementedError(type(self))
+        handleNotImplementedError(type(self))
 
 class LabelElement:
     """Same as Element but uses label as main identifier instead of name"""
@@ -146,7 +146,7 @@ class AutosarDataPrototype(Element):
             self.swImplPolicy = props.swImplPolicy
             self.dataConstraintRef = props.dataConstraintRef
         else:
-            raise NotImplementedError(type(props))
+            handleNotImplementedError(type(props))
 
 class SoftwareAddressMethod(Element):
     """

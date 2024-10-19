@@ -8,6 +8,8 @@ import autosar.element
 import xml
 from functools import wraps
 
+from autosar.util.errorHandler import handleNotImplementedError
+
 def _parseBoolean(value):
     if value is None:
         return None
@@ -114,7 +116,7 @@ class BaseParser:
         elif xmlElem.tag == 'INTRODUCTION':
             pass #implement later
         else:
-            raise NotImplementedError(xmlElem.tag)
+            handleNotImplementedError(xmlElem.tag)
     
     def applyDesc(self, obj):
         if self.common[-1].desc is not None:            
@@ -229,7 +231,7 @@ class BaseParser:
                         except KeyError: pass
                         specialDataGroup.SD.append(SpecialData(TEXT, SD_GID))
                     else:
-                        raise NotImplementedError(xmlChild.tag)
+                        handleNotImplementedError(xmlChild.tag)
                 adminData.specialDataGroups.append(specialDataGroup)
         return adminData
 
@@ -244,9 +246,9 @@ class BaseParser:
                         assert(variant is not None)
                         variants.append(variant)
                     else:
-                        raise NotImplementedError(subItemXML.tag)
+                        handleNotImplementedError(subItemXML.tag)
             else:
-                raise NotImplementedError(itemXML.tag)
+                handleNotImplementedError(itemXML.tag)
         return variants if len(variants)>0 else None
 
     def parseSwDataDefPropsConditional(self, xmlRoot):
@@ -296,7 +298,7 @@ class BaseParser:
                 print("[BaseParser] unhandled: %s"%xmlItem.tag)
                 pass #implement later
             else:
-                raise NotImplementedError(xmlItem.tag)
+                handleNotImplementedError(xmlItem.tag)
 
         variant = SwDataDefPropsConditional(
             baseTypeRef=baseTypeRef,
@@ -420,7 +422,7 @@ class BaseParser:
                     elif xmlChild.tag == 'LOCAL-PARAMETER-REF':
                         accessedParameter = autosar.behavior.LocalParameterRef(self.parseTextNode(xmlChild))
                     else:
-                        raise NotImplementedError(xmlChild.tag)
+                        handleNotImplementedError(xmlChild.tag)
             else:
                 raise RuntimeError(f"ERROR: Tag {tag} not recognized")
 
@@ -449,7 +451,7 @@ class BaseParser:
             elif xmlElem.tag == 'SYMBOL':
                 symbol = self.parseTextNode(xmlElem)
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
         return SymbolProps(name, symbol)
             
 class ElementParser(BaseParser, metaclass=abc.ABCMeta):
@@ -487,7 +489,7 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
         assert(xmlRoot.tag in ['VARIABLE-DATA-PROTOTYPE', 'PARAMETER-DATA-PROTOTYPE', 'ARGUMENT-DATA-PROTOTYPE'])
         dataPrototypeRole = autosar.element.AutosarDataPrototype.TAG_TO_ROLE_MAP.get(xmlRoot.tag)
         if dataPrototypeRole is None:
-            raise NotImplementedError(xmlRoot.tag)
+            handleNotImplementedError(xmlRoot.tag)
         (typeRef, props_variants, isQueued, initValue, initValueRef) = (None, None, False, None, None)
         self.push()
         for xmlElem in xmlRoot.findall('./*'):

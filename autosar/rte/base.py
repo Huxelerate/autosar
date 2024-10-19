@@ -96,7 +96,7 @@ class Port:
          elif isinstance(port_func, CalPrmPortFunction):
             api.calprm[port_func.proto.name]=port_func
          else:
-            raise NotImplementedError(type(port_func))
+            handleNotImplementedError(type(port_func))
 
 class ProvidePort(Port):
    """

@@ -45,7 +45,7 @@ class SwcImplementationParser(EntityParser):
                     if codeElem.tag  == 'CODE':
                         implementation.codeDescriptors.append(self.parseCodeDescriptor(codeElem, parent=implementation))
                     else:
-                        raise NotImplementedError(codeElem.tag)
+                        handleNotImplementedError(codeElem.tag)
             elif xmlElem.tag == 'COMPILERS':
                 #TODO: Implement later
                 continue

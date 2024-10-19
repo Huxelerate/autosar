@@ -89,7 +89,7 @@ class PortInterfacePackageParser(EntityParser):
                 if dataElem is not None:
                     dataElements.append(dataElem)
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
         return dataElements
 
     @parseElementUUID
@@ -110,7 +110,7 @@ class PortInterfacePackageParser(EntityParser):
                     modeGroups.append(autosar.portinterface.ModeGroup(self.name, typeRef))
                 self.pop()
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
         return modeGroups
 
     def _parseInvalidationPolicys(self, xmlRoot):
@@ -122,7 +122,7 @@ class PortInterfacePackageParser(EntityParser):
                 if invalidationPolicy is not None:
                     policyList.append(invalidationPolicy)
             else:
-                raise NotImplementedError(xmlChild.tag)
+                handleNotImplementedError(xmlChild.tag)
         return policyList
 
     @parseElementUUID
@@ -162,7 +162,7 @@ class PortInterfacePackageParser(EntityParser):
             elif xmlElem.tag == 'HANDLE-INVALID':
                 handleInvalid = self.parseTextNode(xmlElem)
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
         if (dataElementRef is not None) and (handleInvalid is not None):
             return autosar.portinterface.InvalidationPolicy(dataElementRef, handleInvalid)
         else:
@@ -210,7 +210,7 @@ class PortInterfacePackageParser(EntityParser):
                             operation = self._parseOperationPrototype(xmlChildItem, portInterface)
                             portInterface.operations.append(operation)
                         else:
-                            raise NotImplementedError(xmlChildItem.tag)
+                            handleNotImplementedError(xmlChildItem.tag)
                 elif xmlElem.tag == 'POSSIBLE-ERRORS':
                     for xmlError in xmlElem.findall('APPLICATION-ERROR'):
                         applicationError = self._parseApplicationError(xmlError, portInterface)
@@ -220,7 +220,7 @@ class PortInterfacePackageParser(EntityParser):
                 elif xmlElem.tag == 'LONG-NAME':
                     portInterface.longName = self.parseTextNode(xmlElem)
                 else:
-                    raise NotImplementedError(xmlElem.tag)
+                    handleNotImplementedError(xmlElem.tag)
             return portInterface
 
     @parseElementUUID
@@ -239,7 +239,7 @@ class PortInterfacePackageParser(EntityParser):
             elif xmlElem.tag == 'SERVICE-KIND' and self.version >= 4.0:
                 serviceKind = self.parseTextNode(xmlElem)
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
 
         if (name is not None) and (xmlParameters is not None):
             portInterface = autosar.portinterface.ParameterInterface(name, isService, serviceKind, parent, adminData)
@@ -248,7 +248,7 @@ class PortInterfacePackageParser(EntityParser):
                     parameter = self._parseParameterDataPrototype(xmlChild, portInterface)
                     portInterface.append(parameter)
                 else:
-                    raise NotImplementedError(xmlChild.tag)
+                    handleNotImplementedError(xmlChild.tag)
             return portInterface
 
 
@@ -268,7 +268,7 @@ class PortInterfacePackageParser(EntityParser):
             elif xmlElem.tag == 'SERVICE-KIND' and self.version >= 4.0:
                 serviceKind = self.parseTextNode(xmlElem)            
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
 
         if (name is not None) and (xmlModeGroup is not None):
             portInterface = autosar.portinterface.ModeSwitchInterface(name, isService, serviceKind, parent, adminData)
@@ -302,7 +302,7 @@ class PortInterfacePackageParser(EntityParser):
             elif xmlElem.tag == 'LONG-NAME':
                 pass #implement later
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
 
         if name is not None:
             operation = autosar.portinterface.Operation(name, parent)
@@ -319,13 +319,13 @@ class PortInterfacePackageParser(EntityParser):
                         operation.arguments.append(argument)
                         argument.parent=operation
                     else:
-                        raise NotImplementedError(xmlChild.tag)
+                        handleNotImplementedError(xmlChild.tag)
             if xmlPossibleErrorRefs is not None:
                 for xmlChild in xmlPossibleErrorRefs.findall('./*'):
                     if xmlChild.tag == 'POSSIBLE-ERROR-REF':
                         operation.errorRefs.append(self.parseTextNode(xmlChild))
                     else:
-                        raise NotImplementedError(xmlChild.tag)
+                        handleNotImplementedError(xmlChild.tag)
             return operation
 
     @parseElementUUID
@@ -339,7 +339,7 @@ class PortInterfacePackageParser(EntityParser):
             elif xmlElem.tag == 'DIRECTION':
                 direction = self.parseTextNode(xmlElem)
             else:
-                raise NotImplementedError(xmlElem.tag)
+                handleNotImplementedError(xmlElem.tag)
         if (name is not None) and (typeRef is not None) and (direction is not None):
             return autosar.portinterface.Argument(name, typeRef, direction)
         else:
