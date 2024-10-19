@@ -8,7 +8,8 @@ def handleNotImplementedError(error: str):
         try: 
             raise NotImplementedError(error)
         except NotImplementedError as e:
-            exception = f"WARNING - ignoring NotImplementedError '{e}' in:\n\r{traceback.format_exc()}"
+            stack_trace = "".join(traceback.format_stack())
+            exception = f"WARNING - ignoring NotImplementedError '{e}' in:\n\r{stack_trace}"
             if not exception in already_shown_errors:
                 print(exception)
             else:
@@ -21,7 +22,8 @@ def handleValueError(error: str):
         try: 
             raise ValueError(error)
         except ValueError as e:
-            exception = f"WARNING - ignoring ValueError '{e}' in:\n\r{traceback.format_exc()}"
+            stack_trace = "".join(traceback.format_stack())
+            exception = f"WARNING - ignoring ValueError '{e}' in:\n\r{stack_trace}"
             if not exception in already_shown_errors:
                 print(exception)
             else:
