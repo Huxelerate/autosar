@@ -297,7 +297,7 @@ class SwDataDefPropsConditional:
             if ucvalue in enum_values:
                 self._swImplPolicy = ucvalue
             else:
-                raise handleValueError('invalid swImplPolicy value: ' +  value)
+                handleValueError('invalid swImplPolicy value: ' +  value)
 
     def hasAnyProp(self):
         """

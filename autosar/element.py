@@ -138,7 +138,7 @@ class AutosarDataPrototype(Element):
                 if ucvalue == 'QUEUED':
                     self.isQueued = True
             else:
-                raise handleValueError('invalid swImplPolicy value: ' +  value)
+                handleValueError('invalid swImplPolicy value: ' +  value)
 
     def setProps(self, props):
         if isinstance(props, autosar.base.SwDataDefPropsConditional):
