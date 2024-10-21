@@ -139,7 +139,8 @@ class Port(Element):
             if (parameterName is None) and (len(portInterface.parameters)==1):
                 parameterName = portInterface.parameters[0].name
             initValue = comspec.get('initValue', None)
-            return ParameterComSpec(parameterName, initValue)
+            initValueRef = comspec.get('initValueRef', None)
+            return ParameterComSpec(parameterName, initValue, initValueRef)
         elif isinstance(portInterface, autosar.portinterface.NvDataInterface):
             nvDataName = None
             if 'nvData' in comspec: nvDataName=str(comspec['nvData'])
