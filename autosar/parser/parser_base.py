@@ -533,5 +533,6 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                 values = self.constantParser.parseValueV4(xmlElem, None)
                 if len(values) != 1:
                     handleValueError('{0} cannot cannot contain multiple elements'.format(xmlElem.tag))
-                initValue = values[0]
+                else:
+                    initValue = values[0]
         return (initValue, initValueRef)
