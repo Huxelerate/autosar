@@ -2,7 +2,7 @@ from enum import Enum
 import itertools
 from types import MappingProxyType
 import autosar.base
-from autosar.util.errorHandler import handleNotImplementedError
+from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 class Element:
     def __init__(self, name, parent = None, adminData = None, category = None, uuid = None):
@@ -138,7 +138,7 @@ class AutosarDataPrototype(Element):
                 if ucvalue == 'QUEUED':
                     self.isQueued = True
             else:
-                raise ValueError('invalid swImplPolicy value: ' +  value)
+                raise handleValueError('invalid swImplPolicy value: ' +  value)
 
     def setProps(self, props):
         if isinstance(props, autosar.base.SwDataDefPropsConditional):
