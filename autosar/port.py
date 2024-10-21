@@ -454,9 +454,10 @@ class ModeSwitchComSpec(ComSpec):
             self._modeSwitchAckTimeout = int(val)
 
 class ParameterComSpec(ComSpec):
-    def __init__(self, name, initValue=None):
+    def __init__(self, name, initValue=None, initValueRef=None):
         super().__init__(name)
         self.initValue = initValue
+        self.initValueRef = initValueRef
 
 class NvProvideComSpec(ComSpec):
     """
