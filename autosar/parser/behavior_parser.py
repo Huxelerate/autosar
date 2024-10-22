@@ -122,8 +122,8 @@ class BehaviorParser(EntityParser):
                     for xmlChild in xmlElem.findall('./*'):
                         if xmlChild.tag == 'DATA-TYPE-MAPPING-REF':
                             tmp = self.parseTextNode(xmlChild)
-                            assert(tmp is not None)
-                            internalBehavior.appendDataTypeMappingRef(tmp)
+                            if tmp is not None:
+                                internalBehavior.appendDataTypeMappingRef(tmp)
                 elif xmlElem.tag == 'EVENTS':
                     for xmlEvent in xmlElem.findall('./*'):
                         event = None
@@ -1088,8 +1088,8 @@ class BehaviorParser(EntityParser):
                     for xmlChild in xmlElem.findall('./*'):
                         if xmlChild.tag == 'DATA-TYPE-MAPPING-REF':
                             tmp = self.parseTextNode(xmlChild)
-                            assert(tmp is not None)
-                            descriptor.dataTypeMappingRefs.append(tmp)
+                            if tmp is not None:
+                                descriptor.dataTypeMappingRefs.append(tmp)
                 elif xmlElem.tag == 'NV-BLOCK-DATA-MAPPINGS':
                     for xmlMapping in xmlElem.findall('./NV-BLOCK-DATA-MAPPING'):
                         dataMapping = autosar.behavior.NvBlockDataMapping(descriptor)
