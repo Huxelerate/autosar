@@ -137,6 +137,15 @@ class ComponentTypeParser(EntityParser):
                                 tmp = self.parseTextNode(xmlChild)
                                 if tmp is not None:
                                     componentType.appendDataTypeMappingRef(tmp)
+                elif xmlElem.tag == 'CONSTANT-MAPPING-REFS':
+                    if not isinstance(componentType, autosar.component.ParameterComponent):
+                        handleValueError('CONSTANT-MAPPING-REFS is allowed only in ParameterComponent')
+                    else:
+                        for xmlChild in xmlElem.findall('./*'):
+                            if xmlChild.tag == 'CONSTANT-MAPPING-REF':
+                                tmp = self.parseTextNode(xmlChild)
+                                if tmp is not None:
+                                    componentType.appendConstantMappingRef(tmp)
                 else:
                     print('Unhandled tag: '+xmlElem.tag, file=sys.stderr)
         return componentType
