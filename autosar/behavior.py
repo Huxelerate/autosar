@@ -582,6 +582,117 @@ class NvmBlockNeeds(Element):
         self.cfg = blockConfig
     def tag(self, version): return 'NV-BLOCK-NEEDS'
 
+class DiagnosticEventConfig:
+    """
+    Represents Diagnostic Event config, used inside an DiagnosticEventNeeds object.
+    All options by default is set to None which means "default configuration".
+    In practice a None value means that no XML will be generated for that option.
+    Option List:
+    - considerPtoStatus: None or bool
+    - deferringFidRefs: None or list of str
+    - dtcKind: None or str ('DTC_KIND_ALL_DTCS', 'DTC_KIND_ALL_DTCS_OF_ECU', 'DTC_KIND_ALL_DTCS_OF_UDS', 'DTC_KIND_ALL_UDS_DTCS')
+    - dtcNumber: None or int
+    - inhibitingSecondaryFidRefs: None or list of str
+    - obdDtcNumber: None or int
+    - prestoredFreezeframeStoredInNvm: None or bool
+    - reportBehavior: None or str ('REPORT_IMMEDIATELY', 'REPORT_WHEN_STABLE')
+    - udsDtcNumber: None or int
+    - usesMonitorData: None or bool
+
+    """
+
+    def __init__(self, 
+        considerPtoStatus=None,
+        deferringFidRefs=None,
+        dtcKind=None,
+        dtcNumber=None,
+        inhibitingFidRef=None,
+        inhibitingSecondaryFidRefs=None,
+        obdDtcNumber=None,
+        prestoredFreezeframeStoredInNvm=None,
+        reportBehavior=None,
+        udsDtcNumber=None,
+        usesMonitorData=None,
+        check_input = True):
+
+        self.considerPtoStatus = considerPtoStatus
+        self.deferringFidRefs = deferringFidRefs
+        self.dtcKind = dtcKind
+        self.dtcNumber = dtcNumber
+        self.inhibitingFidRef = inhibitingFidRef
+        self.inhibitingSecondaryFidRefs = inhibitingSecondaryFidRefs
+        self.obdDtcNumber = obdDtcNumber
+        self.prestoredFreezeframeStoredInNvm = prestoredFreezeframeStoredInNvm
+        self.reportBehavior = reportBehavior
+        self.udsDtcNumber = udsDtcNumber
+        self.usesMonitorData = usesMonitorData
+
+        if check_input:
+            self.check()
+
+    def check(self):
+        if not (self.considerPtoStatus is None or isinstance(self.considerPtoStatus, bool) ):
+            raise ValueError('considerPtoStatus is incorrectly formatted (None or bool expected)')
+        if not (self.deferringFidRefs is None or isinstance(self.deferringFidRefs, list) ):
+            raise ValueError('deferringFidRefs is incorrectly formatted (None or list of str expected)')
+        elif self.deferringFidRefs is not None:
+            for item in self.deferringFidRefs:
+                if not isinstance(item, str):
+                    raise ValueError('deferringFidRefs is incorrectly formatted (list of str expected)')
+        if not (self.dtcKind is None or isinstance(self.dtcKind, str) ):
+            raise ValueError('dtcKind is incorrectly formatted (None or str expected)')
+        elif self.dtcKind is not None:
+            if self.dtcKind not in ['EMISSION-RELATED-DTC', 'NON-EMMISSION-RELATED-DTC']:
+                raise ValueError('dtcKind is incorrectly formatted (invalid value)')
+        if not (self.dtcNumber is None or isinstance(self.dtcNumber, int) ):
+            raise ValueError('dtcNumber is incorrectly formatted (None or int expected)')
+        elif self.dtcNumber is not None:
+            if self.dtcNumber < 0:
+                raise ValueError('dtcNumber is incorrectly formatted (negative value)')
+        if not (self.inhibitingFidRef is None or isinstance(self.inhibitingFidRef, str) ):
+            raise ValueError('inhibitingFidRef is incorrectly formatted (None or str expected)')
+        if not (self.inhibitingSecondaryFidRefs is None or isinstance(self.inhibitingSecondaryFidRefs, list) ):
+            raise ValueError('inhibitingSecondaryFidRefs is incorrectly formatted (None or list of str expected)')
+        elif self.inhibitingSecondaryFidRefs is not None:
+            for item in self.inhibitingSecondaryFidRefs:
+                if not isinstance(item, str):
+                    raise ValueError('inhibitingSecondaryFidRefs is incorrectly formatted (list of str expected)')
+        if not (self.obdDtcNumber is None or isinstance(self.obdDtcNumber, int) ):
+            raise ValueError('obdDtcNumber is incorrectly formatted (None or int expected)')
+        elif self.obdDtcNumber is not None:
+            if self.obdDtcNumber < 0:
+                raise ValueError('obdDtcNumber is incorrectly formatted (negative value)')
+        if not (self.prestoredFreezeframeStoredInNvm is None or isinstance(self.prestoredFreezeframeStoredInNvm, bool) ):
+            raise ValueError('prestoredFreezeframeStoredInNvm is incorrectly formatted (None or bool expected)')
+        if not (self.reportBehavior is None or isinstance(self.reportBehavior, str) ):
+            raise ValueError('reportBehavior is incorrectly formatted (None or str expected)')
+        elif self.reportBehavior is not None:
+            if self.reportBehavior not in ['REPORT-AFTER-INIT', 'REPORT-BEFORE-INIT']:
+                raise ValueError('reportBehavior is incorrectly formatted (invalid value)')
+        if not (self.udsDtcNumber is None or isinstance(self.udsDtcNumber, int) ):
+            raise ValueError('udsDtcNumber is incorrectly formatted (None or int expected)')
+        elif self.udsDtcNumber is not None:
+            if self.udsDtcNumber < 0:
+                raise ValueError('udsDtcNumber is incorrectly formatted (negative value)')
+        if not (self.usesMonitorData is None or isinstance(self.usesMonitorData, bool) ):
+            raise ValueError('usesMonitorData is incorrectly formatted (None or bool expected)')
+
+class DiagnosticEventNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-EVENT-NEEDS
+
+    second argument to the init function should be an instance of (a previously configured) DiagnosticEventConfig
+    """
+
+    def __init__(self, name, eventConfig = None, parent = None, adminData = None):
+        super().__init__(name, parent, adminData)
+        assert(eventConfig is None or isinstance(eventConfig, DiagnosticEventConfig))
+        if eventConfig is None:
+            eventConfig = DiagnosticEventConfig() #create a default configuration
+        self.cfg = eventConfig
+
+    def tag(self, version): return 'DIAGNOSTIC-EVENT-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
