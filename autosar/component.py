@@ -228,7 +228,13 @@ class ParameterComponent(AtomicSoftwareComponent):
 
     def __init__(self,name,parent=None):
         super().__init__(name,parent)
+        self.dataTypeMappingRefs = [] # list of strings
 
+    def appendDataTypeMappingRef(self, dataTypeMappingRef):
+        """
+        Adds dataTypeMappingRef to the internal dataTypeMappingRefs list
+        """
+        self.dataTypeMappingRefs.append(str(dataTypeMappingRef))
 
 class SensorActuatorComponent(AtomicSoftwareComponent):
     def tag(self,version=None):

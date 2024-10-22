@@ -128,6 +128,15 @@ class ComponentTypeParser(EntityParser):
                         componentType.nvBlockDescriptors.append(descriptor)
                 elif xmlElem.tag == 'CATEGORY':
                     componentType.category = self.parseTextNode(xmlElem)
+                elif xmlElem.tag == 'DATA-TYPE-MAPPING-REFS':
+                    if not isinstance(componentType, autosar.component.ParameterComponent):
+                        handleValueError('DATA-TYPE-MAPPING-REFS is allowed only in ParameterComponent')
+                    else:
+                        for xmlChild in xmlElem.findall('./*'):
+                            if xmlChild.tag == 'DATA-TYPE-MAPPING-REF':
+                                tmp = self.parseTextNode(xmlChild)
+                                if tmp is not None:
+                                    componentType.appendDataTypeMappingRef(tmp)
                 else:
                     print('Unhandled tag: '+xmlElem.tag, file=sys.stderr)
         return componentType
