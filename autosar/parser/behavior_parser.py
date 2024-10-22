@@ -124,6 +124,12 @@ class BehaviorParser(EntityParser):
                             tmp = self.parseTextNode(xmlChild)
                             if tmp is not None:
                                 internalBehavior.appendDataTypeMappingRef(tmp)
+                elif xmlElem.tag == 'CONSTANT-VALUE-MAPPING-REFS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'CONSTANT-VALUE-MAPPING-REF':
+                            tmp = self.parseTextNode(xmlChild)
+                            if tmp is not None:
+                                internalBehavior.appendConstantValueMappingRef(tmp)
                 elif xmlElem.tag == 'EVENTS':
                     for xmlEvent in xmlElem.findall('./*'):
                         event = None

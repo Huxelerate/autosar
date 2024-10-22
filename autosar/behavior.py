@@ -1255,6 +1255,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         self.dataTypeMappingRefs = [] #list of strings
         self.constantMemories = [] #list of ParameterDataPrototye objects
         self.variationPointProxies = [] #list of VariationPointProxy objects
+        self.constantValueMappingRefs = [] #list of strings
 
     def tag(self, version): return "SWC-INTERNAL-BEHAVIOR"
 
@@ -1474,6 +1475,12 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         Adds dataTypeMappingRef to the internal dataTypeMappingRefs list
         """
         self.dataTypeMappingRefs.append(str(dataTypeMappingRef))
+
+    def appendConstantValueMappingRef(self, constantValueMappingRef):
+        """
+        Adds constantValueMappingRef to the internal constantValueMappingRefs list
+        """
+        self.constantValueMappingRefs.append(str(constantValueMappingRef))
 
 class VariableAccess(Element):
     def __init__(self, name, portPrototypeRef, targetDataPrototypeRef, parent=None):
