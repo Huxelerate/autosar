@@ -592,6 +592,7 @@ class DiagnosticEventConfig:
     - deferringFidRefs: None or list of str
     - dtcKind: None or str ('DTC_KIND_ALL_DTCS', 'DTC_KIND_ALL_DTCS_OF_ECU', 'DTC_KIND_ALL_DTCS_OF_UDS', 'DTC_KIND_ALL_UDS_DTCS')
     - dtcNumber: None or int
+    - inhibitingFidRef: None or str
     - inhibitingSecondaryFidRefs: None or list of str
     - obdDtcNumber: None or int
     - prestoredFreezeframeStoredInNvm: None or bool
