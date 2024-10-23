@@ -590,13 +590,13 @@ class DiagnosticEventConfig:
     Option List:
     - considerPtoStatus: None or bool
     - deferringFidRefs: None or list of str
-    - dtcKind: None or str ('DTC_KIND_ALL_DTCS', 'DTC_KIND_ALL_DTCS_OF_ECU', 'DTC_KIND_ALL_DTCS_OF_UDS', 'DTC_KIND_ALL_UDS_DTCS')
+    - dtcKind: None or str ('EMISSION-RELATED-DTC', 'NON-EMMISSION-RELATED-DTC')
     - dtcNumber: None or int
     - inhibitingFidRef: None or str
     - inhibitingSecondaryFidRefs: None or list of str
     - obdDtcNumber: None or int
     - prestoredFreezeframeStoredInNvm: None or bool
-    - reportBehavior: None or str ('REPORT_IMMEDIATELY', 'REPORT_WHEN_STABLE')
+    - reportBehavior: None or str ('REPORT-AFTER-INIT', 'REPORT-BEFORE-INIT')
     - udsDtcNumber: None or int
     - usesMonitorData: None or bool
 
@@ -1618,9 +1618,10 @@ class ServiceNeeds(Element):
     """
     def tag(self, version): return 'SERVICE-NEEDS'
 
-    def __init__(self, name = None, nvmBlockNeeds = None, parent=None, adminData = None):
+    def __init__(self, name = None, nvmBlockNeeds = None, diagnosticEventNeeds = None, parent=None, adminData = None):
         super().__init__(name, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
+        self.diagnosticEventNeeds = diagnosticEventNeeds
 
 class NvmBlockServiceNeeds(ServiceNeeds):
     def __init__(self, name, nvmBlockNeeds = None, parent=None, adminData = None):

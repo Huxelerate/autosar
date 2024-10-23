@@ -130,7 +130,7 @@ class ComponentTypeParser(EntityParser):
                     componentType.category = self.parseTextNode(xmlElem)
                 elif xmlElem.tag == 'DATA-TYPE-MAPPING-REFS':
                     if not isinstance(componentType, autosar.component.ParameterComponent):
-                        handleValueError('DATA-TYPE-MAPPING-REFS is allowed only in ParameterComponent')
+                        handleValueError(f"DATA-TYPE-MAPPING-REFS cannot appear directly inside {xmlRoot.tag}")
                     else:
                         for xmlChild in xmlElem.findall('./*'):
                             if xmlChild.tag == 'DATA-TYPE-MAPPING-REF':
@@ -139,7 +139,7 @@ class ComponentTypeParser(EntityParser):
                                     componentType.appendDataTypeMappingRef(tmp)
                 elif xmlElem.tag == 'CONSTANT-MAPPING-REFS':
                     if not isinstance(componentType, autosar.component.ParameterComponent):
-                        handleValueError('CONSTANT-MAPPING-REFS is allowed only in ParameterComponent')
+                        handleValueError(f"CONSTANT-MAPPING-REFS cannot appear directly inside {xmlRoot.tag}")
                     else:
                         for xmlChild in xmlElem.findall('./*'):
                             if xmlChild.tag == 'CONSTANT-MAPPING-REF':
