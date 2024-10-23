@@ -88,7 +88,8 @@ class Package(object):
             for item in (self.elements+self.subPackages):
                 if item.name == ref[0] or ref[0]=='*':
                     if len(ref[2])>0:
-                        result.extend(item.findall(ref[2]))
+                        if hasattr(item, "findall"):
+                            result.extend(item.findall(ref[2]))
                     else:
                         result.append(item)
             if (len(result)==0) and ('*' in ref[0]):
@@ -97,7 +98,8 @@ class Package(object):
                     m = p.match(item.name)
                     if m is not None:
                         if len(ref[2])>0:
-                            result.extend(item.findall(ref[2]))
+                            if hasattr(item, "findall"):
+                                result.extend(item.findall(ref[2]))
                         else:
                             result.append(item)
         return result
