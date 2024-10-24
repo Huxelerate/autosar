@@ -331,6 +331,9 @@ class BehaviorParser(EntityParser):
                     pass #implement later
                 else:
                     self.defaultHandler(xmlElem)
+        if name is None:
+            handleValueError('SHORT-NAME is required for RunnableEntity')
+            return None
         runnableEntity = autosar.behavior.RunnableEntity(name, canBeInvokedConcurrently, symbol, parent)
         if minStartInterval is not None:
             runnableEntity.minStartInterval = float(1000 * minStartInterval)
