@@ -247,6 +247,8 @@ class BehaviorParser(EntityParser):
 
     @parseElementUUID
     def parseRunnableEntity(self, xmlRoot, parent):
+        name = None
+        symbol = None
         xmlDataReceivePoints = None
         xmlDataSendPoints = None
         xmlServerCallPoints = None
