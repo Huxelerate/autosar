@@ -16,6 +16,7 @@ class ComponentType(Element):
         super().__init__(name,parent)
         self.requirePorts=[]
         self.providePorts=[]
+        self.provideRequirePorts=[]
 
     def find(self,ref):
         ref=ref.partition('/')
@@ -23,6 +24,9 @@ class ComponentType(Element):
             if port.name == ref[0]:
                 return port
         for port in self.providePorts:
+            if port.name == ref[0]:
+                return port
+        for port in self.provideRequirePorts:
             if port.name == ref[0]:
                 return port
         return None
@@ -33,6 +37,9 @@ class ComponentType(Element):
             elem.parent=self
         elif isinstance(elem,autosar.port.ProvidePort):
             self.providePorts.append(elem)
+            elem.parent=self
+        elif isinstance(elem,autosar.port.ProvideRequirePort):
+            self.provideRequirePorts.append(elem)
             elem.parent=self
         else:
             raise ValueError("unexpected type:" + str(type(elem)))
@@ -146,6 +153,56 @@ class ComponentType(Element):
         self.requirePorts.append(port)
         return port
 
+    def createProvideRequirePort(self, name, portInterfaceRef, **kwargs):
+        """
+        Creates a provide-require port on this ComponentType
+        The ComponentType must have a valid ref (must belong to a valid package in a valid workspace).
+        Parameters:
+
+        - name: Name of the port
+        - portInterfaceRef: Reference to existing port interface
+
+        For SenderReceiver port interfaces which contains one data element there is another way of creating ComSpecs.
+        - initValue (int, float, str): Used to set an init value literal.
+        - initValueRef (str): Used when you want an existing constant specification as your initValue.
+        - aliveTimeout(int): Alive timeout setting (in seconds).
+        - queueLength(int): Length of queue (only applicable for port interface with isQueued property).
+        - canInvalidate(bool): Invalidation property (boolean). (AUTOSAR3 only)
+
+        For Parameter port interfaces you can use these parameters:
+        - initValue (int, float or str): Init value literal
+
+        For ModeSwitch port interfaces these parameters are valid:
+        - modeGroup: The name of the mode group in the port interface (None or str)
+        - enhancedMode: sets the enhancedMode property  (bool)
+        - supportAsync: sets the supportAsync property  (bool)
+
+        For NvDataInterface port interfaces which contains one data element there is another way of creating ComSpecs.
+        - initValue (int, float, str): Used to set an init value literal.
+        - initValueRef (str): Used when you want an existing constant specification as your initValue.
+        """
+        providedComspec = kwargs.get('providedComspec', None)
+        if providedComspec is not None:
+            providedComspecList = providedComspec
+        else:
+            providedComspecList = None
+        requiredComspec = kwargs.get('requiredComspec', None)
+        if requiredComspec is not None:
+            requiredComspecList = requiredComspec
+        else:
+            requiredComspecList = None
+        assert (self.ref is not None)
+        ws = self.rootWS()
+        assert(ws is not None)
+        portInterface = ws.find(portInterfaceRef, role='PortInterface')
+        if portInterface is None:
+            raise autosar.base.InvalidPortInterfaceRef(portInterfaceRef)
+
+        port = autosar.port.ProvideRequirePort(name, portInterface.ref, providedComspecList, requiredComspecList, parent=self)
+
+        self.provideRequirePorts.append(port)
+        return port
+
     def apply(self, template, **kwargs):
         """
         Applies template to this component
@@ -179,14 +236,10 @@ class AtomicSoftwareComponent(ComponentType):
         self.implementation=None
 
     def find(self,ref):
+        if (found := super().find(ref)) is not None:
+            return found
         ws = self.rootWS()
         ref=ref.partition('/')
-        for port in self.requirePorts:
-            if port.name == ref[0]:
-                return port
-        for port in self.providePorts:
-            if port.name == ref[0]:
-                return port
         if (ws is not None) and (ws.version >= 4.0) and (self.behavior is not None):
             if self.behavior.name == ref[0]:
                 if len(ref[2])>0:
@@ -259,6 +312,8 @@ class NvBlockComponent(AtomicSoftwareComponent):
         self.nvBlockDescriptors = []
 
     def find(self, ref):
+        if (found := super().find(ref)) is not None:
+            return found
         parts=ref.partition('/')
         for elem in self.nvBlockDescriptors:
             if elem.name == parts[0]:
@@ -282,6 +337,8 @@ class CompositionComponent(ComponentType):
     def tag(self,version): return 'COMPOSITION-SW-COMPONENT-TYPE' if version >= 4.0 else 'COMPOSITION-TYPE'
 
     def find(self, ref):
+        if (found := super().find(ref)) is not None:
+            return found
         parts=ref.partition('/')
         for elem in self.components:
             if elem.name == parts[0]:
