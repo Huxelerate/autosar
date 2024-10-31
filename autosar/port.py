@@ -58,8 +58,8 @@ class Port(Element):
                     comspec_member.append(comspec)
                 elif isinstance(comspec, collections.abc.Mapping):
                     #Typical usage: port interfaces containing a single data element
-                    providedComspecObj = self._createComSpecFromDict(ws, portInterface, comspec['provided'])
-                    if providedComspecObj is None:
+                    comspecObj = self._createComSpecFromDict(ws, portInterface, comspec)
+                    if comspecObj is None:
                         raise ValueError('Failed to create comspec from comspec data: '+repr(comspec))
                     comspec_member.append(comspecObj)
                 elif isinstance(comspec, collections.abc.Iterable):
@@ -328,6 +328,9 @@ class RequirePort(Port):
             #copy constructor
             super().__init__(other.name, other.portInterfaceRef, None, False, parent)
             self._comspec=copy.deepcopy(other._comspec)
+            if isinstance(other, ProvidePort):
+                self._comspec.required = self._comspec.provided
+                self._comspec.provided = []
         else:
             handleNotImplementedError(type(name))
 
@@ -359,6 +362,9 @@ class ProvidePort(Port):
             #copy constructor
             super().__init__(other.name, other.portInterfaceRef, None, False, parent)
             self._comspec=copy.deepcopy(other._comspec)
+            if isinstance(other, RequirePort):
+                self._comspec.provided = self._comspec.required
+                self._comspec.required = []
         else:
             handleNotImplementedError(type(name))
 
@@ -384,7 +390,7 @@ class ProvideRequirePort(Port):
         if isinstance(name, str):
         #normal constructor
             super().__init__(name, portInterfaceRef, {'provided': providedComspec, 'required': requiredComspec}, autoCreateComSpec, parent)
-        elif isinstance(name, (RequirePort, ProvidePort)):
+        elif isinstance(name, ProvideRequirePort):
             other=name #alias
             #copy constructor
             super().__init__(other.name, other.portInterfaceRef, None, False, parent)
@@ -410,7 +416,9 @@ class ProvideRequirePort(Port):
         """
         returns a mirrored copy of itself
         """
-        return ProvideRequirePort(self)
+        copy = ProvideRequirePort(self)
+        copy._comspec.provided, copy._comspec.required = copy._comspec.required, copy._comspec.provided
+        return copy
 
 class ComSpec:
     def __init__(self, name=None):

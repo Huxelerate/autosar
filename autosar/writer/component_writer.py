@@ -481,7 +481,7 @@ class XMLComponentTypeWriter(ElementWriter):
             interface_tref_tag = 'PROVIDED-REQUIRED-INTERFACE-TREF'
 
         lines.append(self.indent(f'<{interface_tref_tag} DEST="{portInterface.tag(self.version)}">{portInterface.ref}</{interface_tref_tag}>',1))
-        lines.append('</{port.tag()}>')
+        lines.append(f'</{port.tag()}>')
         return lines
     
     def _writeProvidePortXML(self, port):

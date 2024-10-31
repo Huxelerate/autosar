@@ -161,25 +161,8 @@ class ComponentType(Element):
 
         - name: Name of the port
         - portInterfaceRef: Reference to existing port interface
-
-        For SenderReceiver port interfaces which contains one data element there is another way of creating ComSpecs.
-        - initValue (int, float, str): Used to set an init value literal.
-        - initValueRef (str): Used when you want an existing constant specification as your initValue.
-        - aliveTimeout(int): Alive timeout setting (in seconds).
-        - queueLength(int): Length of queue (only applicable for port interface with isQueued property).
-        - canInvalidate(bool): Invalidation property (boolean). (AUTOSAR3 only)
-
-        For Parameter port interfaces you can use these parameters:
-        - initValue (int, float or str): Init value literal
-
-        For ModeSwitch port interfaces these parameters are valid:
-        - modeGroup: The name of the mode group in the port interface (None or str)
-        - enhancedMode: sets the enhancedMode property  (bool)
-        - supportAsync: sets the supportAsync property  (bool)
-
-        For NvDataInterface port interfaces which contains one data element there is another way of creating ComSpecs.
-        - initValue (int, float, str): Used to set an init value literal.
-        - initValueRef (str): Used when you want an existing constant specification as your initValue.
+        - providedComspec: Optional list of comspecs for the provided part of the port
+        - requiredComspec: Optional list of comspecs for the required part of the port
         """
         providedComspec = kwargs.get('providedComspec', None)
         if providedComspec is not None:
@@ -312,8 +295,6 @@ class NvBlockComponent(AtomicSoftwareComponent):
         self.nvBlockDescriptors = []
 
     def find(self, ref):
-        if (found := super().find(ref)) is not None:
-            return found
         parts=ref.partition('/')
         for elem in self.nvBlockDescriptors:
             if elem.name == parts[0]:
@@ -337,8 +318,6 @@ class CompositionComponent(ComponentType):
     def tag(self,version): return 'COMPOSITION-SW-COMPONENT-TYPE' if version >= 4.0 else 'COMPOSITION-TYPE'
 
     def find(self, ref):
-        if (found := super().find(ref)) is not None:
-            return found
         parts=ref.partition('/')
         for elem in self.components:
             if elem.name == parts[0]:
