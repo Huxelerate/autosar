@@ -483,28 +483,30 @@ class BehaviorParser(EntityParser):
     @parseElementUUID
     def _parseVariableAccess(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIABLE-ACCESS')
-        (name, variableAccess) = (None, None)
+        variableAccess = None
+        self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'SHORT-NAME':
-                name = self.parseTextNode(xmlElem)
-            elif xmlElem.tag == 'ACCESSED-VARIABLE':
+            if xmlElem.tag == 'ACCESSED-VARIABLE':
                 variableAccess = self.parseAccessedVariable(xmlElem)
             else:
-                handleNotImplementedError(xmlElem.tag)
-        return autosar.behavior.VariableAccess(name, variableAccess.portPrototypeRef, variableAccess.targetDataPrototypeRef)
+                self.defaultHandler(xmlElem)
+        obj = autosar.behavior.VariableAccess(self.name, variableAccess.portPrototypeRef, variableAccess.targetDataPrototypeRef)
+        self.pop()
+        return obj
 
     @parseElementUUID
     def _parseLocalVariableAccess(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIABLE-ACCESS')
-        (name, variableAccess) = (None, None)
+        name = None
+        self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'SHORT-NAME':
-                name = self.parseTextNode(xmlElem)
-            elif xmlElem.tag == 'ACCESSED-VARIABLE':
+            if xmlElem.tag == 'ACCESSED-VARIABLE':
                 variableAccess = self.parseLocalAccessedVariable(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        return autosar.behavior.LocalVariableAccess(name, variableAccess.localVariableRef)
+        obj = autosar.behavior.LocalVariableAccess(self.name, variableAccess.localVariableRef)
+        self.pop()
+        return obj
 
     @parseElementUUID
     def parseParameterAccessPoint(self, xmlRoot, parent = None):
@@ -960,19 +962,27 @@ class BehaviorParser(EntityParser):
     def parseServiceNeeds(self, xmlRoot, parent = None):
         """parses <SERVICE-NEEDS> (AUTOSAR 4)"""
         assert(xmlRoot.tag == 'SERVICE-NEEDS')
-        (xmlNvBlockNeeds, xmlDiagnosticEventNeeds) = (None, None)
+        (xmlNvBlockNeeds, xmlDiagnosticEventNeeds, xmlDiagnosticEventManagerNeeds, xmlDiagnosticCommunicationManagerNeeds) = (None, None, None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
             elif xmlElem.tag == 'DIAGNOSTIC-EVENT-NEEDS':
                 xmlDiagnosticEventNeeds = xmlElem
+            elif xmlElem.tag == 'DIAGNOSTIC-EVENT-MANAGER-NEEDS':
+                xmlDiagnosticEventManagerNeeds = xmlElem
+            elif xmlElem.tag == 'DIAGNOSTIC-COMMUNICATION-MANAGER-NEEDS':
+                xmlDiagnosticCommunicationManagerNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
-        serviceNeeds = autosar.behavior.ServiceNeeds(None, parent)
+        serviceNeeds = autosar.behavior.ServiceNeeds()
         if xmlNvBlockNeeds is not None:
             serviceNeeds.nvmBlockNeeds = self.parseNvmBlockNeeds(xmlElem, serviceNeeds)
         if xmlDiagnosticEventNeeds is not None:
             serviceNeeds.diagnosticEventNeeds = self.parseDiagnosticEventNeeds(xmlElem, serviceNeeds)
+        if xmlDiagnosticEventManagerNeeds is not None:
+            serviceNeeds.diagnosticEventManagerNeeds = self.parseDiagnosticEventManagerNeeds(xmlElem, serviceNeeds)
+        if xmlDiagnosticCommunicationManagerNeeds is not None:
+            serviceNeeds.diagnosticCommunicationManagerNeeds = self.parseDiagnosticCommunicationManagerNeeds(xmlElem, serviceNeeds)
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1072,6 +1082,37 @@ class BehaviorParser(EntityParser):
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
         config.check()
         obj = autosar.behavior.DiagnosticEventNeeds(self.name, eventConfig = config, parent = parent, adminData = self.adminData)
+        self.pop(obj)
+        return obj
+
+    def parseDiagnosticEventManagerNeeds(self, xmlRoot, parent = None):
+        """parses <DIAGNOSTIC-EVENT-MANAGER-NEEDS> (AUTOSAR 4)"""
+        self.push()
+        for xmlElem in xmlRoot.findall('./*'):
+            self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+
+        obj = autosar.behavior.DiagnosticEventManagerNeeds(self.name, parent = parent, adminData = self.adminData)
+        self.pop(obj)
+        return obj
+    
+    def parseDiagnosticCommunicationManagerNeeds(self, xmlRoot, parent = None):
+        """parses <DIAGNOSTIC-EVENT-NEEDS> (AUTOSAR 4)"""
+        config = autosar.behavior.DiagnosticCommunicationManagerConfig()
+
+        self.push()
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'SERVICE-REQUEST-CALLBACK-TYPE':
+                config.serviceRequestCallbackType = self.parseTextNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        config.check()
+        obj = autosar.behavior.DiagnosticCommunicationManagerNeeds(self.name, config = config, parent = parent, adminData = self.adminData)
         self.pop(obj)
         return obj
 

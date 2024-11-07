@@ -694,6 +694,58 @@ class DiagnosticEventNeeds(Element):
 
     def tag(self, version): return 'DIAGNOSTIC-EVENT-NEEDS'
 
+class DiagnosticEventManagerNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-EVENT-MANAGER-NEEDS
+
+    second argument to the init function should be an instance of (a previously configured) DiagnosticEventManagerConfig
+    """
+
+    def __init__(self, name, parent = None, adminData = None):
+        super().__init__(name, parent, adminData)
+
+    def tag(self, version): return 'DIAGNOSTIC-EVENT-MANAGER-NEEDS'
+
+class DiagnosticCommunicationManagerConfig:
+    """
+    Represents Diagnostic Communication Manager config, used inside an DiagnosticCommunicationManagerNeeds object.
+    All options by default is set to None which means "default configuration".
+    In practice a None value means that no XML will be generated for that option.
+    Option List:
+    - serviceRequestCallbackType: None or str ('REQUEST-CALLBACK-TYPE-MANUFACTURER', 'REQUEST-CALLBACK-TYPE-SUPPLIER')
+
+    """
+
+    def __init__(self, serviceRequestCallbackType = None, check_input = True):
+
+        self.serviceRequestCallbackType = serviceRequestCallbackType
+
+        if check_input:
+            self.check()
+
+    def check(self):
+        if not (self.serviceRequestCallbackType is None or isinstance(self.serviceRequestCallbackType, str) ):
+            raise ValueError('serviceRequestCallbackType is incorrectly formatted (None or str expected)')
+        elif self.serviceRequestCallbackType is not None:
+            if self.serviceRequestCallbackType not in ['REQUEST-CALLBACK-TYPE-MANUFACTURER', 'REQUEST-CALLBACK-TYPE-SUPPLIER']:
+                raise ValueError('serviceRequestCallbackType is incorrectly formatted (invalid value)')
+
+class DiagnosticCommunicationManagerNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-COMMUNICATION-MANAGER-NEEDS
+
+    second argument to the init function should be an instance of (a previously configured) DiagnosticCommunicationManagerNeeds
+    """
+
+    def __init__(self, name, config = None, parent = None, adminData = None):
+        super().__init__(name, parent, adminData)
+        assert(config is None or isinstance(config, DiagnosticCommunicationManagerConfig))
+        if config is None:
+            config = DiagnosticCommunicationManagerConfig() #create a default configuration
+        self.cfg = config
+
+    def tag(self, version): return 'DIAGNOSTIC-COMMUNICATION-MANAGER-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
@@ -1618,10 +1670,14 @@ class ServiceNeeds(Element):
     """
     def tag(self, version): return 'SERVICE-NEEDS'
 
-    def __init__(self, name = None, nvmBlockNeeds = None, diagnosticEventNeeds = None, parent=None, adminData = None):
+    def __init__(self, name = None, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
+                 diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
+                 parent=None, adminData = None):
         super().__init__(name, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
+        self.diagnosticEventManagerNeeds = diagnosticEventManagerNeeds
+        self.diagnosticCommunicationManagerNeeds = diagnosticCommunicationManagerNeeds
 
 class NvmBlockServiceNeeds(ServiceNeeds):
     def __init__(self, name, nvmBlockNeeds = None, parent=None, adminData = None):
