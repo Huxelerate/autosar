@@ -597,17 +597,13 @@ class DiagnosticCapabilityElementConfig:
     def __init__(self, 
                  audiences = None,
                  diagRequirement = None,
-                 securityAccessLevel = None,
-                 check_input = True):
+                 securityAccessLevel = None):
 
         self.audiences = audiences
         self.diagRequirement = diagRequirement
         self.securityAccessLevel = securityAccessLevel
 
-        if check_input:
-            self.check()
-    
-    def check(self):
+    def _check(self):
         if not (self.audiences is None or isinstance(self.audiences, str) ):
             raise ValueError('audiences is incorrectly formatted (None or str expected)')
         elif self.audiences is not None:
@@ -676,6 +672,7 @@ class DiagnosticEventConfig(DiagnosticCapabilityElementConfig):
             self.check()
 
     def check(self):
+        super()._check()
         if not (self.considerPtoStatus is None or isinstance(self.considerPtoStatus, bool) ):
             raise ValueError('considerPtoStatus is incorrectly formatted (None or bool expected)')
         if not (self.deferringFidRefs is None or isinstance(self.deferringFidRefs, list) ):
@@ -755,6 +752,12 @@ class DiagnosticEventManagerConfig(DiagnosticCapabilityElementConfig):
                  check_input = True):
         super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
 
+        if check_input:
+            self.check()
+
+    def check(self):
+        super()._check()
+
 class DiagnosticEventManagerNeeds(Element):
     """
     AUTOSAR 4 representation of DIAGNOSTIC-EVENT-MANAGER-NEEDS
@@ -797,6 +800,7 @@ class DiagnosticCommunicationManagerConfig(DiagnosticCapabilityElementConfig):
             self.check()
 
     def check(self):
+        super()._check()
         if not (self.serviceRequestCallbackType is None or isinstance(self.serviceRequestCallbackType, str) ):
             raise ValueError('serviceRequestCallbackType is incorrectly formatted (None or str expected)')
         elif self.serviceRequestCallbackType is not None:
