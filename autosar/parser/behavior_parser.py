@@ -1110,7 +1110,7 @@ class BehaviorParser(EntityParser):
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
 
         config.check()
-        obj = autosar.behavior.DiagnosticEventManagerNeeds(self.name, parent = parent, adminData = self.adminData)
+        obj = autosar.behavior.DiagnosticEventManagerNeeds(self.name, eventConfig = config, parent = parent, adminData = self.adminData)
         self.pop(obj)
         return obj
     

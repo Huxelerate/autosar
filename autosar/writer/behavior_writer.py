@@ -560,7 +560,8 @@ class XMLBehaviorWriter(ElementWriter):
         lines.append('</%s>'%elem.tag(self.version))
         return lines
 
-    def _writeDiagnosticCapabilityElementConfigs(self, elem_cfg: autosar.behavior.DiagnosticCapabilityElementConfig):
+    def _writeDiagnosticCapabilityElementConfigs(self, elem_cfg):
+        assert(isinstance(elem_cfg, autosar.behavior.DiagnosticCapabilityElementConfig))
         lines = []
         if elem_cfg.audiences is not None:
             lines.append('<AUDIENCES>%s</AUDIENCES>'%elem_cfg.audiences)
@@ -577,7 +578,7 @@ class XMLBehaviorWriter(ElementWriter):
         lines.append(self.indent('<SHORT-NAME>%s</SHORT-NAME>'%elem.name,1))
         if elem.adminData is not None:
             lines.extend(self.indent(self.writeAdminDataXML(elem.adminData),1))
-        lines.extend(self._writeDiagnosticCapabilityElementConfigs(ws, elem.cfg))
+        lines.extend(self.indent(self._writeDiagnosticCapabilityElementConfigs(elem.cfg),1))
         if elem.cfg.considerPtoStatus is not None:
             lines.append(self.indent('<CONSIDER-PTO-STATUS>%s</CONSIDER-PTO-STATUS>'%('true' if elem.cfg.considerPtoStatus else 'false'),1))
         if elem.cfg.deferringFidRefs is not None and len(elem.cfg.deferringFidRefs)>0:
@@ -625,7 +626,7 @@ class XMLBehaviorWriter(ElementWriter):
         lines.append(self.indent('<SHORT-NAME>%s</SHORT-NAME>'%elem.name,1))
         if elem.adminData is not None:
             lines.extend(self.indent(self.writeAdminDataXML(elem.adminData),1))
-        lines.extend(self._writeDiagnosticCapabilityElementConfigs(ws, elem.cfg))
+        lines.extend(self.indent(self._writeDiagnosticCapabilityElementConfigs(elem.cfg),1))
         lines.append('</%s>'%elem.tag(self.version))
         return lines
     
@@ -636,7 +637,7 @@ class XMLBehaviorWriter(ElementWriter):
         lines.append(self.indent('<SHORT-NAME>%s</SHORT-NAME>'%elem.name,1))
         if elem.adminData is not None:
             lines.extend(self.indent(self.writeAdminDataXML(elem.adminData),1))
-        lines.extend(self._writeDiagnosticCapabilityElementConfigs(ws, elem.cfg))
+        lines.extend(self.indent(self._writeDiagnosticCapabilityElementConfigs(elem.cfg),1))
         if elem.cfg.serviceRequestCallbackType is not None:
             lines.append(self.indent('<SERVICE-REQUEST-CALLBACK-TYPE>%s</SERVICE-REQUEST-CALLBACK-TYPE>'%elem.cfg.serviceRequestCallbackType,1))
         lines.append('</%s>'%elem.tag(self.version))

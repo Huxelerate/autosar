@@ -619,7 +619,7 @@ class DiagnosticCapabilityElementConfig:
             raise ValueError('securityAccessLevel is incorrectly formatted (None or int expected)')
         elif self.securityAccessLevel is not None:
             if self.securityAccessLevel < 0:
-                raise ValueError('dtcNumber is incorrectly formatted (negative value)')
+                raise ValueError('securityAccessLevel is incorrectly formatted (negative value)')
 
 class DiagnosticEventConfig(DiagnosticCapabilityElementConfig):
     """
