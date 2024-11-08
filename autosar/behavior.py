@@ -582,12 +582,52 @@ class NvmBlockNeeds(Element):
         self.cfg = blockConfig
     def tag(self, version): return 'NV-BLOCK-NEEDS'
 
-class DiagnosticEventConfig:
+class DiagnosticCapabilityElementConfig:
+    """
+    Represents Diagnostic Capability Element config used as part of diagnostic configs.
+    All options by default is set to None which means "default configuration".
+    In practice a None value means that no XML will be generated for that option.
+    Option List:
+    - audiences: None or str ('AFTER-SALES', 'AFTERMAKET', 'AFTERMARKET', 'DEVELOPMENT', 'MANUFACTURING', 'SUPPLIER')
+    - diagRequirement: None or str
+    - securityAccessLevel: None or int
+
+    """
+
+    def __init__(self, 
+                 audiences = None,
+                 diagRequirement = None,
+                 securityAccessLevel = None,
+                 check_input = True):
+
+        self.audiences = audiences
+        self.diagRequirement = diagRequirement
+        self.securityAccessLevel = securityAccessLevel
+
+        if check_input:
+            self.check()
+    
+    def check(self):
+        if not (self.audiences is None or isinstance(self.audiences, str) ):
+            raise ValueError('audiences is incorrectly formatted (None or str expected)')
+        elif self.audiences is not None:
+            if self.audiences not in ['AFTER-SALES', 'AFTERMAKET', 'AFTERMARKET', 'DEVELOPMENT', 'MANUFACTURING', 'SUPPLIER']:
+                raise ValueError('audiences is incorrectly formatted (invalid value)')
+        if not (self.diagRequirement is None or isinstance(self.diagRequirement, str) ):
+            raise ValueError('diagRequirement is incorrectly formatted (None or str expected)')
+        if not (self.securityAccessLevel is None or isinstance(self.securityAccessLevel, int) ):
+            raise ValueError('securityAccessLevel is incorrectly formatted (None or int expected)')
+        elif self.securityAccessLevel is not None:
+            if self.securityAccessLevel < 0:
+                raise ValueError('dtcNumber is incorrectly formatted (negative value)')
+
+class DiagnosticEventConfig(DiagnosticCapabilityElementConfig):
     """
     Represents Diagnostic Event config, used inside an DiagnosticEventNeeds object.
     All options by default is set to None which means "default configuration".
     In practice a None value means that no XML will be generated for that option.
     Option List:
+    - all options from: DiagnosticCapabilityElementConfig
     - considerPtoStatus: None or bool
     - deferringFidRefs: None or list of str
     - dtcKind: None or str ('EMISSION-RELATED-DTC', 'NON-EMMISSION-RELATED-DTC')
@@ -603,6 +643,9 @@ class DiagnosticEventConfig:
     """
 
     def __init__(self, 
+        audiences=None,
+        diagRequirement=None,
+        securityAccessLevel=None,
         considerPtoStatus=None,
         deferringFidRefs=None,
         dtcKind=None,
@@ -616,6 +659,7 @@ class DiagnosticEventConfig:
         usesMonitorData=None,
         check_input = True):
 
+        super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
         self.considerPtoStatus = considerPtoStatus
         self.deferringFidRefs = deferringFidRefs
         self.dtcKind = dtcKind
@@ -694,6 +738,23 @@ class DiagnosticEventNeeds(Element):
 
     def tag(self, version): return 'DIAGNOSTIC-EVENT-NEEDS'
 
+class DiagnosticEventManagerConfig(DiagnosticCapabilityElementConfig):
+    """
+    Represents Diagnostic Event Manager config, used inside an DiagnosticEventManagerNeeds object.
+    All options by default is set to None which means "default configuration".
+    In practice a None value means that no XML will be generated for that option.
+    Option List:
+    - all options from: DiagnosticCapabilityElementConfig
+
+    """
+
+    def __init__(self, 
+                 audiences = None,
+                 diagRequirement = None,
+                 securityAccessLevel = None,
+                 check_input = True):
+        super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
+
 class DiagnosticEventManagerNeeds(Element):
     """
     AUTOSAR 4 representation of DIAGNOSTIC-EVENT-MANAGER-NEEDS
@@ -701,23 +762,35 @@ class DiagnosticEventManagerNeeds(Element):
     second argument to the init function should be an instance of (a previously configured) DiagnosticEventManagerConfig
     """
 
-    def __init__(self, name, parent = None, adminData = None):
+    def __init__(self, name, eventConfig = None, parent = None, adminData = None):
+        super().__init__(name, parent, adminData)
+        assert(eventConfig is None or isinstance(eventConfig, DiagnosticEventManagerConfig))
+        if eventConfig is None:
+            eventConfig = DiagnosticEventManagerConfig() #create a default configuration
+        self.cfg = eventConfig
+
         super().__init__(name, parent, adminData)
 
     def tag(self, version): return 'DIAGNOSTIC-EVENT-MANAGER-NEEDS'
 
-class DiagnosticCommunicationManagerConfig:
+class DiagnosticCommunicationManagerConfig(DiagnosticCapabilityElementConfig):
     """
     Represents Diagnostic Communication Manager config, used inside an DiagnosticCommunicationManagerNeeds object.
     All options by default is set to None which means "default configuration".
     In practice a None value means that no XML will be generated for that option.
     Option List:
+    - all options from: DiagnosticCapabilityElementConfig
     - serviceRequestCallbackType: None or str ('REQUEST-CALLBACK-TYPE-MANUFACTURER', 'REQUEST-CALLBACK-TYPE-SUPPLIER')
 
     """
 
-    def __init__(self, serviceRequestCallbackType = None, check_input = True):
-
+    def __init__(self, 
+                 audiences = None,
+                 diagRequirement = None,
+                 securityAccessLevel = None,
+                 serviceRequestCallbackType = None, 
+                 check_input = True):
+        super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
         self.serviceRequestCallbackType = serviceRequestCallbackType
 
         if check_input:
@@ -1517,8 +1590,8 @@ class SwcInternalBehavior(InternalBehaviorCommon):
             assert(isinstance(nvmBlockConfig, NvmBlockConfig))
 
         nvmBlockNeeds = NvmBlockNeeds(name, nvmBlockConfig, adminData = blockAdminData)
-        nvmBlockServiceNeeds = NvmBlockServiceNeeds(name, nvmBlockNeeds)
-        serviceDependency = SwcServiceDependency(name, nvmBlockServiceNeeds)
+        serviceNeeds = ServiceNeeds(nvmBlockNeeds = nvmBlockNeeds)
+        serviceDependency = SwcServiceDependency(name, serviceNeeds)
 
         for port in self.swc.requirePorts:
             if port.name == portName:
@@ -1670,20 +1743,14 @@ class ServiceNeeds(Element):
     """
     def tag(self, version): return 'SERVICE-NEEDS'
 
-    def __init__(self, name = None, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
+    def __init__(self, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
                  parent=None, adminData = None):
-        super().__init__(name, parent, adminData)
+        super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
         self.diagnosticEventManagerNeeds = diagnosticEventManagerNeeds
         self.diagnosticCommunicationManagerNeeds = diagnosticCommunicationManagerNeeds
-
-class NvmBlockServiceNeeds(ServiceNeeds):
-    def __init__(self, name, nvmBlockNeeds = None, parent=None, adminData = None):
-        super().__init__(name, parent, adminData)
-        assert(nvmBlockNeeds is None or isinstance(nvmBlockNeeds, NvmBlockNeeds))
-        self.nvmBlockNeeds = nvmBlockNeeds
 
 class SwcServiceDependency(Element):
     """

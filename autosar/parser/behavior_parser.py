@@ -497,13 +497,13 @@ class BehaviorParser(EntityParser):
     @parseElementUUID
     def _parseLocalVariableAccess(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIABLE-ACCESS')
-        name = None
+        variableAccess = None
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'ACCESSED-VARIABLE':
                 variableAccess = self.parseLocalAccessedVariable(xmlElem)
             else:
-                handleNotImplementedError(xmlElem.tag)
+                self.defaultHandler(xmlElem)
         obj = autosar.behavior.LocalVariableAccess(self.name, variableAccess.localVariableRef)
         self.pop()
         return obj
@@ -974,7 +974,7 @@ class BehaviorParser(EntityParser):
                 xmlDiagnosticCommunicationManagerNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
-        serviceNeeds = autosar.behavior.ServiceNeeds()
+        serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
         if xmlNvBlockNeeds is not None:
             serviceNeeds.nvmBlockNeeds = self.parseNvmBlockNeeds(xmlElem, serviceNeeds)
         if xmlDiagnosticEventNeeds is not None:
@@ -1047,7 +1047,13 @@ class BehaviorParser(EntityParser):
 
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'CONSIDER-PTO-STATUS':
+            if xmlElem.tag == 'AUDIENCES':
+                config.audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                config.diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                config.securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'CONSIDER-PTO-STATUS':
                 config.considerPtoStatus = self.parseBooleanNode(xmlElem)
             elif xmlElem.tag == 'DEFERRING-FID-REFS':
                 config.deferringFidRefs = []
@@ -1087,24 +1093,40 @@ class BehaviorParser(EntityParser):
 
     def parseDiagnosticEventManagerNeeds(self, xmlRoot, parent = None):
         """parses <DIAGNOSTIC-EVENT-MANAGER-NEEDS> (AUTOSAR 4)"""
+        config = autosar.behavior.DiagnosticEventManagerConfig()
+
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            self.baseHandler(xmlElem)
+            if xmlElem.tag == 'AUDIENCES':
+                config.audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                config.diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                config.securityAccessLevel = self.parseIntNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
 
         if self.name is None:
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
 
+        config.check()
         obj = autosar.behavior.DiagnosticEventManagerNeeds(self.name, parent = parent, adminData = self.adminData)
         self.pop(obj)
         return obj
     
     def parseDiagnosticCommunicationManagerNeeds(self, xmlRoot, parent = None):
-        """parses <DIAGNOSTIC-EVENT-NEEDS> (AUTOSAR 4)"""
+        """parses <DIAGNOSTIC-COMMUNICATION-MANAGER-NEEDS> (AUTOSAR 4)"""
         config = autosar.behavior.DiagnosticCommunicationManagerConfig()
 
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'SERVICE-REQUEST-CALLBACK-TYPE':
+            if xmlElem.tag == 'AUDIENCES':
+                config.audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                config.diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                config.securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'SERVICE-REQUEST-CALLBACK-TYPE':
                 config.serviceRequestCallbackType = self.parseTextNode(xmlElem)
             else:
                 self.baseHandler(xmlElem)
