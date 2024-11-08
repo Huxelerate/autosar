@@ -655,7 +655,7 @@ class DiagnosticEventConfig(DiagnosticCapabilityElementConfig):
         usesMonitorData=None,
         check_input = True):
 
-        super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
+        super().__init__(audiences, diagRequirement, securityAccessLevel)
         self.considerPtoStatus = considerPtoStatus
         self.deferringFidRefs = deferringFidRefs
         self.dtcKind = dtcKind
@@ -750,7 +750,7 @@ class DiagnosticEventManagerConfig(DiagnosticCapabilityElementConfig):
                  diagRequirement = None,
                  securityAccessLevel = None,
                  check_input = True):
-        super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
+        super().__init__(audiences, diagRequirement, securityAccessLevel)
 
         if check_input:
             self.check()
@@ -793,7 +793,7 @@ class DiagnosticCommunicationManagerConfig(DiagnosticCapabilityElementConfig):
                  securityAccessLevel = None,
                  serviceRequestCallbackType = None, 
                  check_input = True):
-        super().__init__(audiences, diagRequirement, securityAccessLevel, check_input)
+        super().__init__(audiences, diagRequirement, securityAccessLevel)
         self.serviceRequestCallbackType = serviceRequestCallbackType
 
         if check_input:
