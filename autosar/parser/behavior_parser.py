@@ -406,8 +406,8 @@ class BehaviorParser(EntityParser):
             for xmlElem in xmlDataReadAccess.findall('./*'):
                 if xmlElem.tag == 'VARIABLE-ACCESS':
                     variableAccess = self._parseVariableAccess(xmlElem)
-                    assert(variableAccess is not None)
-                    runnableEntity.dataReadAccess.append(variableAccess)
+                    if variableAccess is not None:
+                        runnableEntity.dataReadAccess.append(variableAccess)
                 else:
                     handleNotImplementedError(xmlElem.tag)
         
@@ -415,8 +415,8 @@ class BehaviorParser(EntityParser):
             for xmlElem in xmlDataWriteAccess.findall('./*'):
                 if xmlElem.tag == 'VARIABLE-ACCESS':
                     variableAccess = self._parseVariableAccess(xmlElem)
-                    assert(variableAccess is not None)
-                    runnableEntity.dataWriteAccess.append(variableAccess)
+                    if variableAccess is not None:
+                        runnableEntity.dataWriteAccess.append(variableAccess)
                 else:
                     handleNotImplementedError(xmlElem.tag)
 
@@ -424,8 +424,8 @@ class BehaviorParser(EntityParser):
             for xmlElem in xmlLocalDataReadAccess.findall('./*'):
                 if xmlElem.tag == 'VARIABLE-ACCESS':
                     variableAccess = self._parseLocalVariableAccess(xmlElem)
-                    assert(variableAccess is not None)
-                    runnableEntity.dataLocalReadAccess.append(variableAccess)
+                    if variableAccess is not None:
+                        runnableEntity.dataLocalReadAccess.append(variableAccess)
                 else:
                     handleNotImplementedError(xmlElem.tag)
         
@@ -433,8 +433,8 @@ class BehaviorParser(EntityParser):
             for xmlElem in xmlLocalDataWriteAccess.findall('./*'):
                 if xmlElem.tag == 'VARIABLE-ACCESS':
                     variableAccess = self._parseLocalVariableAccess(xmlElem)
-                    assert(variableAccess is not None)
-                    runnableEntity.dataLocalWriteAccess.append(variableAccess)
+                    if variableAccess is not None:
+                        runnableEntity.dataLocalWriteAccess.append(variableAccess)
                 else:
                     handleNotImplementedError(xmlElem.tag)
         
@@ -490,7 +490,10 @@ class BehaviorParser(EntityParser):
                 variableAccess = self.parseAccessedVariable(xmlElem)
             else:
                 self.defaultHandler(xmlElem)
-        obj = autosar.behavior.VariableAccess(self.name, variableAccess.portPrototypeRef, variableAccess.targetDataPrototypeRef)
+        if variableAccess is not None:
+            obj = autosar.behavior.VariableAccess(self.name, variableAccess.portPrototypeRef, variableAccess.targetDataPrototypeRef)
+        else:
+            obj = None
         self.pop()
         return obj
 
@@ -504,7 +507,10 @@ class BehaviorParser(EntityParser):
                 variableAccess = self.parseLocalAccessedVariable(xmlElem)
             else:
                 self.defaultHandler(xmlElem)
-        obj = autosar.behavior.LocalVariableAccess(self.name, variableAccess.localVariableRef)
+        if variableAccess is not None:
+            obj = autosar.behavior.LocalVariableAccess(self.name, variableAccess.localVariableRef)
+        else:
+            obj = None
         self.pop()
         return obj
 
