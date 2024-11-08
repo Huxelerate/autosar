@@ -568,7 +568,7 @@ class XMLBehaviorWriter(ElementWriter):
         if elem_cfg.diagRequirement is not None:
             lines.append('<DIAG-REQUIREMENT>%s</DIAG-REQUIREMENT>'%elem_cfg.diagRequirement)
         if elem_cfg.securityAccessLevel is not None:
-            lines.append('<DIAG-REQUIREMENT>%d</DIAG-REQUIREMENT>'%elem_cfg.securityAccessLevel)
+            lines.append('<SECURITY-ACCESS-LEVEL>%d</SECURITY-ACCESS-LEVEL>'%elem_cfg.securityAccessLevel)
         return lines
 
     def _writeDiagnosticEventNeedsXML(self, ws, elem):
