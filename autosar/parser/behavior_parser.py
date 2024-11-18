@@ -115,6 +115,7 @@ class BehaviorParser(EntityParser):
         if (name is not None):
             handledXML = ['SHORT-NAME', 'SUPPORTS-MULTIPLE-INSTANTIATION']
             internalBehavior = autosar.behavior.SwcInternalBehavior(name, parent.ref, multipleInstance, parent)
+            self.push()
             for xmlElem in xmlRoot.findall('./*'):
                 if xmlElem.tag in handledXML:
                     pass
@@ -248,7 +249,11 @@ class BehaviorParser(EntityParser):
                         else:
                             handleNotImplementedError(xmlChild.tag)
                 else:
-                    handleNotImplementedError(xmlElem.tag)
+                    self.defaultHandler(xmlElem)
+            
+            internalBehavior.adminData = self.adminData
+            self.pop()
+
             return internalBehavior
 
     @parseElementUUID
@@ -762,7 +767,7 @@ class BehaviorParser(EntityParser):
                 startOnEventRef = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'OPERATION-IREF':
                 portTag = 'CONTEXT-P-PORT-REF' if self.version >= 4.0 else 'P-PORT-PROTOTYPE-REF'
-                operationInstanceRef = self.parseOperationInstanceRef(xmlElem, portTag)
+                operationInstanceRef = self.parseOperationInstanceRef(xmlElem, portTag, xmlRoot)
             elif xmlElem.tag == 'MODE-DEPENDENCY':
                 modeDependency = self._parseModeDependency(xmlElem)
             else:
@@ -786,10 +791,15 @@ class BehaviorParser(EntityParser):
                 handleNotImplementedError(xmlElem.tag)
         return autosar.behavior.DataInstanceRef(portRef,dataElemRef)
 
-    def parseOperationInstanceRef(self,xmlRoot,portTag):
+    def parseOperationInstanceRef(self,xmlRoot,portTag,parent):
         """parses <OPERATION-IREF>"""
         assert(xmlRoot.tag=='OPERATION-IREF')
-        assert(xmlRoot.find(portTag) is not None)
+
+        parent_name = self.parseTextNode(parent.find('SHORT-NAME'))
+        port = xmlRoot.find(portTag)
+        if port is None:
+            handleValueError(f"OPERATION-IREF (inside: '{parent_name}') is missing {portTag}")
+            return None
 
         if self.version >= 4.0:
             if portTag == 'CONTEXT-P-PORT-REF':
@@ -859,7 +869,9 @@ class BehaviorParser(EntityParser):
                 if xmlElem.tag=='SHORT-NAME':
                     name=self.parseTextNode(xmlElem)
                 elif xmlElem.tag=='OPERATION-IREF':
-                    operationInstanceRefs.append(self.parseOperationInstanceRef(xmlElem,'CONTEXT-R-PORT-REF'))
+                    operationRef = self.parseOperationInstanceRef(xmlElem,'CONTEXT-R-PORT-REF', xmlRoot)
+                    if operationRef is not None:
+                        operationInstanceRefs.append(operationRef)
                 elif xmlElem.tag=='TIMEOUT':
                     timeout=self.parseFloatNode(xmlElem)
                 else:
@@ -872,7 +884,9 @@ class BehaviorParser(EntityParser):
                     operationInstanceRefs=[]
                     for xmlOperation in xmlElem.findall('*'):
                         if xmlOperation.tag=='OPERATION-IREF':
-                            operationInstanceRefs.append(self.parseOperationInstanceRef(xmlOperation,'R-PORT-PROTOTYPE-REF'))
+                            operationRef = self.parseOperationInstanceRef(xmlOperation,'R-PORT-PROTOTYPE-REF', xmlRoot)
+                            if operationRef is not None:
+                                operationInstanceRefs.append(operationRef)
                         else:
                             handleNotImplementedError(xmlElem.tag)
                 elif xmlElem.tag=='TIMEOUT':
@@ -905,15 +919,15 @@ class BehaviorParser(EntityParser):
         xmlTargetDataPrototypeRef = xmlRoot.find('./AUTOSAR-VARIABLE-IREF/TARGET-DATA-PROTOTYPE-REF')
         parent_name = self.parseTextNode(parent.find('./SHORT-NAME'))
 
-        if xmlPortPrototypeRef is not None and xmlTargetDataPrototypeRef is not None:
+        if xmlPortPrototypeRef is None and xmlTargetDataPrototypeRef is None:
             # Ignore empty variable access
             return None
         
-        if xmlPortPrototypeRef is not None:
+        if xmlPortPrototypeRef is None:
             handleValueError(f"ACCESSED-VARIABLE in VARIABLE-ACCESS (name: '{parent_name}') is missing required tag PORT-PROTOTYPE-REF")
             return None
         
-        if xmlTargetDataPrototypeRef is not None:
+        if xmlTargetDataPrototypeRef is None:
             handleValueError(f"ACCESSED-VARIABLE in VARIABLE-ACCESS (name: '{parent_name}') is missing required tag TARGET-DATA-PROTOTYPE-REF")
             return None
         
