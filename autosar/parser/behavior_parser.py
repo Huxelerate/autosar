@@ -351,9 +351,9 @@ class BehaviorParser(EntityParser):
                         dataReceivePoint=autosar.behavior.DataReceivePoint(dataElementInstanceRef.portRef,dataElementInstanceRef.dataElemRef,name)
                         runnableEntity.append(dataReceivePoint)
             else:
-                for xmlVariableAcess in xmlDataReceivePoints.findall('VARIABLE-ACCESS'):
-                    name=self.parseTextNode(xmlVariableAcess.find('SHORT-NAME'))
-                    accessedVariable = self.parseAccessedVariable(xmlVariableAcess.find('./ACCESSED-VARIABLE'), xmlVariableAcess)
+                for xmlVariableAccess in xmlDataReceivePoints.findall('VARIABLE-ACCESS'):
+                    name=self.parseTextNode(xmlVariableAccess.find('SHORT-NAME'))
+                    accessedVariable = self.parseAccessedVariable(xmlVariableAccess.find('./ACCESSED-VARIABLE'), xmlVariableAccess)
                     if accessedVariable is not None:
                         dataReceivePoint=autosar.behavior.DataReceivePoint(accessedVariable.portPrototypeRef,accessedVariable.targetDataPrototypeRef,name)
                         runnableEntity.append(dataReceivePoint)
@@ -366,9 +366,9 @@ class BehaviorParser(EntityParser):
                         dataSendPoint=autosar.behavior.DataSendPoint(dataElementInstanceRef.portRef,dataElementInstanceRef.dataElemRef,name)
                         runnableEntity.append(dataSendPoint)
             else:
-                for xmlVariableAcess in xmlDataSendPoints.findall('VARIABLE-ACCESS'):
-                    name=self.parseTextNode(xmlVariableAcess.find('SHORT-NAME'))
-                    accessedVariable = self.parseAccessedVariable(xmlVariableAcess.find('./ACCESSED-VARIABLE'), xmlVariableAcess)
+                for xmlVariableAccess in xmlDataSendPoints.findall('VARIABLE-ACCESS'):
+                    name=self.parseTextNode(xmlVariableAccess.find('SHORT-NAME'))
+                    accessedVariable = self.parseAccessedVariable(xmlVariableAccess.find('./ACCESSED-VARIABLE'), xmlVariableAccess)
                     if accessedVariable is not None:
                         dataSendPoint=autosar.behavior.DataSendPoint(accessedVariable.portPrototypeRef,accessedVariable.targetDataPrototypeRef,name)
                         runnableEntity.append(dataSendPoint)
@@ -798,11 +798,11 @@ class BehaviorParser(EntityParser):
                 handleNotImplementedError(xmlElem.tag)
         return autosar.behavior.DataInstanceRef(portRef,dataElemRef)
 
-    def parseOperationInstanceRef(self,xmlRoot,portTag,parent):
+    def parseOperationInstanceRef(self,xmlRoot,portTag,xmlParentElement):
         """parses <OPERATION-IREF>"""
         assert(xmlRoot.tag=='OPERATION-IREF')
 
-        parent_name = self.parseTextNode(parent.find('SHORT-NAME'))
+        parent_name = self.parseTextNode(xmlParentElement.find('SHORT-NAME'))
         port = xmlRoot.find(portTag)
         if port is None:
             handleValueError(f"OPERATION-IREF (inside: '{parent_name}') is missing {portTag}")
@@ -919,12 +919,12 @@ class BehaviorParser(EntityParser):
         return self._parseServerCallPoint(xmlRoot, autosar.behavior.SyncServerCallPoint)
 
     @parseElementUUID
-    def parseAccessedVariable(self, xmlRoot, parent):
+    def parseAccessedVariable(self, xmlRoot, xmlParentElement):
         assert(xmlRoot.tag == 'ACCESSED-VARIABLE')
 
         xmlPortPrototypeRef = xmlRoot.find('./AUTOSAR-VARIABLE-IREF/PORT-PROTOTYPE-REF')
         xmlTargetDataPrototypeRef = xmlRoot.find('./AUTOSAR-VARIABLE-IREF/TARGET-DATA-PROTOTYPE-REF')
-        parent_name = self.parseTextNode(parent.find('./SHORT-NAME'))
+        parent_name = self.parseTextNode(xmlParentElement.find('./SHORT-NAME'))
 
         if xmlPortPrototypeRef is None and xmlTargetDataPrototypeRef is None:
             # Ignore empty variable access
