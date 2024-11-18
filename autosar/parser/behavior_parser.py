@@ -59,7 +59,7 @@ class BehaviorParser(EntityParser):
                         if event is not None:
                             internalBehavior.events.append(event)
                         else:
-                            handleValueError('event')
+                            handleValueError(f'failing to parse event: {xmlEvent.tag}')
                 elif xmlNode.tag == 'PORT-API-OPTIONS':
                     for xmlOption in xmlNode.findall('./PORT-API-OPTION'):
                         portAPIOption = autosar.behavior.PortAPIOption(self.parseTextNode(xmlOption.find('PORT-REF')),self.parseBooleanNode(xmlOption.find('ENABLE-TAKE-ADDRESS')),self.parseBooleanNode(xmlOption.find('INDIRECT-API')))
@@ -742,7 +742,14 @@ class BehaviorParser(EntityParser):
                 timingEvent.disabledInModes = self._parseDisabledModesInstanceRefs(xmlDisabledModeRefs, parent)
             return timingEvent
         else:
-            raise RuntimeError('Parse error: <SHORT-NAME> and <START-ON-EVENT-REF> and <PERIOD> must be defined')
+            if name is None:
+                handleValueError('Parse error: <SHORT-NAME> is not set for <TIMING-EVENT>')
+            elif startOnEventRef is None:
+                handleValueError(f'Parse error: <START-ON-EVENT-REF> is not set for <TIMING-EVENT> named: "{name}"')
+            elif period is None:
+                handleValueError(f'Parse error: <PERIOD> is not set for <TIMING-EVENT> named: "{name}"')
+
+        return None
 
     @parseElementUUID
     def parseDataReceivedEvent(self,xmlRoot,parent=None):
