@@ -39,6 +39,8 @@ class SystemParser(EntityParser):
                     system.adminData=parseAdminDataNode(xmlElem)
                 elif xmlElem.tag=='FIBEX-ELEMENT-REFS':
                     self.parseFibexElementRefs(xmlElem,system)
+                elif xmlElem.tag=='FIBEX-ELEMENTS':
+                    self.parseFibexElementRefConditionals(xmlElem,system)
                 elif xmlElem.tag=='MAPPING':
                     self.parseSystemMapping(xmlElem,system)
                 elif xmlElem.tag=='SOFTWARE-COMPOSITION':
@@ -53,6 +55,15 @@ class SystemParser(EntityParser):
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='FIBEX-ELEMENT-REF':
                 system.fibexElementRefs.append(parseTextNode(xmlElem))
+            else:
+                handleNotImplementedError(xmlElem.tag)
+
+    def parseFibexElementRefConditionals(self,xmlRoot,system):
+        """parses <FIBEX-ELEMENTS>"""
+        assert(xmlRoot.tag=='FIBEX-ELEMENTS')
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag=='FIBEX-ELEMENT-REF-CONDITIONAL':
+                system.fibexElementRefConditionals.append(parseTextNode(xmlElem))
             else:
                 handleNotImplementedError(xmlElem.tag)
 

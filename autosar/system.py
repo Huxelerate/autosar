@@ -4,6 +4,7 @@ class System(Element):
     def __init__(self,name,parent=None):
         super().__init__(name,parent)
         self.fibexElementRefs=[]
+        self.fibexElementRefConditionals=[]
         self.mapping=None
         self.softwareComposition=None
 
