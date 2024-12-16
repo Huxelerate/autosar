@@ -1388,12 +1388,10 @@ class BehaviorParser(EntityParser):
             elif xmlElem.tag == 'AUTOSAR-VARIABLE-IREF' or xmlElem.tag == 'AUTOSAR-VARIABLE-IN-IMPL-DATATYPE':
                 xmlPortPrototypeRef = xmlElem.find('./PORT-PROTOTYPE-REF')
                 xmlTargetDataPrototypeRef = xmlElem.find('./TARGET-DATA-PROTOTYPE-REF')
-                # TODO: handle these as possibly NULL
-                if xmlPortPrototypeRef is not None:
+                if xmlPortPrototypeRef is None:
+                    # TODO: add support for ROOT-VARIABLE-DATA-PROTOTYPE-REF
                     continue
-                if xmlTargetDataPrototypeRef is not None:
-                    continue
-                assert (xmlPortPrototypeRef is not None)
+                
                 assert (xmlTargetDataPrototypeRef is not None)
                 portPrototypeRef = self.parseTextNode(xmlPortPrototypeRef)
                 targetDataPrototypeRef = self.parseTextNode(xmlTargetDataPrototypeRef)
@@ -1426,8 +1424,10 @@ class BehaviorParser(EntityParser):
                             localVariableRef, portPrototypeRef, targetDataPrototypeRef = self.parseAutosarVariableRefXML(xmlData)
                             if xmlData.tag == 'NV-RAM-BLOCK-ELEMENT':
                                 if localVariableRef is None:
-                                    handleValueError('Cannot find needed LOCAL-VARIABLE-REF for NV-RAM-BLOCK-ELEMENT in {0}'.format(descriptor.name))
-                                dataMapping.nvRamBlockElement = autosar.behavior.NvRamBlockElement(dataMapping, localVariableRef=localVariableRef)
+                                    # TODO: add support for non local variable ref for NV-RAM-BLOCK-ELEMENT
+                                    dataMapping.nvRamBlockElement = None
+                                else:
+                                    dataMapping.nvRamBlockElement = autosar.behavior.NvRamBlockElement(dataMapping, localVariableRef=localVariableRef)
                             elif xmlData.tag == 'READ-NV-DATA':
                                 if portPrototypeRef is None and targetDataPrototypeRef is None:
                                     handleValueError('Cannot find needed AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE for READ-NV-DATA in {0}'.format(descriptor.name))
