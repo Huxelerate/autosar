@@ -259,6 +259,7 @@ class RunnableEntity(Element):
 
         self.parameterAccessPoints = [] #AUTOSAR4 only
         self.activationReasons = [] #AUTOSAR4 only
+        self.externalTriggeringPoints = [] #AUTOSAR4 only
 
     def tag(self,version=None):
         return 'RUNNABLE-ENTITY'
@@ -390,9 +391,9 @@ class DataInstanceRef(object):
         return 'DATA-IREF'
 
 
-class TriggerInstanceRef(object):
+class RTriggerInAtomicSwcInstanceRef(object):
     """
-    <TRIGGER-IREF>
+    xsd complex type: <R-TRIGGER-IN-ATOMIC-SWC-INSTANCE-REF>
     """
     def __init__(self,portRef,triggerRef):
         self.portRef = portRef
@@ -401,8 +402,17 @@ class TriggerInstanceRef(object):
         data={'type': self.__class__.__name__,'portRef':self.portRef, 'triggerRef':self.triggerRef}
         return data
 
-    def tag(self, version=None):
-        return 'TRIGGER-IREF'
+class PTriggerInAtomicSwcTypeInstanceRef(object):
+    """
+    xsd complex type: <P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF>
+    """
+    def __init__(self,portRef,triggerRef):
+        self.portRef = portRef
+        self.triggerRef = triggerRef
+    def asdict(self):
+        data={'type': self.__class__.__name__,'portRef':self.portRef, 'triggerRef':self.triggerRef}
+        return data
+
 
 
 class OperationInstanceRef(object):
@@ -1833,6 +1843,15 @@ class SwcServiceDependency(Element):
         elem.parent = self
         self._serviceNeeds = elem
 
+
+class ExternalTriggeringPoint:
+    """
+    Represents <EXTERNAL-TRIGGERING-POINT> (AUTODSAR 4)
+    """
+    def __init__(self, triggerIref):
+        self.triggerIref = triggerIref
+    
+    def tag(self, version): return 'EXTERNAL-TRIGGERING-POINT'
 
 class SwcExclusiveAreaPolicy:
     """

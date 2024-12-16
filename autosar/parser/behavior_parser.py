@@ -284,6 +284,7 @@ class BehaviorParser(EntityParser):
         xmlModeSwitchPoints = None
         minStartInterval = None
         xmlActivationReasons = None
+        xmlExternalTriggeringPoints = None
 
         xmlDataReadAccess = None
         xmlDataWriteAccess = None
@@ -350,6 +351,8 @@ class BehaviorParser(EntityParser):
                     xmlDataWriteAccess = xmlElem
                 elif xmlElem.tag == 'ACTIVATION-REASONS':
                     xmlActivationReasons = xmlElem
+                elif xmlElem.tag == 'EXTERNAL-TRIGGERING-POINTS':
+                    xmlExternalTriggeringPoints = xmlElem
                 elif xmlElem.tag == 'RUNS-INSIDE-EXCLUSIVE-AREA-REFS':
                     pass #implement later
                 else:
@@ -474,6 +477,15 @@ class BehaviorParser(EntityParser):
                 else:
                     handleNotImplementedError(xmlElem.tag)
         
+        if xmlExternalTriggeringPoints is not None:
+            for xmlElem in xmlExternalTriggeringPoints.findall('./*'):
+                if xmlElem.tag == 'EXTERNAL-TRIGGERING-POINT':
+                    externalTriggeringPoint = self._parseExternalTriggeringPoint(xmlElem)
+                    if externalTriggeringPoint is not None:
+                        runnableEntity.externalTriggeringPoints.append(externalTriggeringPoint)
+                else:
+                    handleNotImplementedError(xmlElem.tag)
+        
         if runnableEntity is not None:
             runnableEntity.adminData = adminData
         self.pop()
@@ -565,6 +577,23 @@ class BehaviorParser(EntityParser):
         obj = autosar.behavior.ExecutableEntityActivationReason(self.name, bit_position, symbol, parent)
         self.pop(obj)
         return obj
+    
+    def _parseExternalTriggeringPoint(self, xmlRoot):
+        assert(xmlRoot.tag == 'EXTERNAL-TRIGGERING-POINT')
+        triggerIref = None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'TRIGGER-IREF':
+                triggerIrefXml = xmlElem.find('P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF')
+                if triggerIrefXml is not None:
+                    triggerIref = self.parsePTriggerInAtomicSwcTypeInstanceRef(triggerIrefXml)
+            else:
+                # TODO: support IDENT and VARIATION-POINT
+                handleNotImplementedError(xmlElem.tag)
+        
+        if triggerIref is not None:
+            return autosar.behavior.ExternalTriggeringPoint(triggerIref)
+
+        return None
 
     @parseElementUUID
     def parseParameterAccessPoint(self, xmlRoot, parent = None):
@@ -815,7 +844,7 @@ class BehaviorParser(EntityParser):
     def parseExternalTriggerOccurredEvent(self,xmlRoot,parent=None):
         name = self.parseTextNode(xmlRoot.find('SHORT-NAME'))
         startOnEventRef = self.parseTextNode(xmlRoot.find('START-ON-EVENT-REF'))
-        triggerInstanceRef=self.parseTriggerInstanceRef(xmlRoot.find('TRIGGER-IREF'))
+        triggerInstanceRef=self.parseRTriggerInAtomicSwcInstanceRef(xmlRoot.find('TRIGGER-IREF'))
         externalTriggerOccurredEvent=autosar.behavior.ExternalTriggerOccurredEvent(name, startOnEventRef, parent)
         xmlModeDependency = xmlRoot.find('MODE-DEPENDENCY')
         if xmlModeDependency is not None:
@@ -869,8 +898,8 @@ class BehaviorParser(EntityParser):
                 handleNotImplementedError(xmlElem.tag)
         return autosar.behavior.DataInstanceRef(portRef,dataElemRef)
     
-    def parseTriggerInstanceRef(self, xmlRoot):
-        """parses <TRIGGER-IREF>"""
+    def parseRTriggerInAtomicSwcInstanceRef(self, xmlRoot):
+        """parses <TRIGGER-IREF> referring to type: R-TRIGGER-IN-ATOMIC-SWC-INSTANCE-REF"""
         assert(xmlRoot.tag=='TRIGGER-IREF')
         (portRef, triggerRef) = (None, None)
         for xmlElem in xmlRoot.findall('./*'):
@@ -880,7 +909,20 @@ class BehaviorParser(EntityParser):
                 triggerRef = self.parseTextNode(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        return autosar.behavior.TriggerInstanceRef(portRef,triggerRef)
+        return autosar.behavior.RTriggerInAtomicSwcInstanceRef(portRef,triggerRef)
+
+    def parsePTriggerInAtomicSwcTypeInstanceRef(self, xmlRoot):
+        """parses <P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF>"""
+        assert(xmlRoot.tag=='P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF')
+        (portRef, triggerRef) = (None, None)
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == "CONTEXT-P-PORT-REF":
+                portRef = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == "TARGET-TRIGGER-REF":
+                triggerRef = self.parseTextNode(xmlElem)
+            else:
+                handleNotImplementedError(xmlElem.tag)
+        return autosar.behavior.PTriggerInAtomicSwcTypeInstanceRef(portRef,triggerRef)
 
     def parseOperationInstanceRef(self,xmlRoot,portTag,xmlParentElement):
         """parses <OPERATION-IREF>"""
