@@ -109,8 +109,8 @@ class PortInterfacePackageParser(EntityParser):
                         # TODO: implement "TRIGGER-PERIOD"
                         self.defaultHandler(xmlChild)
                 
-                    if self.name is not None:
-                        triggers.append(autosar.portinterface.Trigger(self.name, swImplPolicy))
+                if self.name is not None:
+                    triggers.append(autosar.portinterface.Trigger(self.name, swImplPolicy))
                 self.pop()
             else:
                 handleNotImplementedError(xmlElem.tag)

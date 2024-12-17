@@ -415,7 +415,7 @@ class TriggerInterface(PortInterface):
 
     def append(self,elem):
         """
-        adds elem to the self.nvDatas list and sets elem.parent to self (the port interface)
+        adds elem to the self.triggers list and sets elem.parent to self (the port interface)
         """
         if not isinstance(elem, Trigger):
             raise ValueError("expected elem variable to be of type Trigger")

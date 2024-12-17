@@ -866,7 +866,7 @@ class BehaviorParser(EntityParser):
 
     @parseElementUUID
     def parseOperationInvokedEvent(self,xmlRoot,parent=None):
-        (name, startOnEventRef, modeDependency, operationInstanceRef) = (None, None, None, None)
+        (startOnEventRef, modeDependency, operationInstanceRef) = (None, None, None)
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'START-ON-EVENT-REF':
