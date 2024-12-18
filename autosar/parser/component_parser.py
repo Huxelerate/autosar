@@ -343,7 +343,7 @@ class ComponentTypeParser(EntityParser):
                 handleNotImplementedError(elem.tag)
 
     @parseElementUUID
-    def _parseAssemblyConnector(self, xmlRoot, parent = None):
+    def _parseAssemblySwConnector(self, xmlRoot, parent = None):
         """
         parses <ASSEMBLY-SW-CONNECTOR>
         """
@@ -372,7 +372,7 @@ class ComponentTypeParser(EntityParser):
         return autosar.component.AssemblyConnector(name, autosar.component.ProviderInstanceRef(providerComponentRef,providerPortRef), autosar.component.RequesterInstanceRef(requesterComponentRef,requesterPortRef), parent=parent)
 
     @parseElementUUID
-    def _parseDelegationConnector(self, xmlRoot, parent = None):
+    def _parseDelegationSwConnector(self, xmlRoot, parent = None):
         """
         parses <DELEGATION-SW-CONNECTOR>
         """
@@ -399,10 +399,10 @@ class ComponentTypeParser(EntityParser):
         assert(xmlRoot.tag=='CONNECTORS')
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='ASSEMBLY-SW-CONNECTOR':
-                connector = self._parseAssemblyConnector(xmlElem,parent)
+                connector = self._parseAssemblySwConnector(xmlElem,parent)
                 parent.assemblyConnectors.append(connector)
             elif xmlElem.tag=='DELEGATION-SW-CONNECTOR':
-                connector = self._parseDelegationConnector(xmlElem,parent)
+                connector = self._parseDelegationSwConnector(xmlElem,parent)
                 parent.delegationConnectors.append(connector)
             else:
                 handleNotImplementedError(xmlElem.tag)
