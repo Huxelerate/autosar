@@ -343,7 +343,11 @@ class ComponentTypeParser(EntityParser):
                 handleNotImplementedError(elem.tag)
 
     @parseElementUUID
-    def parseAssemblyConnector(self, xmlRoot, parent = None):
+    def _parseAssemblyConnector(self, xmlRoot, parent = None):
+        """
+        parses <ASSEMBLY-SW-CONNECTOR>
+        """
+        assert xmlRoot.tag == 'ASSEMBLY-SW-CONNECTOR'
         name=self.parseTextNode(xmlRoot.find('SHORT-NAME'))
         for xmlChild in xmlRoot.findall('./*'):
             if xmlChild.tag == 'SHORT-NAME':
@@ -368,7 +372,11 @@ class ComponentTypeParser(EntityParser):
         return autosar.component.AssemblyConnector(name, autosar.component.ProviderInstanceRef(providerComponentRef,providerPortRef), autosar.component.RequesterInstanceRef(requesterComponentRef,requesterPortRef), parent=parent)
 
     @parseElementUUID
-    def parseDelegationConnector(self, xmlRoot, parent = None):
+    def _parseDelegationConnector(self, xmlRoot, parent = None):
+        """
+        parses <DELEGATION-SW-CONNECTOR>
+        """
+        assert xmlRoot.tag == 'DELEGATION-SW-CONNECTOR'
         name=self.parseTextNode(xmlRoot.find('SHORT-NAME'))
         for xmlChild in xmlRoot.findall('./INNER-PORT-IREF/*'):
             if xmlChild.tag == 'R-PORT-IN-COMPOSITION-INSTANCE-REF':
@@ -391,10 +399,10 @@ class ComponentTypeParser(EntityParser):
         assert(xmlRoot.tag=='CONNECTORS')
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='ASSEMBLY-SW-CONNECTOR':
-                connector = self.parseAssemblyConnector(xmlElem,parent)
+                connector = self._parseAssemblyConnector(xmlElem,parent)
                 parent.assemblyConnectors.append(connector)
             elif xmlElem.tag=='DELEGATION-SW-CONNECTOR':
-                connector = self.parseDelegationConnector(xmlElem,parent)
+                connector = self._parseDelegationConnector(xmlElem,parent)
                 parent.delegationConnectors.append(connector)
             else:
                 handleNotImplementedError(xmlElem.tag)
