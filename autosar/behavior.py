@@ -274,6 +274,7 @@ class RunnableEntity(Element):
             self.dataReceivePoints,
             self.dataSendPoints,
             self.serverCallPoints,
+            self.asyncServerCallResultPoints,
             self.modeAccessPoints,
             self.modeSwitchPoints,
             self.dataReadAccess,
@@ -952,13 +953,12 @@ class AsyncServerCallReturnPoint(object):
     """
     <ASYNCHRONOUS-SERVER-CALL-RESULT-POINT>
     """
-    def __init__(self, name, timeout=0.0):
+    def __init__(self, name, asyncServerCallPointRef):
         self.name=name
-        self.timeout=timeout
-        self.operationInstanceRefs=[]
+        self.asyncServerCallPointRef=asyncServerCallPointRef
 
     def asdict(self):
-        data={'type': self.__class__.__name__,'name':self.name,'timeout':self.timeout}
+        data={'type': self.__class__.__name__, 'name':self.name, 'asyncServerCallPointRef':self.asyncServerCallPointRef}
         return data
 
 class InternalBehaviorCommon(Element):
