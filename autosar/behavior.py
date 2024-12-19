@@ -270,7 +270,20 @@ class RunnableEntity(Element):
         ref=ref.partition('/')
         name=ref[0]
         foundElem = None
-        for elem in self.modeAccessPoints + self.modeSwitchPoints + self.parameterAccessPoints:
+        for elem in itertools.chain(
+            self.dataReceivePoints,
+            self.dataSendPoints,
+            self.serverCallPoints,
+            self.modeAccessPoints,
+            self.modeSwitchPoints,
+            self.dataReadAccess,
+            self.dataWriteAccess,
+            self.dataLocalReadAccess,
+            self.dataLocalWriteAccess,
+            self.parameterAccessPoints,
+            self.activationReasons,
+            self.externalTriggeringPoints
+        ):
             if elem.name == name:
                 foundElem = elem
                 break
