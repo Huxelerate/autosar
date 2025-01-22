@@ -522,7 +522,7 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
         else:
             self.pop()
             if self.name is None:
-                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME and TYPE-TREF must not be None')
+                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
 
     def _parseAr4InitValue(self, xmlElem):
         (initValue, initValueRef) = (None, None)

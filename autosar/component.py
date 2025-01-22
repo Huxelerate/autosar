@@ -626,7 +626,7 @@ class AssemblyConnector(Element):
     """
     <ASSEMBLY-CONNECTOR-PROTOTYPE>
     """
-    def __init__(self,name,providerInstanceRef,requesterInstanceRef,mappingRef,parent=None):
+    def __init__(self,name,providerInstanceRef,requesterInstanceRef,mappingRef=None,parent=None):
         assert(isinstance(providerInstanceRef,ProviderInstanceRef))
         assert(isinstance(requesterInstanceRef,RequesterInstanceRef))
         super().__init__(name, parent)
