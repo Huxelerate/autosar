@@ -113,6 +113,8 @@ class BaseParser:
             self.common[-1].displayFormat = None
         elif xmlElem.tag == 'ANNOTATION':
             pass #implement later
+        elif xmlElem.tag == 'ANNOTATIONS':
+            pass #implement later
         elif xmlElem.tag == 'INTRODUCTION':
             pass #implement later
         else:
@@ -520,9 +522,7 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
         else:
             self.pop()
             if self.name is None:
-                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME and TYPE-TREF must not be None')
-            else:
-                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: TYPE-TREF not defined for element with SHORT-NAME "{self.name}"')
+                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
 
     def _parseAr4InitValue(self, xmlElem):
         (initValue, initValueRef) = (None, None)
