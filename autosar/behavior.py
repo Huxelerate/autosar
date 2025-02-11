@@ -1927,10 +1927,11 @@ class ParameterAccessPoint(Element):
     Represents <PARAMETER-ACCESS> (AUTOSAR 4)
     """
 
-    def __init__(self, name, accessedParameter = None, parent = None, adminData = None, swDataDefProps = None):
+    def __init__(self, name, accessedParameter = None, parent = None, adminData = None, swDataDefProps = None, variationPoint = None):
         super().__init__(name, parent, adminData)
         self.accessedParameter = accessedParameter #this can be NoneType or LocalParameterRef or ParameterInstanceRef
         self.swDataDefProps = swDataDefProps
+        self.variationPoint = variationPoint
 
     def tag(self, version): return 'PARAMETER-ACCESS'
 
@@ -2291,3 +2292,16 @@ class VariationPointProxy(Element):
         self.condition_access = condition_access
 
     def tag(self, version): return 'VARIATION-POINT-PROXY'
+
+class VariationPoint:
+    """
+    Represents <VARIATION-POINT> (AUTOSAR 4)
+    """
+
+    def __init__(self, shortLabel = None, swSysCond = None, desc = None, sdg = None):
+        self.shortLabel = shortLabel
+        self.swSysCond = swSysCond
+        self.desc = desc
+        self.sdg = sdg
+
+    def tag(self, version): return 'VARIATION-POINT'

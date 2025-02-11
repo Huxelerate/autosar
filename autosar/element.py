@@ -100,7 +100,8 @@ class AutosarDataPrototype(Element):
         swImplPolicy = None,
         category = None,
         parent=None,
-        adminData=None
+        adminData=None,
+        variationPoint=None
     ):
         super().__init__(name, parent, adminData, category)
         self.role = role
@@ -121,6 +122,7 @@ class AutosarDataPrototype(Element):
         self.dataConstraintRef = None
         if self.swImplPolicy is None and self.isQueued:
             self.swImplPolicy = "QUEUED"
+        self.variationPoint = variationPoint
 
     @property
     def swImplPolicy(self):
