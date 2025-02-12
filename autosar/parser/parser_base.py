@@ -546,7 +546,7 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
             elif xmlElem.tag == 'BLUEPRINT-CONDITION':
                 pass #implement later (documentation related)
             else:
-                # TODO: handle POST-BUILD-VARIANT-CONDITIONS and FORMAL-BLUEPRINT-GENERATOR
+                # TODO: handle FORMAL-BLUEPRINT-CONDITION, POST-BUILD-VARIANT-CONDITIONS and FORMAL-BLUEPRINT-GENERATOR
                 handleNotImplementedError(xmlElem)
 
         return autosar.behavior.VariationPoint(shortLabel, swSysCond, desc, bindingTime)
