@@ -493,11 +493,11 @@ class BehaviorParser(EntityParser):
 
     def parseModeAccessPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'MODE-ACCESS-POINT')
-        (name, modeGroupInstanceRef) = (None, None)
+        (name, modeGroupInstanceRef, variationPoint) = (None, None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-NAME':
                 name = self.parseTextNode(xmlElem)
-            if xmlElem.tag == 'MODE-GROUP-IREF':
+            elif xmlElem.tag == 'MODE-GROUP-IREF':
                 for childElem in xmlElem.findall('./*'):
                     if childElem.tag == 'R-MODE-GROUP-IN-ATOMIC-SWC-INSTANCE-REF':
                         if modeGroupInstanceRef is None:
@@ -511,35 +511,41 @@ class BehaviorParser(EntityParser):
                             handleNotImplementedError('Multiple instances of P-MODE-GROUP-IN-ATOMIC-SWC-INSTANCE-REF not implemented')
                     else:
                         handleNotImplementedError(childElem.tag)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        return autosar.behavior.ModeAccessPoint(name, modeGroupInstanceRef)
+        return autosar.behavior.ModeAccessPoint(name, modeGroupInstanceRef, variationPoint=variationPoint)
 
     @parseElementUUID
     def _parseModeSwitchPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'MODE-SWITCH-POINT')
-        (name, modeGroupInstanceRef) = (None, None)
+        (name, modeGroupInstanceRef, variationPoint) = (None, None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-NAME':
                 name = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'MODE-GROUP-IREF':
                 modeGroupInstanceRef=self._parseProvideModeGroupInstanceRef(xmlElem)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        return autosar.behavior.ModeSwitchPoint(name, modeGroupInstanceRef)
+        return autosar.behavior.ModeSwitchPoint(name, modeGroupInstanceRef, variationPoint=variationPoint)
 
     @parseElementUUID
     def _parseVariableAccess(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIABLE-ACCESS')
-        variableAccess = None
+        (variableAccess, variationPoint) = (None, None)
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'ACCESSED-VARIABLE':
                 variableAccess = self.parseAccessedVariable(xmlElem, xmlRoot)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 self.defaultHandler(xmlElem)
         if variableAccess is not None:
-            obj = autosar.behavior.VariableAccess(self.name, variableAccess.portPrototypeRef, variableAccess.targetDataPrototypeRef)
+            obj = autosar.behavior.VariableAccess(self.name, variableAccess.portPrototypeRef, variableAccess.targetDataPrototypeRef, variationPoint=variationPoint)
         else:
             obj = None
         self.pop()
@@ -548,15 +554,17 @@ class BehaviorParser(EntityParser):
     @parseElementUUID
     def _parseLocalVariableAccess(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIABLE-ACCESS')
-        variableAccess = None
+        (variableAccess, variationPoint) = (None, None)
         self.push()
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'ACCESSED-VARIABLE':
                 variableAccess = self.parseLocalAccessedVariable(xmlElem)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 self.defaultHandler(xmlElem)
         if variableAccess is not None:
-            obj = autosar.behavior.LocalVariableAccess(self.name, variableAccess.localVariableRef)
+            obj = autosar.behavior.LocalVariableAccess(self.name, variableAccess.localVariableRef, variationPoint=variationPoint)
         else:
             obj = None
         self.pop()
@@ -580,25 +588,27 @@ class BehaviorParser(EntityParser):
     
     def _parseExternalTriggeringPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'EXTERNAL-TRIGGERING-POINT')
-        triggerIref = None
+        (triggerIref, variationPoint) = (None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'TRIGGER-IREF':
                 triggerIrefXml = xmlElem.find('P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF')
                 if triggerIrefXml is not None:
                     triggerIref = self.parsePTriggerInAtomicSwcTypeInstanceRef(triggerIrefXml)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
-                # TODO: support IDENT and VARIATION-POINT
+                # TODO: support IDENT
                 handleNotImplementedError(xmlElem.tag)
         
         if triggerIref is not None:
-            return autosar.behavior.ExternalTriggeringPoint(triggerIref)
+            return autosar.behavior.ExternalTriggeringPoint(triggerIref, variationPoint)
 
         return None
 
     @parseElementUUID
     def parseParameterAccessPoint(self, xmlRoot, parent = None):
         assert(xmlRoot.tag == 'PARAMETER-ACCESS')
-        (name, accessedParameter, swDataDefProps) = (None, None, None)
+        (name, accessedParameter, swDataDefProps, variationPoint) = (None, None, None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-NAME':
                 name = self.parseTextNode(xmlElem)
@@ -612,10 +622,12 @@ class BehaviorParser(EntityParser):
                         handleNotImplementedError(xmlChild.tag)
             elif xmlElem.tag == 'SW-DATA-DEF-PROPS':
                 swDataDefProps = self.parseSwDataDefProps(xmlElem)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
         if (name is not None) and (accessedParameter is not None):
-            return autosar.behavior.ParameterAccessPoint(name, accessedParameter, swDataDefProps=swDataDefProps)
+            return autosar.behavior.ParameterAccessPoint(name, accessedParameter, swDataDefProps=swDataDefProps, variationPoint=variationPoint)
 
     def _parseRequireModeGroupInstanceRef(self, xmlRoot):
         """parses <R-MODE-GROUP-IN-ATOMIC-SWC-INSTANCE-REF>"""
@@ -1141,18 +1153,19 @@ class BehaviorParser(EntityParser):
     @parseElementUUID
     def parseSwcExclusiveAreaPolicy(self, xmlRoot, parent = None):
         assert(xmlRoot.tag == 'SWC-EXCLUSIVE-AREA-POLICY')
-        (exclusiveAreaRef, apiPrinciple) = (None, None)
+        (exclusiveAreaRef, apiPrinciple, variationPoint) = (None, None, None)
         
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'EXCLUSIVE-AREA-REF':
                 exclusiveAreaRef = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'API-PRINCIPLE':
                 apiPrinciple = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
-                # TODO: support VARIATION-POINT
                 handleNotImplementedError(xmlElem.tag)
         
-        return autosar.behavior.SwcExclusiveAreaPolicy(exclusiveAreaRef, apiPrinciple)
+        return autosar.behavior.SwcExclusiveAreaPolicy(exclusiveAreaRef, apiPrinciple, variationPoint)
 
     @parseElementUUID
     def parseParameterDataPrototype(self, xmlRoot, parent = None):
