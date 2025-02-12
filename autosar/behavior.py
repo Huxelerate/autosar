@@ -1861,8 +1861,9 @@ class ExternalTriggeringPoint:
     """
     Represents <EXTERNAL-TRIGGERING-POINT> (AUTODSAR 4)
     """
-    def __init__(self, triggerIref):
+    def __init__(self, triggerIref, variationPoint):
         self.triggerIref = triggerIref
+        self.variationPoint = variationPoint
     
     def tag(self, version): return 'EXTERNAL-TRIGGERING-POINT'
 
@@ -1870,9 +1871,10 @@ class SwcExclusiveAreaPolicy:
     """
     Represents <SWC-EXCLUSIVE-AREA-POLICY> (AUTODSAR 4)
     """
-    def __init__(self, exclusiveAreaRef, apiPrinciple):
+    def __init__(self, exclusiveAreaRef, apiPrinciple, variationPoint):
         self.exclusiveAreaRef = exclusiveAreaRef
         self.apiPrinciple = apiPrinciple
+        self.variationPoint = variationPoint
     
     def tag(self, version): return 'SWC-EXCLUSIVE-AREA-POLICY'
 
@@ -2298,10 +2300,10 @@ class VariationPoint:
     Represents <VARIATION-POINT> (AUTOSAR 4)
     """
 
-    def __init__(self, shortLabel = None, swSysCond = None, desc = None, sdg = None):
+    def __init__(self, shortLabel = None, swSysCond = None, desc = None, bindingTime = None):
         self.shortLabel = shortLabel
         self.swSysCond = swSysCond
         self.desc = desc
-        self.sdg = sdg
+        self.bindingTime = bindingTime
 
     def tag(self, version): return 'VARIATION-POINT'

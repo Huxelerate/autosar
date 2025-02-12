@@ -580,18 +580,20 @@ class BehaviorParser(EntityParser):
     
     def _parseExternalTriggeringPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'EXTERNAL-TRIGGERING-POINT')
-        triggerIref = None
+        (triggerIref, variationPoint) = (None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'TRIGGER-IREF':
                 triggerIrefXml = xmlElem.find('P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF')
                 if triggerIrefXml is not None:
                     triggerIref = self.parsePTriggerInAtomicSwcTypeInstanceRef(triggerIrefXml)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
-                # TODO: support IDENT and VARIATION-POINT
+                # TODO: support IDENT
                 handleNotImplementedError(xmlElem.tag)
         
         if triggerIref is not None:
-            return autosar.behavior.ExternalTriggeringPoint(triggerIref)
+            return autosar.behavior.ExternalTriggeringPoint(triggerIref, variationPoint)
 
         return None
 
@@ -1143,18 +1145,19 @@ class BehaviorParser(EntityParser):
     @parseElementUUID
     def parseSwcExclusiveAreaPolicy(self, xmlRoot, parent = None):
         assert(xmlRoot.tag == 'SWC-EXCLUSIVE-AREA-POLICY')
-        (exclusiveAreaRef, apiPrinciple) = (None, None)
+        (exclusiveAreaRef, apiPrinciple, variationPoint) = (None, None, None)
         
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'EXCLUSIVE-AREA-REF':
                 exclusiveAreaRef = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'API-PRINCIPLE':
                 apiPrinciple = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
-                # TODO: support VARIATION-POINT
                 handleNotImplementedError(xmlElem.tag)
         
-        return autosar.behavior.SwcExclusiveAreaPolicy(exclusiveAreaRef, apiPrinciple)
+        return autosar.behavior.SwcExclusiveAreaPolicy(exclusiveAreaRef, apiPrinciple, variationPoint)
 
     @parseElementUUID
     def parseParameterDataPrototype(self, xmlRoot, parent = None):

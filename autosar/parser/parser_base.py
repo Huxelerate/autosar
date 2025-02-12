@@ -530,18 +530,15 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
     @parseElementUUID
     def parseVariationPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIATION-POINT')
-        (shortLabel, swSysCond, desc, sdg) = (None, None, None, None)
+        (shortLabel, swSysCond, desc, bindingTime) = (None, None, None, None)
 
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-LABEL':
                 shortLabel = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'SW-SYSCOND':
-                # NOTE: SW-SYSCOND is a CONDITION-BY-FORMULA that can be a mix
-                # of FORMULA-EXPRESSION (plain formula text) and SW-SYSTEMCONST-DEPENDENT-FORMULA
-                # (such as: SYSC-REF and SYSC-STRING-REF). Currently we support only FORMULA-EXPRESSION.
-                # TODO: parse tag attribute: "BINDING-TIME"
-                if len(xmlElem) > 0:
-                    handleNotImplementedError(xmlElem[0])
+                # TODO: Implement condition by formula parsing (currently translated as plain text)
+                bindingTime = xmlElem.get("BINDING-TIME")
+                swSysCond = ''.join(xmlElem.itertext())
             elif xmlElem.tag == 'DESC':
                 desc = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'SDG':
@@ -552,7 +549,7 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                 # TODO: handle POST-BUILD-VARIANT-CONDITIONS and FORMAL-BLUEPRINT-GENERATOR
                 handleNotImplementedError(xmlElem)
 
-        return autosar.behavior.VariationPoint(shortLabel, swSysCond, desc, sdg)
+        return autosar.behavior.VariationPoint(shortLabel, swSysCond, desc, bindingTime)
     
     def _parseAr4InitValue(self, xmlElem):
         (initValue, initValueRef) = (None, None)
