@@ -1791,18 +1791,20 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         self.constantValueMappingRefs.append(str(constantValueMappingRef))
 
 class VariableAccess(Element):
-    def __init__(self, name, portPrototypeRef, targetDataPrototypeRef, parent=None):
+    def __init__(self, name, portPrototypeRef, targetDataPrototypeRef, parent=None, variationPoint = None):
         super().__init__(name, parent)
         self.portPrototypeRef=portPrototypeRef
         self.targetDataPrototypeRef = targetDataPrototypeRef
+        self.variationPoint = variationPoint
 
     def tag(self, version=None):
         return 'VARIABLE-ACCESS'
 
 class LocalVariableAccess(Element):
-    def __init__(self, name, localVariableRef, parent=None):
+    def __init__(self, name, localVariableRef, parent=None, variationPoint=None):
         super().__init__(name, parent)
         self.localVariableRef=localVariableRef
+        self.variationPoint = variationPoint
 
     def tag(self, version=None):
         return 'VARIABLE-ACCESS'
@@ -1943,7 +1945,7 @@ class ModeAccessPoint:
     In the XSD this is not a first-class element.
     Therefore we do not inherit from Element but instead allow <SHORT-NAME> only as (optional) identifier
     """
-    def __init__(self, name = None, modeGroupInstanceRef = None):
+    def __init__(self, name = None, modeGroupInstanceRef = None, variationPoint = None):
         """
         Arguments:
         * name: <SHORT-NAME> (None or str)
@@ -1951,6 +1953,7 @@ class ModeAccessPoint:
         """
         self.name = str(name) if name is not None else None
         self.modeGroupInstanceRef = modeGroupInstanceRef
+        self.variationPoint = variationPoint
 
     def tag(self, version):
         return 'MODE-ACCESS-POINT'
@@ -1973,9 +1976,10 @@ class ModeSwitchPoint(Element):
     """
     Represents <MODE-SWITCH-POINT> (AUTOSAR 4)
     """
-    def __init__(self, name, modeGroupInstanceRef = None, parent=None, adminData=None):
+    def __init__(self, name, modeGroupInstanceRef = None, parent=None, adminData=None, variationPoint = None):
         super().__init__(name, parent, adminData)
         self.modeGroupInstanceRef = modeGroupInstanceRef
+        self.variationPoint = variationPoint
 
     def tag(self, version):
         return 'MODE-SWITCH-POINT'
