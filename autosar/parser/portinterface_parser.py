@@ -247,55 +247,55 @@ class PortInterfacePackageParser(EntityParser):
 
     @parseElementUUID
     def parseParameterInterface(self,xmlRoot,parent=None):
-        (name, adminData, isService, xmlParameters, serviceKind) = (None, None, False, None, None)
+        (isService, xmlParameters, serviceKind) = (False, None, None)
+
+        self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'SHORT-NAME':
-                name = self.parseTextNode(xmlElem)
-            elif xmlElem.tag == 'ADMIN-DATA':
-                adminData = self.parseAdminDataNode(xmlElem)
-            elif xmlElem.tag == 'IS-SERVICE':
-                if self.parseTextNode(xmlElem) == 'true':
-                    isService = True
+            if xmlElem.tag == 'IS-SERVICE':
+                isService = self.parseBooleanNode(xmlElem)
             elif xmlElem.tag == 'PARAMETERS':
                 xmlParameters = xmlElem
             elif xmlElem.tag == 'SERVICE-KIND' and self.version >= 4.0:
                 serviceKind = self.parseTextNode(xmlElem)
             else:
-                handleNotImplementedError(xmlElem.tag)
-
-        if (name is not None) and (xmlParameters is not None):
-            portInterface = autosar.portinterface.ParameterInterface(name, isService, serviceKind, parent, adminData)
+                self.defaultHandler(xmlElem)
+                        
+        portInterface = None
+        if (self.name is not None) and (xmlParameters is not None):
+            portInterface = autosar.portinterface.ParameterInterface(self.name, isService, serviceKind, parent, self.adminData)
             for xmlChild in xmlParameters.findall('./*'):
                 if xmlChild.tag == 'PARAMETER-DATA-PROTOTYPE':
                     parameter = self._parseParameterDataPrototype(xmlChild, portInterface)
                     portInterface.append(parameter)
                 else:
                     handleNotImplementedError(xmlChild.tag)
-            return portInterface
+        
+        self.pop(portInterface)
+        return portInterface
 
 
     @parseElementUUID
     def parseModeSwitchInterface(self,xmlRoot,parent=None):
-        (name, adminData, desc, isService, xmlModeGroup, serviceKind) = (None, None, None, False, None, None)
+        (isService, xmlModeGroup, serviceKind) = (False, None, None)
+
+        self.push()
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'SHORT-NAME':
-                name = self.parseTextNode(xmlElem)
-            elif xmlElem.tag == 'ADMIN-DATA':
-                adminData = self.parseAdminDataNode(xmlElem)
-            elif xmlElem.tag == 'IS-SERVICE':
-                if self.parseTextNode(xmlElem) == 'true':
-                    isService = True
+            if xmlElem.tag == 'IS-SERVICE':
+                isService = self.parseBooleanNode(xmlElem)
             elif xmlElem.tag == 'MODE-GROUP':
                 xmlModeGroup = xmlElem
             elif xmlElem.tag == 'SERVICE-KIND' and self.version >= 4.0:
-                serviceKind = self.parseTextNode(xmlElem)            
+                serviceKind = self.parseTextNode(xmlElem)
             else:
-                handleNotImplementedError(xmlElem.tag)
+                self.defaultHandler(xmlElem)
 
-        if (name is not None) and (xmlModeGroup is not None):
-            portInterface = autosar.portinterface.ModeSwitchInterface(name, isService, serviceKind, parent, adminData)
+        portInterface = None
+        if (self.name is not None) and (xmlModeGroup is not None):
+            portInterface = autosar.portinterface.ModeSwitchInterface(self.name, isService, serviceKind, parent, self.adminData)
             portInterface.modeGroup=self._parseModeGroup(xmlModeGroup, portInterface)
-            return portInterface
+        
+        self.pop(portInterface)
+        return portInterface
 
     @parseElementUUID
     def _parseModeGroup(self, xmlModeGroup, parent):
@@ -309,28 +309,21 @@ class PortInterfacePackageParser(EntityParser):
 
     @parseElementUUID
     def _parseOperationPrototype(self, xmlOperation, parent):
-        (name, xmlDesc, xmlArguments, xmlPossibleErrorRefs) = (None, None, None, None)
+        (xmlArguments, xmlPossibleErrorRefs) = (None, None)
+        self.push()
         for xmlElem in xmlOperation.findall('./*'):
-            if xmlElem.tag == 'ADMIN-DATA':
-                pass #implement later
-            elif xmlElem.tag == 'SHORT-NAME':
-                name = self.parseTextNode(xmlElem)
-            elif xmlElem.tag == 'DESC':
-                xmlDesc = xmlElem
-            elif xmlElem.tag == 'ARGUMENTS':
+            if xmlElem.tag == 'ARGUMENTS':
                 xmlArguments = xmlElem
             elif xmlElem.tag == 'POSSIBLE-ERROR-REFS':
                 xmlPossibleErrorRefs = xmlElem
-            elif xmlElem.tag == 'LONG-NAME':
-                pass #implement later
             else:
-                handleNotImplementedError(xmlElem.tag)
-
-        if name is not None:
-            operation = autosar.portinterface.Operation(name, parent)
+                self.defaultHandler(xmlElem)
+        
+        operation = None
+        if self.name is not None:
+            operation = autosar.portinterface.Operation(self.name, parent)
+            operation.category = self.category
             argumentTag = 'ARGUMENT-DATA-PROTOTYPE' if self.version >= 4.0 else 'ARGUMENT-PROTOTYPE'
-            if xmlDesc is not None:
-                self.parseDesc(xmlOperation,operation)
             if xmlArguments is not None:
                 for xmlChild in xmlArguments.findall('./*'):
                     if xmlChild.tag == argumentTag:
@@ -348,7 +341,9 @@ class PortInterfacePackageParser(EntityParser):
                         operation.errorRefs.append(self.parseTextNode(xmlChild))
                     else:
                         handleNotImplementedError(xmlChild.tag)
-            return operation
+
+        self.pop(operation)
+        return operation
 
     @parseElementUUID
     def _parseOperationArgumentV3(self, xmlArgument, parent):

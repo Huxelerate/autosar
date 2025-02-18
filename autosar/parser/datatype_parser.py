@@ -142,8 +142,8 @@ class DataTypeParser(EntityParser):
     def _parseDataConstraintRule(self, xmlElem, constraintType):
         lowerLimitXML = xmlElem.find('./LOWER-LIMIT')
         upperLimitXML = xmlElem.find('./UPPER-LIMIT')
-        lowerLimit = None if lowerLimitXML is None else self.parseNumberNode(lowerLimitXML)
-        upperLimit = None if upperLimitXML is None else self.parseNumberNode(upperLimitXML)
+        lowerLimit = None if lowerLimitXML is None else self.parseArLimitNode(lowerLimitXML)
+        upperLimit = None if upperLimitXML is None else self.parseArLimitNode(upperLimitXML)
         lowerLimitType = 'CLOSED'
         upperLimitType = 'CLOSED'
         key = 'INTERVAL-TYPE'
@@ -485,7 +485,7 @@ class DataTypeSemanticsParser(EntityParser):
     def _parseCompuScaleXML(self, xmlRoot):
         assert(xmlRoot.tag == 'COMPU-SCALE')
         label, lowerLimit, upperLimit, lowerLimitType, upperLimitType, symbol, adminData = None, None, None, None, None, None, None
-        offset, numerator, denominator, textValue, mask = None, None, None, None, None
+        offset, numerator, denominator, textValue, mask, compuInverseValue = None, None, None, None, None, None
 
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'DESC':
@@ -493,13 +493,15 @@ class DataTypeSemanticsParser(EntityParser):
             elif xmlElem.tag == 'SHORT-LABEL':
                 label = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'LOWER-LIMIT':
-                lowerLimit = self.parseNumberNode(xmlElem)
+                lowerLimit = self.parseArLimitNode(xmlElem)
                 if (self.version >= 4.0) and 'INTERVAL-TYPE' in xmlElem.attrib:
                     lowerLimitType = xmlElem.attrib['INTERVAL-TYPE']
             elif xmlElem.tag == 'UPPER-LIMIT':
-                upperLimit = self.parseNumberNode(xmlElem)
+                upperLimit = self.parseArLimitNode(xmlElem)
                 if (self.version >= 4.0) and 'INTERVAL-TYPE' in xmlElem.attrib:
                     upperLimitType = xmlElem.attrib['INTERVAL-TYPE']
+            elif xmlElem.tag == 'COMPU-INVERSE-VALUE':
+                compuInverseValue = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'COMPU-RATIONAL-COEFFS':
                 offset, numerator, denominator = self._parseCompuRationalXML(xmlElem)
             elif xmlElem.tag == 'SYMBOL':
@@ -518,6 +520,7 @@ class DataTypeSemanticsParser(EntityParser):
         compuScale.denominator = denominator
         compuScale.textValue = textValue
         compuScale.mask = mask
+        compuScale.compuInverseValue = compuInverseValue
         return compuScale
 
     def _parseCompuRationalXML(self, xmlRoot):
