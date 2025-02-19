@@ -603,27 +603,32 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                 variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 self.defaultHandler(xmlElem)
-        if (self.name is not None) and (typeRef is not None):
-            specializedAutosarDataPrototype = autosar.element.AutosarDataPrototype(
-                dataPrototypeRole,
-                self.name,
-                typeRef,
-                isQueued,
-                initValue = initValue,
-                initValueRef = initValueRef,
-                category = self.category,
-                parent = parent,
-                adminData = self.adminData,
-                variationPoint = variationPoint
-            )
-            if (props_variants is not None) and len(props_variants) > 0:
-                specializedAutosarDataPrototype.setProps(props_variants[0])
-            self.pop(specializedAutosarDataPrototype)
-            return specializedAutosarDataPrototype
-        else:
+        
+        if self.name is None:
+            raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
+    
+        if typeRef is None:
+            handleValueError(f"Error in {xmlRoot.tag} named: '{self.name}': missing expected TYPE-TREF")
             self.pop()
-            if self.name is None:
-                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
+            return None
+
+        specializedAutosarDataPrototype = autosar.element.AutosarDataPrototype(
+            dataPrototypeRole,
+            self.name,
+            typeRef,
+            isQueued,
+            initValue = initValue,
+            initValueRef = initValueRef,
+            category = self.category,
+            parent = parent,
+            adminData = self.adminData,
+            variationPoint = variationPoint
+        )
+        if (props_variants is not None) and len(props_variants) > 0:
+            specializedAutosarDataPrototype.setProps(props_variants[0])
+        self.pop(specializedAutosarDataPrototype)
+        return specializedAutosarDataPrototype
+        
 
     @parseElementUUID
     def parseVariationPoint(self, xmlRoot):
