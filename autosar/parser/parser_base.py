@@ -242,7 +242,7 @@ class BaseParser:
     def parseArLimitNode(self, xmlElem) -> Union[str, int, float]:
         """
         Parses an AR:LIMIT
-        expected format, one of:
+        from AUTOSAR_TPS_SoftwareComponentTemplate (R22-11) the expected format should be:
         - 0[xX][0-9a-fA-F]+
         - 0[0-7]+
         - 0[bB][0-1]+
@@ -252,6 +252,9 @@ class BaseParser:
         - INF
         - -INF
         - NaN
+
+        However, the corresponding XSD does not pose this restriction. Hence we try matching the format
+        but not raise an exception if there is no match and directly return the raw string value.
         """
         textValue: str = self.parseTextNode(xmlElem)
         textValue = textValue.strip()
@@ -275,7 +278,7 @@ class BaseParser:
                 return float(textValue)
 
         except ValueError:
-            raise RuntimeError(f"Invalid Autosar AR:LIMIT value: {textValue}")
+            return textValue
     
     def hasAdminData(self, xmlRoot):
         return True if xmlRoot.find('ADMIN-DATA') is not None else False
@@ -297,7 +300,9 @@ class BaseParser:
                 if childSpecialDataGroup is not None:
                     specialDataGroup.children.append(childSpecialDataGroup)
             else:
-                handleNotImplementedError(xmlChild.tag)        
+                handleNotImplementedError(xmlChild.tag)
+        
+        return specialDataGroup
 
     def parseAdminDataNode(self, xmlRoot):
         if xmlRoot is None: return None
