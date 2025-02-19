@@ -46,7 +46,7 @@ class CompuScaleElement:
     """
     def tag(self, version=None): return 'COMPU-SCALE'
 
-    def __init__(self, lowerLimit, upperLimit, lowerLimitType = 'CLOSED', upperLimitType = 'CLOSED', label=None, symbol=None, textValue = None, numerator = None, denominator = None, offset = None, mask = None, adminData=None):
+    def __init__(self, lowerLimit, upperLimit, lowerLimitType = 'CLOSED', upperLimitType = 'CLOSED', label=None, symbol=None, textValue = None, numerator = None, denominator = None, offset = None, mask = None, adminData=None, compuInverseValue=None):
         self.lowerLimit = lowerLimit
         self.upperLimit = upperLimit
         self.lowerLimitType = lowerLimitType
@@ -59,6 +59,7 @@ class CompuScaleElement:
         self.numerator = numerator
         self.denominator = denominator
         self.mask = mask
+        self.compuInverseValue = compuInverseValue
 
 class Unit(Element):
     """

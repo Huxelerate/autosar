@@ -25,9 +25,10 @@ class AdminData:
     def __ne__(self, other): return not (self == other)
 
 class SpecialDataGroup(object):
-    def __init__(self,SDG_GID,SD=None,SD_GID=None):
+    def __init__(self,SDG_GID,SD=None,SD_GID=None,children=[]):
         self.SDG_GID=SDG_GID
         self.SD = []
+        self.children = children
         if SD is not None or SD_GID is not None:
             self.SD.append(SpecialData(SD, SD_GID))
 
@@ -265,7 +266,8 @@ class SwDataDefPropsConditional:
             swCalprmAxisSet = [],
             swValueBlockSize = None,
             swValueBlockSizeMults = [],
-            parent = None):
+            parent = None,
+            swTextProps = None):
 
         self.baseTypeRef = baseTypeRef
         self.swCalibrationAccess = swCalibrationAccess
@@ -281,6 +283,7 @@ class SwDataDefPropsConditional:
         self.swCalprmAxisSet = swCalprmAxisSet
         self.swValueBlockSize = swValueBlockSize
         self.swValueBlockSizeMults = swValueBlockSizeMults
+        self.swTextProps = swTextProps
         self.parent = parent
 
     @property
@@ -415,6 +418,27 @@ class SwPointerTargetProps:
                 self.variants = [variants]
             else:
                 self.variants = list(variants)
+
+class SwTextProps:
+    """
+    (AUTOSAR 4)
+    Implements <SW-TEXT-PROPS>
+    """
+
+    def tag(self, version=None): return 'SW-TEXT-PROPS'
+
+    def __init__(
+            self,
+            swFillCharacter = None,
+            baseTypeRef = None,
+            swMaxTextSize = None,
+            arraySizeSemantics = None
+            ):
+        
+        self.swFillCharacter = swFillCharacter
+        self.baseTypeRef = baseTypeRef
+        self.swMaxTextSize = swMaxTextSize
+        self.arraySizeSemantics = arraySizeSemantics
 
 class SymbolProps:
     """

@@ -1,9 +1,10 @@
 import abc
 from collections import deque
+from typing import Union
 from autosar.base import (AdminData, SpecialDataGroup, SpecialData,
                           SwDataDefPropsConditional, SwCalprmAxis,
                           SwAxisIndividual, SwAxisGrouped,
-                          SwPointerTargetProps, SymbolProps)
+                          SwPointerTargetProps, SwTextProps, SymbolProps)
 import autosar.element
 import xml
 from functools import wraps
@@ -117,6 +118,8 @@ class BaseParser:
             pass #implement later
         elif xmlElem.tag == 'INTRODUCTION':
             pass #implement later
+        elif xmlElem.tag == 'SHORT-NAME-PATTERN':
+            pass #implement later
         else:
             handleNotImplementedError(xmlElem.tag)
     
@@ -212,8 +215,94 @@ class BaseParser:
                 retval = textValue
         return retval
 
+    def parseArIntegerNode(self, xmlElem):
+        """
+        Parses an AR:INTEGER
+        expected format: "0|[\+\-]?[1-9][0-9]*|0[xX][0-9a-fA-F]+|0[bB][0-1]+|0[0-7]+"
+        """
+        textValue: str = self.parseTextNode(xmlElem)
+        textValue = textValue.strip()
+
+        if textValue == "0":
+            return 0
+        
+        try:
+            if textValue.startswith("0x") or textValue.startswith("0X"):
+                return int(textValue, base=16)
+            elif textValue.startswith("0b") or textValue.startswith("0B"):
+                return int(textValue, base=2)
+            elif textValue.startswith("0"):
+                return int(textValue, base=8)
+            else:
+                return int(textValue)
+
+        except ValueError:
+            raise RuntimeError(f"Invalid Autosar AR:INTEGER value: {textValue}")
+    
+    def parseArLimitNode(self, xmlElem) -> Union[str, int, float]:
+        """
+        Parses an AR:LIMIT
+        from AUTOSAR_TPS_SoftwareComponentTemplate (R22-11) the expected format should be:
+        - 0[xX][0-9a-fA-F]+
+        - 0[0-7]+
+        - 0[bB][0-1]+
+        - (([+\-]?[1-9][0-9]+(\.[0-9]+)?
+        - [+\-]?[0-9](\.[0-9]+)?)([eE]([+\-]?)[0-9]+)?)
+        - \.0
+        - INF
+        - -INF
+        - NaN
+
+        However, the corresponding XSD does not pose this restriction. Hence we try matching the format
+        but not raise an exception if there is no match and directly return the raw string value.
+        """
+        textValue: str = self.parseTextNode(xmlElem)
+        textValue = textValue.strip()
+
+        if textValue == "0":
+            return 0
+        
+        if textValue == "INF" or textValue == "-INF" or textValue == "NaN":
+            return textValue
+        
+        try:
+            if textValue.startswith("0x") or textValue.startswith("0X"):
+                return int(textValue, base=16)
+            elif textValue.startswith("0b") or textValue.startswith("0B"):
+                return int(textValue, base=2)
+            elif "." in textValue or "e" in textValue or "E" in textValue:
+                return float(textValue)
+            elif textValue.startswith("0"):
+                return int(textValue, base=8)
+            else:
+                return float(textValue)
+
+        except ValueError:
+            return textValue
+    
     def hasAdminData(self, xmlRoot):
         return True if xmlRoot.find('ADMIN-DATA') is not None else False
+
+
+    def parseSpecialDataGroup(self, xmlElem):
+        SDG_GID=xmlElem.attrib['GID']
+        specialDataGroup = SpecialDataGroup(SDG_GID)
+        for xmlChild in xmlElem.findall('./*'):
+            if xmlChild.tag == 'SD':
+                SD_GID = None
+                TEXT=xmlChild.text
+                try:
+                    SD_GID=xmlChild.attrib['GID']
+                except KeyError: pass
+                specialDataGroup.SD.append(SpecialData(TEXT, SD_GID))
+            elif xmlChild.tag == 'SDG':
+                childSpecialDataGroup = self.parseSpecialDataGroup(xmlChild)
+                if childSpecialDataGroup is not None:
+                    specialDataGroup.children.append(childSpecialDataGroup)
+            else:
+                handleNotImplementedError(xmlChild.tag)
+        
+        return specialDataGroup
 
     def parseAdminDataNode(self, xmlRoot):
         if xmlRoot is None: return None
@@ -222,19 +311,9 @@ class BaseParser:
         xmlSDGS = xmlRoot.find('./SDGS')
         if xmlSDGS is not None:
             for xmlElem in xmlSDGS.findall('./SDG'):
-                SDG_GID=xmlElem.attrib['GID']
-                specialDataGroup = SpecialDataGroup(SDG_GID)
-                for xmlChild in xmlElem.findall('./*'):
-                    if xmlChild.tag == 'SD':
-                        SD_GID = None
-                        TEXT=xmlChild.text
-                        try:
-                            SD_GID=xmlChild.attrib['GID']
-                        except KeyError: pass
-                        specialDataGroup.SD.append(SpecialData(TEXT, SD_GID))
-                    else:
-                        handleNotImplementedError(xmlChild.tag)
-                adminData.specialDataGroups.append(specialDataGroup)
+                specialDataGroup = self.parseSpecialDataGroup(xmlElem)
+                if specialDataGroup is not None:
+                    adminData.specialDataGroups.append(specialDataGroup)
         return adminData
 
     def parseSwDataDefProps(self, xmlRoot):
@@ -258,7 +337,7 @@ class BaseParser:
         (baseTypeRef, implementationTypeRef, swCalibrationAccess,
          compuMethodRef, dataConstraintRef, swPointerTargetPropsXML,
          swImplPolicy, swAddressMethodRef, unitRef, valueAxisDataTypeRef,
-         swRecordLayoutRef, swCalprmAxisSet, swValueBlockSize) = (None,) * 13
+         swRecordLayoutRef, swCalprmAxisSet, swValueBlockSize, swTextProps) = (None,) * 14
         
         swValueBlockSizeMults = []
         for xmlItem in xmlRoot.findall('./*'):
@@ -291,6 +370,8 @@ class BaseParser:
             elif xmlItem.tag == 'SW-VALUE-BLOCK-SIZE-MULTS':
                 for sizeItem in xmlItem.findall('./*'):
                     swValueBlockSizeMults.append(int(self.parseTextNode(sizeItem)))
+            elif xmlItem.tag == 'SW-TEXT-PROPS':
+                swTextProps = self.parseSwTextProps(xmlItem)
             elif xmlItem.tag == 'ADDITIONAL-NATIVE-TYPE-QUALIFIER':
                 pass #implement later
             elif xmlItem.tag == 'INVALID-VALUE':
@@ -316,7 +397,8 @@ class BaseParser:
             swRecordLayoutRef=swRecordLayoutRef,
             swCalprmAxisSet=swCalprmAxisSet,
             swValueBlockSize=swValueBlockSize,
-            swValueBlockSizeMults=swValueBlockSizeMults
+            swValueBlockSizeMults=swValueBlockSizeMults,
+            swTextProps=swTextProps
         )
         if swPointerTargetPropsXML is not None:
             variant.swPointerTargetProps = self.parseSwPointerTargetProps(swPointerTargetPropsXML, variant)
@@ -332,6 +414,22 @@ class BaseParser:
                 raise RuntimeError("SW-CALPRM-AXIS-SET tag cannot have children other than SW-CALPRM-AXIS")
 
         return swCalprmAxisSet
+    
+    def parseSwTextProps(self, xmlRoot):
+        assert (xmlRoot.tag == 'SW-TEXT-PROPS')
+        swTextProps = SwTextProps()
+        for itemXML in xmlRoot.findall("./*"):
+            tag = itemXML.tag
+            if tag == "SW-FILL-CHARACTER":
+                swTextProps.swFillCharacter = self.parseArIntegerNode(itemXML)
+            elif tag == "BASE-TYPE-REF":
+                swTextProps.baseTypeRef = self.parseTextNode(itemXML)
+            elif tag == "SW-MAX-TEXT-SIZE":
+                swTextProps.swMaxTextSize = self.parseNumberNode(itemXML)
+            elif tag == "ARRAY-SIZE-SEMANTICS":
+                swTextProps.arraySizeSemantics = self.parseTextNode(itemXML)
+
+        return swTextProps
     
     def parseSwCalprmAxis(self, rootXML, parent = None):
         (swAxisIndex, category, swAxisIndividual, swAxisGrouped,
@@ -505,27 +603,32 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                 variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 self.defaultHandler(xmlElem)
-        if (self.name is not None) and (typeRef is not None):
-            specializedAutosarDataPrototype = autosar.element.AutosarDataPrototype(
-                dataPrototypeRole,
-                self.name,
-                typeRef,
-                isQueued,
-                initValue = initValue,
-                initValueRef = initValueRef,
-                category = self.category,
-                parent = parent,
-                adminData = self.adminData,
-                variationPoint = variationPoint
-            )
-            if (props_variants is not None) and len(props_variants) > 0:
-                specializedAutosarDataPrototype.setProps(props_variants[0])
-            self.pop(specializedAutosarDataPrototype)
-            return specializedAutosarDataPrototype
-        else:
+        
+        if self.name is None:
+            raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
+    
+        if typeRef is None:
+            handleValueError(f"Error in {xmlRoot.tag} named: '{self.name}': missing expected TYPE-TREF")
             self.pop()
-            if self.name is None:
-                raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
+            return None
+
+        specializedAutosarDataPrototype = autosar.element.AutosarDataPrototype(
+            dataPrototypeRole,
+            self.name,
+            typeRef,
+            isQueued,
+            initValue = initValue,
+            initValueRef = initValueRef,
+            category = self.category,
+            parent = parent,
+            adminData = self.adminData,
+            variationPoint = variationPoint
+        )
+        if (props_variants is not None) and len(props_variants) > 0:
+            specializedAutosarDataPrototype.setProps(props_variants[0])
+        self.pop(specializedAutosarDataPrototype)
+        return specializedAutosarDataPrototype
+        
 
     @parseElementUUID
     def parseVariationPoint(self, xmlRoot):
