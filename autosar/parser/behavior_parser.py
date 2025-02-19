@@ -1,3 +1,4 @@
+import sys
 import autosar.behavior, autosar.element
 from autosar.parser.parser_base import EntityParser, parseElementUUID
 from autosar.util.errorHandler import handleNotImplementedError, handleValueError
@@ -833,9 +834,9 @@ class BehaviorParser(EntityParser):
             if name is None:
                 handleValueError('Parse error: <SHORT-NAME> is not set for <TIMING-EVENT>')
             elif startOnEventRef is None:
-                handleValueError(f'Parse error: <START-ON-EVENT-REF> is not set for <TIMING-EVENT> named: "{name}"')
+                print(f"WARNING: <START-ON-EVENT-REF> is not set for <TIMING-EVENT> '{name}'. The event will be ignored.", file=sys.stderr)
             elif period is None:
-                handleValueError(f'Parse error: <PERIOD> is not set for <TIMING-EVENT> named: "{name}"')
+                print(f"WARNING: <PERIOD> is not set for <TIMING-EVENT> '{name}'. The event will be ignored.", file=sys.stderr)
 
         return None
 

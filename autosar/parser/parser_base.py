@@ -1,6 +1,6 @@
 import abc
 from collections import deque
-from typing import Union
+from typing import Optional, Union
 from autosar.base import (AdminData, SpecialDataGroup, SpecialData,
                           SwDataDefPropsConditional, SwCalprmAxis,
                           SwAxisIndividual, SwAxisGrouped,
@@ -220,7 +220,10 @@ class BaseParser:
         Parses an AR:INTEGER
         expected format: "0|[\+\-]?[1-9][0-9]*|0[xX][0-9a-fA-F]+|0[bB][0-1]+|0[0-7]+"
         """
-        textValue: str = self.parseTextNode(xmlElem)
+        textValue = self.parseTextNode(xmlElem)
+        if textValue is None:
+            return None
+        
         textValue = textValue.strip()
 
         if textValue == "0":
@@ -239,7 +242,7 @@ class BaseParser:
         except ValueError:
             raise RuntimeError(f"Invalid Autosar AR:INTEGER value: {textValue}")
     
-    def parseArLimitNode(self, xmlElem) -> Union[str, int, float]:
+    def parseArLimitNode(self, xmlElem) -> Optional[Union[str, int, float]]:
         """
         Parses an AR:LIMIT
         from AUTOSAR_TPS_SoftwareComponentTemplate (R22-11) the expected format should be:
@@ -256,7 +259,10 @@ class BaseParser:
         However, the corresponding XSD does not pose this restriction. Hence we try matching the format
         but not raise an exception if there is no match and directly return the raw string value.
         """
-        textValue: str = self.parseTextNode(xmlElem)
+        textValue = self.parseTextNode(xmlElem)
+        if textValue is None:
+            return None
+
         textValue = textValue.strip()
 
         if textValue == "0":
