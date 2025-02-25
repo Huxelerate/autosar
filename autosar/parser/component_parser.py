@@ -366,7 +366,7 @@ class ComponentTypeParser(EntityParser):
         if providerComponentRef is None:
             #raise RuntimeError('PROVIDER-IREF/CONTEXT-COMPONENT-REF is missing: item=%s'%name)
             pass # NOTE: in order to support partially defined ARXML files, the exception is suppressed and the user is expected to discard incomplete connectors
-        if providerComponentRef is None:
+        if providerPortRef is None:
             #raise RuntimeError('PROVIDER-IREF/TARGET-P-PORT-REF is missing: item=%s'%name)
             pass # NOTE: in order to support partially defined ARXML files, the exception is suppressed and the user is expected to discard incomplete connectors
         if requesterComponentRef is None:
