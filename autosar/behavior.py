@@ -260,6 +260,7 @@ class RunnableEntity(Element):
         self.parameterAccessPoints = [] #AUTOSAR4 only
         self.activationReasons = [] #AUTOSAR4 only
         self.externalTriggeringPoints = [] #AUTOSAR4 only
+        self.runsInsidesExclusiveAreas = [] #AUTOSAR4 only #type: List[Union[ExclusiveAreaRefConditional, str]]
 
     def tag(self,version=None):
         return 'RUNNABLE-ENTITY'
@@ -2311,3 +2312,14 @@ class VariationPoint:
         self.bindingTime = bindingTime
 
     def tag(self, version): return 'VARIATION-POINT'
+
+class ExclusiveAreaRefConditional:
+    """
+    Represents <EXCLUSIVE-AREA-REF-CONDITIONAL> (AUTOSAR 4)
+    """
+
+    def __init__(self, exclusiveAreaRef, variationPoint):
+        self.exclusiveAreaRef = exclusiveAreaRef
+        self.variationPoint = variationPoint
+
+    def tag(self, version): return 'EXCLUSIVE-AREA-REF-CONDITIONAL'
