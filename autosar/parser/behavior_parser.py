@@ -1588,6 +1588,7 @@ class BehaviorParser(EntityParser):
                 raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the VARIATION-POINT-PROXY element")
 
         return autosar.behavior.VariationPointProxy(name=name, category=category, binding_time=binding_time, condition_access=condition_access, parent=parent)
+
     def parseExclusiveAreaRefConditional(self, xmlRoot, parent):
         """parses <EXCLUSIVE-AREA-REF-CONDITIONAL>"""
         assert(xmlRoot.tag == 'EXCLUSIVE-AREA-REF-CONDITIONAL')
