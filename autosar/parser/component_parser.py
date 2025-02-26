@@ -364,13 +364,17 @@ class ComponentTypeParser(EntityParser):
             else:
                 self.defaultHandler(xmlChild)
         if providerComponentRef is None:
-            raise RuntimeError('PROVIDER-IREF/CONTEXT-COMPONENT-REF is missing: item=%s'%name)
-        if providerComponentRef is None:
-            raise RuntimeError('PROVIDER-IREF/TARGET-P-PORT-REF is missing: item=%s'%name)
+            #raise RuntimeError('PROVIDER-IREF/CONTEXT-COMPONENT-REF is missing: item=%s'%name)
+            pass # NOTE: in order to support partially defined ARXML files, the exception is suppressed and the user is expected to discard incomplete connectors
+        if providerPortRef is None:
+            #raise RuntimeError('PROVIDER-IREF/TARGET-P-PORT-REF is missing: item=%s'%name)
+            pass # NOTE: in order to support partially defined ARXML files, the exception is suppressed and the user is expected to discard incomplete connectors
         if requesterComponentRef is None:
-            raise RuntimeError('REQUESTER-IREF/CONTEXT-COMPONENT-REF is missing: item=%s'%name)
+            #raise RuntimeError('REQUESTER-IREF/CONTEXT-COMPONENT-REF is missing: item=%s'%name)
+            pass # NOTE: in order to support partially defined ARXML files, the exception is suppressed and the user is expected to discard incomplete connectors
         if requesterPortRef is None:
-            raise RuntimeError('REQUESTER-IREF/TARGET-R-PORT-REF is missing: item=%s'%name)
+            #raise RuntimeError('REQUESTER-IREF/TARGET-R-PORT-REF is missing: item=%s'%name)
+            pass # NOTE: in order to support partially defined ARXML files, the exception is suppressed and the user is expected to discard incomplete connectors
 
         return autosar.component.AssemblyConnector(
             name,

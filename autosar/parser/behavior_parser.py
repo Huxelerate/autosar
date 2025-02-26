@@ -286,6 +286,8 @@ class BehaviorParser(EntityParser):
         minStartInterval = None
         xmlActivationReasons = None
         xmlExternalTriggeringPoints = None
+        xmlRunsInsides = None
+        xmlRunsInsideExclusiveAreaRefs = None
 
         xmlDataReadAccess = None
         xmlDataWriteAccess = None
@@ -355,7 +357,9 @@ class BehaviorParser(EntityParser):
                 elif xmlElem.tag == 'EXTERNAL-TRIGGERING-POINTS':
                     xmlExternalTriggeringPoints = xmlElem
                 elif xmlElem.tag == 'RUNS-INSIDE-EXCLUSIVE-AREA-REFS':
-                    pass #implement later
+                    xmlRunsInsideExclusiveAreaRefs = xmlElem
+                elif xmlElem.tag == 'RUNS-INSIDES':
+                    xmlRunsInsides = xmlElem
                 else:
                     self.defaultHandler(xmlElem)
         if name is None:
@@ -486,7 +490,24 @@ class BehaviorParser(EntityParser):
                         runnableEntity.externalTriggeringPoints.append(externalTriggeringPoint)
                 else:
                     handleNotImplementedError(xmlElem.tag)
-        
+
+        if xmlRunsInsideExclusiveAreaRefs is not None:
+            for xmlElem in xmlRunsInsideExclusiveAreaRefs.findall('./*'):
+                if xmlElem.tag == 'RUNS-INSIDE-EXCLUSIVE-AREA-REF':
+                    runnableEntity.runsInsidesExclusiveAreas.append(self.parseTextNode(xmlElem))
+                else:
+                    handleNotImplementedError(xmlElem.tag)
+
+
+        if xmlRunsInsides is not None:
+            for xmlElem in xmlRunsInsides.findall('./*'):
+                if xmlElem.tag == 'EXCLUSIVE-AREA-REF-CONDITIONAL':
+                    exclusiveAreaRefConditional = self.parseExclusiveAreaRefConditional(xmlElem, runnableEntity)
+                    if exclusiveAreaRefConditional is not None:
+                        runnableEntity.runsInsidesExclusiveAreas.append(exclusiveAreaRefConditional)
+                else:
+                    handleNotImplementedError(xmlElem.tag)
+
         if runnableEntity is not None:
             runnableEntity.adminData = adminData
         self.pop()
@@ -1567,3 +1588,17 @@ class BehaviorParser(EntityParser):
                 raise RuntimeError(f"Tag '{tag}' is not present in the AUTOSAR specification for the VARIATION-POINT-PROXY element")
 
         return autosar.behavior.VariationPointProxy(name=name, category=category, binding_time=binding_time, condition_access=condition_access, parent=parent)
+
+    def parseExclusiveAreaRefConditional(self, xmlRoot, parent):
+        """parses <EXCLUSIVE-AREA-REF-CONDITIONAL>"""
+        assert(xmlRoot.tag == 'EXCLUSIVE-AREA-REF-CONDITIONAL')
+        exclusiveAreaRef, variationPoint = None, None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'EXCLUSIVE-AREA-REF':
+                exclusiveAreaRef = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
+            else:
+                handleNotImplementedError(xmlElem.tag)
+
+        return autosar.behavior.ExclusiveAreaRefConditional(exclusiveAreaRef, variationPoint)
