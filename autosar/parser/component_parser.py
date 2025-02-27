@@ -72,7 +72,9 @@ class ComponentTypeParser(EntityParser):
                'COMPOSITION-SW-COMPONENT-TYPE': self.parseCompositionType,
                'SENSOR-ACTUATOR-SW-COMPONENT-TYPE': self.parseSoftwareComponent,
                'SERVICE-SW-COMPONENT-TYPE': self.parseSoftwareComponent,
-               'NV-BLOCK-SW-COMPONENT-TYPE': self.parseSoftwareComponent
+               'NV-BLOCK-SW-COMPONENT-TYPE': self.parseSoftwareComponent,
+               'ECU-ABSTRACTION-SW-COMPONENT-TYPE': self.parseSoftwareComponent,
+               'SERVICE-PROXY-SW-COMPONENT-TYPE': self.parseSoftwareComponent
             }
 
     def getSupportedTags(self):
@@ -106,6 +108,10 @@ class ComponentTypeParser(EntityParser):
             componentType = autosar.component.SensorActuatorComponent(self.parseTextNode(xmlRoot.find('SHORT-NAME')),parent)
         elif xmlRoot.tag == 'NV-BLOCK-SW-COMPONENT-TYPE': #for AUTOSAR 4.x
             componentType = autosar.component.NvBlockComponent(self.parseTextNode(xmlRoot.find('SHORT-NAME')),parent)
+        elif xmlRoot.tag == 'ECU-ABSTRACTION-SW-COMPONENT-TYPE': #for AUTOSAR 4.x
+            componentType = autosar.component.EcuAbstractionSwComponent(self.parseTextNode(xmlRoot.find('SHORT-NAME')),parent)
+        elif xmlRoot.tag == 'SERVICE-PROXY-SW-COMPONENT-TYPE': #for AUTOSAR 4.x
+            componentType = autosar.component.ServiceProxyComponent(self.parseTextNode(xmlRoot.find('SHORT-NAME')),parent)
         else:
             handleNotImplementedError(xmlRoot.tag)
         for xmlElem in xmlRoot.findall('./*'):
@@ -148,6 +154,14 @@ class ComponentTypeParser(EntityParser):
                                 tmp = self.parseTextNode(xmlChild)
                                 if tmp is not None:
                                     componentType.appendConstantMappingRef(tmp)
+                elif xmlElem.tag == 'HARDWARE-ELEMENT-REFS':
+                    if not isinstance(componentType, autosar.component.EcuAbstractionSwComponent):
+                        handleValueError(f"HARDWARE-ELEMENT-REFS cannot appear directly inside {xmlRoot.tag}")
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'HARDWARE-ELEMENT-REF':
+                            hardwareElementRef = self.parseTextNode(xmlChild)
+                            if hardwareElementRef is not None:
+                                componentType.hardwareElementRefs.append(hardwareElementRef)
                 else:
                     print('Unhandled tag: '+xmlElem.tag, file=sys.stderr)
         return componentType
