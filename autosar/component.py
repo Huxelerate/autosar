@@ -564,6 +564,22 @@ class CompositionComponent(ComponentType):
                     return typeRef
         return None
 
+class EcuAbstractionSwComponent(AtomicSoftwareComponent):
+    def tag(self,version=None):
+        return "ECU-ABSTRACTION-SW-COMPONENT-TYPE"
+
+    def __init__(self,name,parent=None):
+        super().__init__(name,parent)
+
+        self.hardwareElementRefs = [] # list of strings
+
+class ServiceProxyComponent(AtomicSoftwareComponent):
+    def tag(self,version=None):
+        return "SERVICE-PROXY-SW-COMPONENT-TYPE"
+
+    def __init__(self,name,parent=None):
+        super().__init__(name,parent)
+
 class ComponentPrototype(Element):
     def __init__(self,name,typeRef,parent=None):
         super().__init__(name,parent)
