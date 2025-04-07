@@ -217,10 +217,18 @@ class ComponentTypeParser(EntityParser):
                 if xmlElem != None:
                     comspec.initValue, comspec.initValueRef = self._parseAr4InitValue(xmlElem)
             else:
-                if xmlItem.find('./INIT-VALUE-REF') is not None:
-                    comspec.initValueRef = self.parseTextNode(xmlItem.find('./INIT-VALUE-REF'))
-            if xmlItem.find('./CAN-INVALIDATE') != None:
-                comspec.canInvalidate = True if self.parseTextNode(xmlItem.find('./CAN-INVALIDATE'))=='true' else False
+                initValueRef = xmlItem.find('./INIT-VALUE-REF')
+                if initValueRef is not None:
+                    comspec.initValueRef = self.parseTextNode(initValueRef)
+
+            canInvalidate = xmlItem.find('./CAN-INVALIDATE')
+            if canInvalidate != None:
+                comspec.canInvalidate = True if self.parseTextNode(canInvalidate)=='true' else False
+
+            usesEndToEndProtection = xmlItem.find('./USES-END-TO-END-PROTECTION')
+            if usesEndToEndProtection != None:
+                comspec.useEndToEndProtection = True if self.parseTextNode(usesEndToEndProtection)=='true' else False
+
             port._comspec.provided.append(comspec)
         elif xmlItem.tag == 'QUEUED-SENDER-COM-SPEC':
             dataElemName = _getDataElemNameFromComSpec(xmlItem,portInterfaceRef)

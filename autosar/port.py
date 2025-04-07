@@ -93,6 +93,7 @@ class Port(Element):
             if 'aliveTimeout' in comspec: aliveTimeout=int(comspec['aliveTimeout'])
             if 'queueLength' in comspec: queueLength=int(comspec['queueLength'])
             if 'canInvalidate' in comspec: canInvalidate=bool(comspec['canInvalidate'])
+            if 'usesEndToEndProtection' in comspec: usesEndToEndProtection=bool(comspec['usesEndToEndProtection'])
             if (dataElementName is None) and (len(portInterface.dataElements)==1):
                 dataElementName=portInterface.dataElements[0].name
             #verify dataElementName
@@ -131,7 +132,7 @@ class Port(Element):
                     initValue = valueBuilder.buildFromDataType(dataType, rawInitValue)
                 else:
                     raise ValueError('initValue must be an instance of (autosar.constant.Value, int, float, str)')
-            return DataElementComSpec(dataElement.name, initValue, initValueRef, aliveTimeout, queueLength, canInvalidate)
+            return DataElementComSpec(dataElement.name, initValue, initValueRef, aliveTimeout, queueLength, canInvalidate, usesEndToEndProtection)
         elif isinstance(portInterface,autosar.portinterface.ClientServerInterface):
             operation = comspec.get('operation', None)
             queueLength = comspec.get('queueLength', 1)
@@ -430,7 +431,7 @@ class OperationComSpec(ComSpec):
         self.queueLength=queueLength
 
 class DataElementComSpec(ComSpec):
-    def __init__(self, name=None, initValue=None, initValueRef=None, aliveTimeout=None, queueLength=None, canInvalidate=None, useEndToEndProtection = None):
+    def __init__(self, name=None, initValue=None, initValueRef=None, aliveTimeout=None, queueLength=None, canInvalidate=None, usesEndToEndProtection = None):
         super().__init__(name)
         if initValue is not None:
             assert(isinstance(initValue, (autosar.constant.Value, autosar.constant.ValueAR4)))
@@ -439,7 +440,7 @@ class DataElementComSpec(ComSpec):
         self._aliveTimeout = int(aliveTimeout) if aliveTimeout is not None else None
         self._queueLength = int(queueLength) if queueLength is not None else None
         self.canInvalidate = bool(canInvalidate) if canInvalidate is not None else None
-        self.useEndToEndProtection = bool(useEndToEndProtection) if useEndToEndProtection is not None else None
+        self.usesEndToEndProtection = bool(usesEndToEndProtection) if usesEndToEndProtection is not None else None
 
     @property
     def aliveTimeout(self):
