@@ -610,7 +610,7 @@ class BehaviorParser(EntityParser):
     
     def _parseExternalTriggeringPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'EXTERNAL-TRIGGERING-POINT')
-        (triggerIref, variationPoint) = (None, None)
+        (triggerIref, variationPoint, ident) = (None, None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'TRIGGER-IREF':
                 triggerIrefXml = xmlElem.find('P-TRIGGER-IN-ATOMIC-SWC-TYPE-INSTANCE-REF')
@@ -618,12 +618,13 @@ class BehaviorParser(EntityParser):
                     triggerIref = self.parsePTriggerInAtomicSwcTypeInstanceRef(triggerIrefXml)
             elif xmlElem.tag == 'VARIATION-POINT':
                 variationPoint = self.parseVariationPoint(xmlElem)
+            elif xmlElem.tag == 'IDENT':
+                ident = self.parseExternalTriggeringPointIdent(xmlElem)
             else:
-                # TODO: support IDENT
                 handleNotImplementedError(xmlElem.tag)
         
         if triggerIref is not None:
-            return autosar.behavior.ExternalTriggeringPoint(triggerIref, variationPoint)
+            return autosar.behavior.ExternalTriggeringPoint(triggerIref, variationPoint, ident)
 
         return None
 
@@ -957,6 +958,25 @@ class BehaviorParser(EntityParser):
             else:
                 handleNotImplementedError(xmlElem.tag)
         return autosar.behavior.PTriggerInAtomicSwcTypeInstanceRef(portRef,triggerRef)
+    
+    @parseElementUUID
+    def parseExternalTriggeringPointIdent(self, xmlRoot):
+        """parses <IDENT> when aggregated by <EXTERNAL-TRIGGERING-POINT>"""
+        assert(xmlRoot.tag=='IDENT')
+        
+        returnValueProvision = None
+        self.push()
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'RETURN-VALUE-PROVISION':
+                returnValueProvision = self.parseTextNode(xmlElem)
+            else:
+                self.defaultHandler(xmlElem)
+        
+        externalTriggeringPointIdent = autosar.behavior.ExternalTriggeringPointIdent(self.name, returnValueProvision)
+        self.pop()
+        
+        return externalTriggeringPointIdent
+
 
     def parseOperationInstanceRef(self,xmlRoot,portTag,xmlParentElement):
         """parses <OPERATION-IREF>"""
