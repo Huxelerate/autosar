@@ -221,13 +221,17 @@ class ComponentTypeParser(EntityParser):
                 if initValueRef is not None:
                     comspec.initValueRef = self.parseTextNode(initValueRef)
 
+            enableUpdate = xmlItem.find('./ENABLE-UPDATE')
+            if enableUpdate != None:
+                comspec.enableUpdate = True if self.parseTextNode(enableUpdate)=='true' else False
+
             canInvalidate = xmlItem.find('./CAN-INVALIDATE')
             if canInvalidate != None:
                 comspec.canInvalidate = True if self.parseTextNode(canInvalidate)=='true' else False
 
             usesEndToEndProtection = xmlItem.find('./USES-END-TO-END-PROTECTION')
             if usesEndToEndProtection != None:
-                comspec.useEndToEndProtection = True if self.parseTextNode(usesEndToEndProtection)=='true' else False
+                comspec.usesEndToEndProtection = True if self.parseTextNode(usesEndToEndProtection)=='true' else False
 
             port._comspec.provided.append(comspec)
         elif xmlItem.tag == 'QUEUED-SENDER-COM-SPEC':
