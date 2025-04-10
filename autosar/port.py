@@ -16,8 +16,8 @@ import collections
 
 from autosar.util.errorHandler import handleNotImplementedError
 
-sender_receiver_com_spec_arguments_ar4 = {'dataElement', 'initValue', 'initValueRef', 'aliveTimeout', 'queueLength'}
-sender_receiver_com_spec_arguments_ar3 = {'dataElement', 'canInvalidate', 'initValueRef', 'aliveTimeout', 'queueLength'}
+sender_receiver_com_spec_arguments_ar4 = {'dataElement', 'initValue', 'initValueRef', 'aliveTimeout', 'queueLength', 'usesEndToEndProtection'}
+sender_receiver_com_spec_arguments_ar3 = {'dataElement', 'canInvalidate', 'initValueRef', 'aliveTimeout', 'queueLength', 'usesEndToEndProtection'}
 client_server_com_spec_arguments = {'operation', 'queueLength'}
 mode_switch_com_spec_arguments = {'enhancedMode', 'supportAsync', 'queueLength', 'modeSwitchAckTimeout', 'modeGroup'}
 parameter_com_spec_arguments = {'parameter', 'initValue'}
@@ -444,7 +444,7 @@ class DataElementComSpec(ComSpec):
         self._queueLength = int(queueLength) if queueLength is not None else None
         self.canInvalidate = bool(canInvalidate) if canInvalidate is not None else None
         self.enableUpdate = bool(enableUpdate) if enableUpdate is not None else None
-        self.usesEndToEndProtection = bool(usesEndToEndProtection) if usesEndToEndProtection is not None else None
+        self.usesEndToEndProtection = bool(usesEndToEndProtection) if usesEndToEndProtection is not None else False
 
     @property
     def aliveTimeout(self):
