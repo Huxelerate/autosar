@@ -25,14 +25,20 @@ class SystemParser(EntityParser):
         assert(xmlRoot.tag=='SYSTEM')
         xmlName = xmlRoot.find('SHORT-NAME')
         if xmlName is not None:
-            system=System(parseTextNode(xmlName),parent)
+            if self.version >= 4.0:
+                system=SystemV4(parseTextNode(xmlName),parent)
+            else:
+                system=SystemV3(parseTextNode(xmlName),parent)
+
             for xmlElem in xmlRoot.findall('./*'):
                 if xmlElem.tag=='SHORT-NAME':
                     pass
                 elif xmlElem.tag=='CATEGORY':
                     system.category=parseTextNode(xmlElem)
-                elif xmlElem.tag=='MAPPINGS':
-                    print("Unhandled: %s"%xmlElem.tag)
+                elif xmlElem.tag=='MAPPINGS' and self.version >= 4.0:
+                    for xmlMappingElem in xmlElem.findall('./*'):
+                        if xmlMappingElem.tag=='SYSTEM-MAPPING':
+                            self.parseSystemMapping(xmlMappingElem,system)
                 elif xmlElem.tag=='ROOT-SOFTWARE-COMPOSITIONS':
                     self.parseRootSoftwareCompositions(xmlElem,system)
                 elif xmlElem.tag=='ADMIN-DATA':
@@ -41,7 +47,7 @@ class SystemParser(EntityParser):
                     self.parseFibexElementRefs(xmlElem,system)
                 elif xmlElem.tag=='FIBEX-ELEMENTS':
                     self.parseFibexElementRefConditionals(xmlElem,system)
-                elif xmlElem.tag=='MAPPING':
+                elif xmlElem.tag=='MAPPING' and self.version < 4.0:
                     self.parseSystemMapping(xmlElem,system)
                 else:
                     handleNotImplementedError(xmlElem.tag)
@@ -79,19 +85,30 @@ class SystemParser(EntityParser):
                 handleNotImplementedError(xmlElem.tag)
 
     def parseSystemMapping(self,xmlRoot,system):
-        """parses <MAPPING>"""
-        assert(xmlRoot.tag=='MAPPING')
+        """parses:
+            version < 4.0: <MAPPING>
+            version > 4.0: <SYSTEM-MAPPING>
+        """
         name=parseTextNode(xmlRoot.find('SHORT-NAME'))
-        system.mapping = Mapping(name,system)
+
+        if self.version < 4.0:
+            assert xmlRoot.tag=='MAPPING'
+            mapping = Mapping(name,system)
+            system.mapping = mapping
+        else:
+            assert xmlRoot.tag=='SYSTEM-MAPPING'
+            mapping = SystemMapping(name,system)
+            system.mappings.append(mapping)
+
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='SHORT-NAME':
                 pass
             elif xmlElem.tag=='DATA-MAPPINGS':
-                self.parseDataMapping(xmlElem,system.mapping.data)
+                self.parseDataMapping(xmlElem,mapping.data)
             elif xmlElem.tag=='SW-IMPL-MAPPINGS':
-                self.parseSwImplMapping(xmlElem,system.mapping)
+                self.parseSwImplMapping(xmlElem,mapping)
             elif xmlElem.tag=='SW-MAPPINGS':
-                self.parseSwMapping(xmlElem,system.mapping)
+                self.parseSwMapping(xmlElem,mapping)
             else:
                 handleNotImplementedError(xmlElem.tag)
 
@@ -151,14 +168,20 @@ class SystemParser(EntityParser):
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='DATA-ELEMENT-IREF':
                 dataElemIRef=self.parseDataElemInstanceRef(xmlElem)
-            elif xmlElem.tag=='SIGNAL-REF':
+            elif xmlElem.tag=='SIGNAL-REF' and self.version < 4.0:
                 signalRef=parseTextNode(xmlElem)
+            elif xmlElem.tag=='SYSTEM-SIGNAL-REF' and self.version >= 4.0:
+                systemSignalRef=parseTextNode(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        if (dataElemIRef is not None) and (signalRef is not None):
-            return SenderReceiverToSignalMapping(dataElemIRef,signalRef)
-        else:
-            raise Exception("failed to parse SENDER-RECEIVER-TO-SIGNAL-MAPPING")
+
+        if dataElemIRef is not None:
+            if self.version >= 4.0 and systemSignalRef is not None:
+                return SenderReceiverToSignalMappingV4(dataElemIRef,systemSignalRef)
+            elif signalRef is not None:
+                return SenderReceiverToSignalMappingV3(dataElemIRef,signalRef)
+        
+        raise Exception("failed to parse SENDER-RECEIVER-TO-SIGNAL-MAPPING")
 
     def parseSenderReceiverToSignalGroupMapping(self,xmlRoot):
         """parses <'SENDER-RECEIVER-TO-SIGNAL-GROUP-MAPPING'>"""
@@ -188,20 +211,36 @@ class SystemParser(EntityParser):
         return SenderReceiverToSignalGroupMapping(dataElemIRef,signalGroupRef,typeMapping)
 
     def parseDataElemInstanceRef(self,xmlRoot):
-        dataElemRef=parseTextNode(xmlRoot.find('DATA-ELEMENT-REF'))
-        assert(dataElemRef is not None)
-        dataElemIRef=SignalDataElementInstanceRef(dataElemRef)
-        for xmlChild in xmlRoot.findall('./*'):
-            if xmlChild.tag=='DATA-ELEMENT-REF':
-                pass
-            elif xmlChild.tag=='SOFTWARE-COMPOSITION-REF':
-                dataElemIRef.softwareCompositionRef=parseTextNode(xmlChild)
-            elif xmlChild.tag=='COMPONENT-PROTOTYPE-REF':
-                dataElemIRef.componentPrototypeRef.append(parseTextNode(xmlChild))
-            elif xmlChild.tag=='PORT-PROTOTYPE-REF':
-                dataElemIRef.portPrototypeRef=parseTextNode(xmlChild)
-            else:
-                handleNotImplementedError(xmlChild.tag)
+        if self.version >= 4.0:
+            dataElemIRef=SignalDataElementInstanceRefV4()
+            for xmlChild in xmlRoot.findall('./*'):
+                if xmlChild.tag=='CONTEXT-COMPONENT-REF':
+                    dataElemIRef.contextComponentRef.append(parseTextNode(xmlChild))
+                elif xmlChild.tag=='CONTEXT-COMPOSITION-REF':
+                    dataElemIRef.contextCompositionRef=parseTextNode(xmlChild)
+                elif xmlChild.tag=='CONTEXT-PORT-REF':
+                    dataElemIRef.contextPortRef=parseTextNode(xmlChild)
+                elif xmlChild.tag=='TARGET-DATA-PROTOTYPE-REF':
+                    dataElemIRef.targetDataPrototypeRef=parseTextNode(xmlChild)
+                else:
+                    handleNotImplementedError(xmlChild.tag)
+
+        else:
+            dataElemRef=parseTextNode(xmlRoot.find('DATA-ELEMENT-REF'))
+            assert(dataElemRef is not None)
+            dataElemIRef=SignalDataElementInstanceRefV3(dataElemRef)
+            for xmlChild in xmlRoot.findall('./*'):
+                if xmlChild.tag=='DATA-ELEMENT-REF':
+                    pass
+                elif xmlChild.tag=='SOFTWARE-COMPOSITION-REF':
+                    dataElemIRef.softwareCompositionRef=parseTextNode(xmlChild)
+                elif xmlChild.tag=='COMPONENT-PROTOTYPE-REF':
+                    dataElemIRef.componentPrototypeRef.append(parseTextNode(xmlChild))
+                elif xmlChild.tag=='PORT-PROTOTYPE-REF':
+                    dataElemIRef.portPrototypeRef=parseTextNode(xmlChild)
+                else:
+                    handleNotImplementedError(xmlChild.tag)
+
         return dataElemIRef
 
     def parseSenderRecRecordElementMapping(self,xmlRoot):
