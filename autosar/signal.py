@@ -2,7 +2,7 @@ from autosar.base import splitRef
 from autosar.element import Element
 import sys
 
-class SystemSignal(Element):
+class SystemSignalV3(Element):
     def __init__(self,name,dataTypeRef,initValueRef,length,desc=None,parent=None):
         super().__init__(name,parent)
         self.dataTypeRef=dataTypeRef
@@ -18,6 +18,19 @@ class SystemSignal(Element):
               'length': self.length
               }
         if self.desc is not None: data['desc']=self.desc
+        return data
+
+class SystemSignalV4(Element):
+    def __init__(self,name,dynamic_length=False,parent=None):
+        super().__init__(name,parent)
+        self.dynamic_length = dynamic_length
+
+    def asdict(self):
+        data={
+            'type': self.__class__.__name__,
+            'name':self.name,
+            'dynamic_length': self.dynamic_length
+        }
         return data
 
 class SystemSignalGroup(Element):
