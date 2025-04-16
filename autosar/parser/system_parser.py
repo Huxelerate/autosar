@@ -122,6 +122,14 @@ class SystemParser(EntityParser):
                 dataMapping.senderReceiverToSignal.append(self.parseSenderReceiverToSignalMapping(xmlElem))
             elif xmlElem.tag=='SENDER-RECEIVER-TO-SIGNAL-GROUP-MAPPING':
                 dataMapping.senderReceiverToSignalGroup.append(self.parseSenderReceiverToSignalGroupMapping(xmlElem))
+            elif xmlElem.tag=='SENDER-RECEIVER-COMPOSITE-ELEMENT-TO-SIGNAL-MAPPING':
+                pass
+            elif xmlElem.tag=='CLIENT-SERVER-TO-SIGNAL-MAPPING':
+                pass
+            elif xmlElem.tag=='CLIENT-SERVER-TO-SIGNAL-GROUP-MAPPING':
+                pass
+            elif xmlElem.tag=='TRIGGER-TO-SIGNAL-MAPPING':
+                pass
             else:
                 handleNotImplementedError(xmlElem.tag)
 
@@ -180,8 +188,7 @@ class SystemParser(EntityParser):
                 return SenderReceiverToSignalMappingV4(dataElemIRef,systemSignalRef)
             elif signalRef is not None:
                 return SenderReceiverToSignalMappingV3(dataElemIRef,signalRef)
-        
-        raise Exception("failed to parse SENDER-RECEIVER-TO-SIGNAL-MAPPING")
+
 
     def parseSenderReceiverToSignalGroupMapping(self,xmlRoot):
         """parses <'SENDER-RECEIVER-TO-SIGNAL-GROUP-MAPPING'>"""
