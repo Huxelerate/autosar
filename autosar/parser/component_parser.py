@@ -188,11 +188,11 @@ class ComponentTypeParser(EntityParser):
 
             enableUpdate = xmlItem.find('./ENABLE-UPDATE')
             if enableUpdate != None:
-                comspec.enableUpdate = True if self.parseTextNode(enableUpdate)=='true' else False
+                comspec.enableUpdate = self.parseBooleanNode(enableUpdate)
 
             usesEndToEndProtection = xmlItem.find('./USES-END-TO-END-PROTECTION')
             if usesEndToEndProtection != None:
-                comspec.usesEndToEndProtection = True if self.parseTextNode(usesEndToEndProtection)=='true' else False
+                comspec.usesEndToEndProtection = self.parseBooleanNode(usesEndToEndProtection)
 
             port._comspec.required.append(comspec)
         elif xmlItem.tag == 'QUEUED-RECEIVER-COM-SPEC':
@@ -234,15 +234,15 @@ class ComponentTypeParser(EntityParser):
 
             enableUpdate = xmlItem.find('./ENABLE-UPDATE')
             if enableUpdate != None:
-                comspec.enableUpdate = True if self.parseTextNode(enableUpdate)=='true' else False
+                comspec.enableUpdate = self.parseBooleanNode(enableUpdate)
 
             canInvalidate = xmlItem.find('./CAN-INVALIDATE')
             if canInvalidate != None:
-                comspec.canInvalidate = True if self.parseTextNode(canInvalidate)=='true' else False
+                comspec.canInvalidate = self.parseBooleanNode(canInvalidate)
 
             usesEndToEndProtection = xmlItem.find('./USES-END-TO-END-PROTECTION')
             if usesEndToEndProtection != None:
-                comspec.usesEndToEndProtection = True if self.parseTextNode(usesEndToEndProtection)=='true' else False
+                comspec.usesEndToEndProtection = self.parseBooleanNode(usesEndToEndProtection)
 
             port._comspec.provided.append(comspec)
         elif xmlItem.tag == 'QUEUED-SENDER-COM-SPEC':
