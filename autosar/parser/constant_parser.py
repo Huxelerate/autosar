@@ -216,7 +216,7 @@ class ConstantParser(ElementParser):
             raise RuntimeError('<CONSTANT-REF> must not be None')
 
     def _parseApplicationValueSpecification(self, xmlRoot, parent):
-        label, swValueCont, swAxisCont, category = None, None, None, None
+        label, swValueCont, swAxisConts, category = None, None, [], None
 
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-LABEL':
@@ -226,12 +226,13 @@ class ConstantParser(ElementParser):
             elif xmlElem.tag == 'SW-VALUE-CONT':
                 swValueCont = self._parseSwValueCont(xmlElem)
             elif xmlElem.tag == 'SW-AXIS-CONTS':
-                xmlChild = xmlElem.find('./SW-AXIS-CONT')
-                if xmlChild is not None:
+                for xmlChild in xmlElem.findall('./SW-AXIS-CONT'):
                     swAxisCont = self._parseSwAxisCont(xmlChild)
+                    if swAxisCont is not None:
+                        swAxisConts.append(self._parseSwAxisCont(xmlChild))
             else:
                 handleNotImplementedError(xmlElem.tag)
-        value = autosar.constant.ApplicationValue(label, swValueCont = swValueCont, swAxisCont = swAxisCont, category = category, parent = parent)
+        value = autosar.constant.ApplicationValue(label, swValueCont = swValueCont, swAxisConts = swAxisConts, category = category, parent = parent)
         return value
 
     def _parseSwValueCont(self, xmlRoot):

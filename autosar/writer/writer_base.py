@@ -293,8 +293,8 @@ class BaseWriter:
         lines=[]
         if value.label is not None:
             lines.append('<SHORT-LABEL>{}</SHORT-LABEL>'.format(value.label))
-        if value.swAxisCont is not None:
-            lines.extend(self._writeSwAxisContXML(ws, value.swAxisCont))
+        for swAxisCont in value.swAxisConts:
+            lines.extend(self._writeSwAxisContXML(ws, swAxisCont))
         if value.swValueCont is not None:
             lines.extend(self._writeSwValueContXML(ws, value.swValueCont))
         return lines
