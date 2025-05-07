@@ -881,7 +881,7 @@ class Package(object):
         self.append(constant)
         return constant
 
-    def createApplicationValueConstant(self, name, swValueCont = None, swAxisCont = None, valueCategory = None, valueLabel = None):
+    def createApplicationValueConstant(self, name, swValueCont = None, swAxisConts = [], valueCategory = None, valueLabel = None):
         """
         (AUTOSAR4)
         Creates a new Constant containing a application value specification
@@ -889,7 +889,7 @@ class Package(object):
         ws=self.rootWS()
         assert(ws is not None)
         constant = autosar.constant.Constant(name, None, self)
-        innerValue = autosar.constant.ApplicationValue(valueLabel, swValueCont, swAxisCont, valueCategory, parent = self)
+        innerValue = autosar.constant.ApplicationValue(valueLabel, swValueCont, swAxisConts, valueCategory, parent = self)
         constant.value = innerValue
         self.append(constant)
         return constant
