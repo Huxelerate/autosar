@@ -16,8 +16,8 @@ import collections
 
 from autosar.util.errorHandler import handleNotImplementedError
 
-sender_receiver_com_spec_arguments_ar4 = {'dataElement', 'initValue', 'initValueRef', 'aliveTimeout', 'queueLength'}
-sender_receiver_com_spec_arguments_ar3 = {'dataElement', 'canInvalidate', 'initValueRef', 'aliveTimeout', 'queueLength'}
+sender_receiver_com_spec_arguments_ar4 = {'dataElement', 'initValue', 'initValueRef', 'aliveTimeout', 'queueLength', 'enableUpdate', 'usesEndToEndProtection'}
+sender_receiver_com_spec_arguments_ar3 = {'dataElement', 'canInvalidate', 'initValueRef', 'aliveTimeout', 'queueLength', 'enableUpdate', 'usesEndToEndProtection'}
 client_server_com_spec_arguments = {'operation', 'queueLength'}
 mode_switch_com_spec_arguments = {'enhancedMode', 'supportAsync', 'queueLength', 'modeSwitchAckTimeout', 'modeGroup'}
 parameter_com_spec_arguments = {'parameter', 'initValue'}
@@ -86,6 +86,8 @@ class Port(Element):
             aliveTimeout = 0
             queueLength = None
             canInvalidate = False if isinstance(self,ProvidePort) else None
+            enableUpdate = False
+            usesEndToEndProtection = False
 
             if 'dataElement' in comspec: dataElementName=str(comspec['dataElement'])
             if 'initValue' in comspec: rawInitValue=comspec['initValue']
@@ -93,6 +95,8 @@ class Port(Element):
             if 'aliveTimeout' in comspec: aliveTimeout=int(comspec['aliveTimeout'])
             if 'queueLength' in comspec: queueLength=int(comspec['queueLength'])
             if 'canInvalidate' in comspec: canInvalidate=bool(comspec['canInvalidate'])
+            if 'enableUpdate' in comspec: enableUpdate=bool(comspec['enableUpdate'])
+            if 'usesEndToEndProtection' in comspec: usesEndToEndProtection=bool(comspec['usesEndToEndProtection'])
             if (dataElementName is None) and (len(portInterface.dataElements)==1):
                 dataElementName=portInterface.dataElements[0].name
             #verify dataElementName
@@ -131,7 +135,7 @@ class Port(Element):
                     initValue = valueBuilder.buildFromDataType(dataType, rawInitValue)
                 else:
                     raise ValueError('initValue must be an instance of (autosar.constant.Value, int, float, str)')
-            return DataElementComSpec(dataElement.name, initValue, initValueRef, aliveTimeout, queueLength, canInvalidate)
+            return DataElementComSpec(dataElement.name, initValue, initValueRef, aliveTimeout, queueLength, canInvalidate, enableUpdate, usesEndToEndProtection)
         elif isinstance(portInterface,autosar.portinterface.ClientServerInterface):
             operation = comspec.get('operation', None)
             queueLength = comspec.get('queueLength', 1)
@@ -430,7 +434,7 @@ class OperationComSpec(ComSpec):
         self.queueLength=queueLength
 
 class DataElementComSpec(ComSpec):
-    def __init__(self, name=None, initValue=None, initValueRef=None, aliveTimeout=None, queueLength=None, canInvalidate=None, useEndToEndProtection = None):
+    def __init__(self, name=None, initValue=None, initValueRef=None, aliveTimeout=None, queueLength=None, canInvalidate=None, enableUpdate=None, usesEndToEndProtection = None):
         super().__init__(name)
         if initValue is not None:
             assert(isinstance(initValue, (autosar.constant.Value, autosar.constant.ValueAR4)))
@@ -439,7 +443,8 @@ class DataElementComSpec(ComSpec):
         self._aliveTimeout = int(aliveTimeout) if aliveTimeout is not None else None
         self._queueLength = int(queueLength) if queueLength is not None else None
         self.canInvalidate = bool(canInvalidate) if canInvalidate is not None else None
-        self.useEndToEndProtection = bool(useEndToEndProtection) if useEndToEndProtection is not None else None
+        self.enableUpdate = bool(enableUpdate) if enableUpdate is not None else None
+        self.usesEndToEndProtection = bool(usesEndToEndProtection) if usesEndToEndProtection is not None else None
 
     @property
     def aliveTimeout(self):

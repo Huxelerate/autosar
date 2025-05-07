@@ -174,15 +174,26 @@ class ComponentTypeParser(EntityParser):
         elif xmlItem.tag == 'UNQUEUED-RECEIVER-COM-SPEC' or xmlItem.tag == 'NONQUEUED-RECEIVER-COM-SPEC':
             dataElemName = _getDataElemNameFromComSpec(xmlItem,portInterfaceRef)
             comspec = autosar.port.DataElementComSpec(dataElemName)
-            if xmlItem.find('./ALIVE-TIMEOUT') is not None:
-                comspec.aliveTimeout = self.parseTextNode(xmlItem.find('./ALIVE-TIMEOUT'))
+            aliveTimeout = xmlItem.find('./ALIVE-TIMEOUT')
+            if aliveTimeout != None:
+                comspec.aliveTimeout = self.parseTextNode(aliveTimeout)
             if self.version >= 4.0:
                 xmlElem = xmlItem.find('./INIT-VALUE')
                 if xmlElem != None:
                     comspec.initValue, comspec.initValueRef = self._parseAr4InitValue(xmlElem)
             else:
-                if xmlItem.find('./INIT-VALUE-REF') != None:
-                    comspec.initValueRef = self.parseTextNode(xmlItem.find('./INIT-VALUE-REF'))
+                initValueRef = xmlItem.find('./INIT-VALUE-REF')
+                if initValueRef is not None:
+                    comspec.initValueRef = self.parseTextNode(initValueRef)
+
+            enableUpdate = xmlItem.find('./ENABLE-UPDATE')
+            if enableUpdate != None:
+                comspec.enableUpdate = self.parseBooleanNode(enableUpdate)
+
+            usesEndToEndProtection = xmlItem.find('./USES-END-TO-END-PROTECTION')
+            if usesEndToEndProtection != None:
+                comspec.usesEndToEndProtection = self.parseBooleanNode(usesEndToEndProtection)
+
             port._comspec.required.append(comspec)
         elif xmlItem.tag == 'QUEUED-RECEIVER-COM-SPEC':
             dataElemName = _getDataElemNameFromComSpec(xmlItem,portInterfaceRef)
@@ -217,10 +228,22 @@ class ComponentTypeParser(EntityParser):
                 if xmlElem != None:
                     comspec.initValue, comspec.initValueRef = self._parseAr4InitValue(xmlElem)
             else:
-                if xmlItem.find('./INIT-VALUE-REF') is not None:
-                    comspec.initValueRef = self.parseTextNode(xmlItem.find('./INIT-VALUE-REF'))
-            if xmlItem.find('./CAN-INVALIDATE') != None:
-                comspec.canInvalidate = True if self.parseTextNode(xmlItem.find('./CAN-INVALIDATE'))=='true' else False
+                initValueRef = xmlItem.find('./INIT-VALUE-REF')
+                if initValueRef is not None:
+                    comspec.initValueRef = self.parseTextNode(initValueRef)
+
+            enableUpdate = xmlItem.find('./ENABLE-UPDATE')
+            if enableUpdate != None:
+                comspec.enableUpdate = self.parseBooleanNode(enableUpdate)
+
+            canInvalidate = xmlItem.find('./CAN-INVALIDATE')
+            if canInvalidate != None:
+                comspec.canInvalidate = self.parseBooleanNode(canInvalidate)
+
+            usesEndToEndProtection = xmlItem.find('./USES-END-TO-END-PROTECTION')
+            if usesEndToEndProtection != None:
+                comspec.usesEndToEndProtection = self.parseBooleanNode(usesEndToEndProtection)
+
             port._comspec.provided.append(comspec)
         elif xmlItem.tag == 'QUEUED-SENDER-COM-SPEC':
             dataElemName = _getDataElemNameFromComSpec(xmlItem,portInterfaceRef)

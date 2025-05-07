@@ -315,13 +315,13 @@ Convenience method that calls :ref:`ar4_package_Package_createCompuMethodRationa
 createApplicationValueConstant
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. py:method:: Package.createApplicationValueConstant(name, [swValueCont = None], [swAxisCont = None], [valueCategory = None], [valueLabel = None])
+.. py:method:: Package.createApplicationValueConstant(name, [swValueCont = None], [swAxisConts = []], [valueCategory = None], [valueLabel = None])
 
     Creates an application value constant and adds it to the package.
 
     :param str name: ShortName of the new constant
     :param SwValueCont swValueCont: Value container
-    :param SwValueCont swAxisCont: Axis container
+    :param SwValueCont swAxisConts: Axis containers
     :param str valueCategory: Optional category for (inner) value
     :param str valueLabel: Optional label for (inner) value
     :rtype: :ref:`ar4_constant_Constant`

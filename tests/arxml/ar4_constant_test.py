@@ -201,12 +201,12 @@ class ARXML4ConstantTest(ARXMLTestClass):
         package = ws['Constants']
         c1 = package.createApplicationValueConstant('Phys_Calibration_IV',
                                                     autosar.constant.SwValueCont(63),
-                                                    autosar.constant.SwAxisCont(unitRef = '/DataTypes/Units/kg'))
+                                                    [autosar.constant.SwAxisCont(unitRef = '/DataTypes/Units/kg')])
         self.assertIsInstance(c1, autosar.constant.Constant)
 
         cNaN = package.createApplicationValueConstant('Phys_Calibration_NAN_IV',
                                                     autosar.constant.SwValueCont(float('NaN')),
-                                                    autosar.constant.SwAxisCont(unitRef = '/DataTypes/Units/kg'))
+                                                    [autosar.constant.SwAxisCont(unitRef = '/DataTypes/Units/kg')])
         self.assertIsInstance(cNaN, autosar.constant.Constant)
 
         cnINF = package.createApplicationValueConstant('Phys_Calibration_nINF_IV',
@@ -232,8 +232,8 @@ class ARXML4ConstantTest(ARXMLTestClass):
         self.assertIsInstance(c2, autosar.constant.Constant)
         value = c2.value
         self.assertIsInstance(value, autosar.constant.ApplicationValue)
-        self.assertIsInstance(value.swAxisCont, autosar.constant.SwAxisCont)
-        self.assertEqual(value.swAxisCont.unitRef, '/DataTypes/Units/kg')
+        self.assertIsInstance(value.swAxisConts[0], autosar.constant.SwAxisCont)
+        self.assertEqual(value.swAxisConts[0].unitRef, '/DataTypes/Units/kg')
 
         c2 = ws2.find(cNaN.ref)
         value = c2.value

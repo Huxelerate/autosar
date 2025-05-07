@@ -240,8 +240,8 @@ class XMLComponentTypeWriter(ElementWriter):
         lines=[]
         lines.append('<QUEUED-SENDER-COM-SPEC>')
         lines.append(self.indent('<DATA-ELEMENT-REF DEST="%s">%s</DATA-ELEMENT-REF>'%(elem.tag(self.version),elem.ref),1))
-        if (self.version>=4.0 and comspec.useEndToEndProtection is not None):
-            lines.append(self.indent('<USES-END-TO-END-PROTECTION>{}</USES-END-TO-END-PROTECTION>'.format(self.toBooleanStr(comspec.useEndToEndProtection)), 1))
+        if (self.version>=4.0 and comspec.usesEndToEndProtection is not None):
+            lines.append(self.indent('<USES-END-TO-END-PROTECTION>{}</USES-END-TO-END-PROTECTION>'.format(self.toBooleanStr(comspec.usesEndToEndProtection)), 1))
         lines.append('</QUEUED-SENDER-COM-SPEC>')
         return lines
 

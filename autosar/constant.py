@@ -196,19 +196,18 @@ class ApplicationValue(ValueAR4):
     """
     def tag(self, version=None): return "APPLICATION-VALUE-SPECIFICATION"
 
-    def __init__(self, label = None, swValueCont = None, swAxisCont = None, category = None, parent = None, adminData = None):
+    def __init__(self, label = None, swValueCont = None, swAxisConts = [], category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
-        if (swAxisCont is not None) and (not isinstance(swAxisCont, SwAxisCont)):
-            raise ValueError('swAxisCont argument must be None or instance of SwAxisCont')
+        if not all(isinstance(swAxisCont, SwAxisCont) for swAxisCont in swAxisConts):
+            raise ValueError('swAxisConts argument must be a list of of SwAxisCont')
         if (swValueCont is not None) and (not isinstance(swValueCont, SwValueCont)):
             raise ValueError('swValueCont argument must be None or instance of SwValueCont')
-        self.swAxisCont = swAxisCont
+        self.swAxisConts = swAxisConts
         self.swValueCont = swValueCont
 
     def asdict(self):
         data = super().asdict()
-        if self.swAxisCont is not None:
-            data['swAxisCont'] = self.swAxisCont.asdict()
+        data['swAxisConts'] = [swAxisCont.asdict() for swAxisCont in self.swAxisConts]
         if self.swValueCont is not None:
             data['swValueCont'] = self.swValueCont.asdict()
         return data
