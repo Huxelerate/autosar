@@ -87,7 +87,7 @@ class SystemParser(EntityParser):
     def parseSystemMapping(self,xmlRoot,system):
         """parses:
             version < 4.0: <MAPPING>
-            version > 4.0: <SYSTEM-MAPPING>
+            version >= 4.0: <SYSTEM-MAPPING>
         """
         name=parseTextNode(xmlRoot.find('SHORT-NAME'))
 
@@ -123,12 +123,16 @@ class SystemParser(EntityParser):
             elif xmlElem.tag=='SENDER-RECEIVER-TO-SIGNAL-GROUP-MAPPING':
                 dataMapping.senderReceiverToSignalGroup.append(self.parseSenderReceiverToSignalGroupMapping(xmlElem))
             elif xmlElem.tag=='SENDER-RECEIVER-COMPOSITE-ELEMENT-TO-SIGNAL-MAPPING':
+                # TODO: add implementation to parse this tag
                 pass
             elif xmlElem.tag=='CLIENT-SERVER-TO-SIGNAL-MAPPING':
+                # TODO: add implementation to parse this tag
                 pass
             elif xmlElem.tag=='CLIENT-SERVER-TO-SIGNAL-GROUP-MAPPING':
+                # TODO: add implementation to parse this tag
                 pass
             elif xmlElem.tag=='TRIGGER-TO-SIGNAL-MAPPING':
+                # TODO: add implementation to parse this tag
                 pass
             else:
                 handleNotImplementedError(xmlElem.tag)
@@ -173,6 +177,7 @@ class SystemParser(EntityParser):
         assert(xmlRoot.tag=='SENDER-RECEIVER-TO-SIGNAL-MAPPING')
         dataElemIRef=None
         signalRef=None
+        systemSignalRef=None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='DATA-ELEMENT-IREF':
                 dataElemIRef=self.parseDataElemInstanceRef(xmlElem)

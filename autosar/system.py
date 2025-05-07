@@ -43,6 +43,21 @@ class SystemV4(System):
         super().__init__(name, parent)
         self.mappings = []
 
+    def find(self, ref):
+        if ref is None: return None
+
+        result = super().find(ref)
+        if result is not None:
+            return result
+        
+        if ref[0]=='/': ref=ref[1:] #removes initial '/' if it exists
+        ref=ref.partition('/')
+        name=ref[0]
+        for elem in self.mappings:
+            if elem.name == name:
+                return elem
+
+        return None
 
 class DataMapping:
     def __init__(self):
@@ -57,7 +72,8 @@ class Mapping:
 
 class SystemMapping:
     def __init__(self,name=None,parent=None):
-        self.name=None
+        self.name=name
+        self.parent=parent
         self.data=DataMapping()
 
 class SenderReceiverToSignalMappingV3:

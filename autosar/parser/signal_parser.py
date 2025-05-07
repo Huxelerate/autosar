@@ -30,7 +30,7 @@ class SignalParser(EntityParser):
     @parseElementUUID
     def parseSystemSignalV3(self,xmlRoot,parent=None):
         """
-        parses <SYSTEM-SIGNAL>
+        parses <SYSTEM-SIGNAL> (Autosar 3 standard)
         """
         assert(xmlRoot.tag=='SYSTEM-SIGNAL')
         name,dataTypeRef,initValueRef,length,desc=None,None,None,None,None
@@ -60,7 +60,7 @@ class SignalParser(EntityParser):
     @parseElementUUID
     def parseSystemSignalV4(self,xmlRoot,parent=None):
         """
-        parses <SYSTEM-SIGNAL>
+        parses <SYSTEM-SIGNAL> (Autosar 4 standard)
         """
         assert(xmlRoot.tag=='SYSTEM-SIGNAL')
         name, dynamic_length = None, False
@@ -70,6 +70,7 @@ class SignalParser(EntityParser):
             elif elem.tag=='DYNAMIC-LENGTH':
                 dynamic_length = parseTextNode(elem) == "true"
             elif elem.tag=='PHYSICAL-PROPS':
+                # TODO: add implementation to parse this tag
                 pass
             else:
                 handleNotImplementedError(elem.tag)
