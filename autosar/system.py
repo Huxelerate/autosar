@@ -5,7 +5,6 @@ class System(Element):
         super().__init__(name,parent)
         self.fibexElementRefs=[]
         self.fibexElementRefConditionals=[]
-        self.mapping=None
         self.softwareComposition=None
         self.rootSoftwareCompositions=[]
     
@@ -33,6 +32,32 @@ class System(Element):
         if len(self.fibexElementRefs)>0:
             data['fibexElementRefs']=self.fibexElementRefs[:]
         return data
+    
+class SystemV3(System):
+    def __init__(self, name, parent=None):
+        super().__init__(name, parent)
+        self.mapping = None
+    
+class SystemV4(System):
+    def __init__(self, name, parent=None):
+        super().__init__(name, parent)
+        self.mappings = []
+
+    def find(self, ref):
+        if ref is None: return None
+
+        result = super().find(ref)
+        if result is not None:
+            return result
+        
+        if ref[0]=='/': ref=ref[1:] #removes initial '/' if it exists
+        ref=ref.partition('/')
+        name=ref[0]
+        for elem in self.mappings:
+            if elem.name == name:
+                return elem
+
+        return None
 
 class DataMapping:
     def __init__(self):
@@ -45,7 +70,13 @@ class Mapping:
         self.name=None
         self.data=DataMapping()
 
-class SenderReceiverToSignalMapping:
+class SystemMapping:
+    def __init__(self,name=None,parent=None):
+        self.name=name
+        self.parent=parent
+        self.data=DataMapping()
+
+class SenderReceiverToSignalMappingV3:
     """
     <SENDER-RECEIVER-TO-SIGNAL-MAPPING>
     """
@@ -53,7 +84,7 @@ class SenderReceiverToSignalMapping:
         self.dataElemInstanceRef=dataElemInstanceRef
         self.signalRef=signalRef
 
-class SignalDataElementInstanceRef:
+class SignalDataElementInstanceRefV3:
     """
     <DATA-ELEMENT-IREF>
     Note: Observe that there are multiple <DATA-ELEMENT-IREF> definitions in the AUTOSAR XSD (used for different purposes)
@@ -65,6 +96,28 @@ class SignalDataElementInstanceRef:
         self.portPrototypeRef=None          #minOccurs=0, maxOccurs=1
     def asdict(self):
         data={'type': self.__class__.__name__,'dataElemRef':self.dataElemRef}
+        return data
+
+class SenderReceiverToSignalMappingV4:
+    """
+    <SENDER-RECEIVER-TO-SIGNAL-MAPPING>
+    """
+    def __init__(self,dataElemInstanceRef,systemSignalRef):
+        self.dataElemInstanceRef=dataElemInstanceRef
+        self.systemSignalRef=systemSignalRef
+
+class SignalDataElementInstanceRefV4:
+    """
+    <DATA-ELEMENT-IREF>
+    Note: Observe that there are multiple <DATA-ELEMENT-IREF> definitions in the AUTOSAR XSD (used for different purposes)
+    """
+    def __init__(self):
+        self.targetDataPrototypeRef=None  #minOccurs=0, maxOccurs=1
+        self.contextCompositionRef=None   #minOccurs=0, maxOccurs=1
+        self.contextPortRef=None          #minOccurs=0, maxOccurs=1
+        self.contextComponentRef=[]       #minOccurs=0, maxOccurs=unbound
+    def asdict(self):
+        data={'type': self.__class__.__name__}
         return data
 
 class SenderReceiverToSignalGroupMapping:

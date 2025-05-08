@@ -8,11 +8,12 @@ class SignalParser(EntityParser):
         self.version=version
 
         if self.version >= 3.0 and self.version < 4.0:
-            self.switcher = {'SYSTEM-SIGNAL': self.parseSystemSignal,
+            self.switcher = {'SYSTEM-SIGNAL': self.parseSystemSignalV3,
                              'SYSTEM-SIGNAL-GROUP': self.parseSystemSignalGroup
             }
         elif self.version >= 4.0:
-            self.switcher = {
+            self.switcher = {'SYSTEM-SIGNAL': self.parseSystemSignalV4,
+                             'SYSTEM-SIGNAL-GROUP': self.parseSystemSignalGroup
             }
 
     def getSupportedTags(self):
@@ -27,9 +28,9 @@ class SignalParser(EntityParser):
             return None
 
     @parseElementUUID
-    def parseSystemSignal(self,xmlRoot,parent=None):
+    def parseSystemSignalV3(self,xmlRoot,parent=None):
         """
-        parses <SYSTEM-SIGNAL>
+        parses <SYSTEM-SIGNAL> (Autosar 3 standard)
         """
         assert(xmlRoot.tag=='SYSTEM-SIGNAL')
         name,dataTypeRef,initValueRef,length,desc=None,None,None,None,None
@@ -52,7 +53,28 @@ class SignalParser(EntityParser):
                 handleNotImplementedError(elem.tag)
 #      if (name is not None) and (dataTypeRef is not None) and (initValueRef is not None) and length is not None:
         if (name is not None) and length is not None:  #All signals doesn't have IV constant Ref or DatatypeRef
-            return SystemSignal(name, dataTypeRef, initValueRef, length, desc, parent)
+            return SystemSignalV3(name, dataTypeRef, initValueRef, length, desc, parent)
+        else:
+            raise RuntimeError('failed to parse %s'%xmlRoot.tag)
+
+    @parseElementUUID
+    def parseSystemSignalV4(self,xmlRoot,parent=None):
+        """
+        parses <SYSTEM-SIGNAL> (Autosar 4 standard)
+        """
+        assert(xmlRoot.tag=='SYSTEM-SIGNAL')
+        name, dynamic_length = None, False
+        for elem in xmlRoot.findall('./*'):
+            if elem.tag=='SHORT-NAME':
+                name=parseTextNode(elem)
+            elif elem.tag=='DYNAMIC-LENGTH':
+                dynamic_length = parseTextNode(elem) == "true"
+            elif elem.tag=='PHYSICAL-PROPS':
+                # TODO: add implementation to parse this tag
+                pass
+            else:
+                handleNotImplementedError(elem.tag)
+            return SystemSignalV4(name, dynamic_length, parent)
         else:
             raise RuntimeError('failed to parse %s'%xmlRoot.tag)
 
