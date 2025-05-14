@@ -375,13 +375,13 @@ class SwAxisIndividual:
             swAxisGeneric = None
             ):
 
-        self.inputVariableTypeRef = inputVariableTypeRef,
-        self.swVariableRefs = swVariableRefs,
-        self.compuMethodRef = compuMethodRef,
-        self.unitRef = unitRef,
-        self.swMaxAxisPoints = swMaxAxisPoints,
-        self.swMinAxisPoints = swMinAxisPoints,
-        self.dataConstrRef = dataConstrRef,
+        self.inputVariableTypeRef = inputVariableTypeRef
+        self.swVariableRefs = swVariableRefs
+        self.compuMethodRef = compuMethodRef
+        self.unitRef = unitRef
+        self.swMaxAxisPoints = swMaxAxisPoints
+        self.swMinAxisPoints = swMinAxisPoints
+        self.dataConstrRef = dataConstrRef
         self.swAxisGeneric = swAxisGeneric
 
 class SwAxisGrouped:
