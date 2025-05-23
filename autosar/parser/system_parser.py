@@ -119,7 +119,9 @@ class SystemParser(EntityParser):
             if xmlElem.tag=='SWC-TO-IMPL-MAPPING':
                 pass
             elif xmlElem.tag=='SENDER-RECEIVER-TO-SIGNAL-MAPPING':
-                dataMapping.senderReceiverToSignal.append(self.parseSenderReceiverToSignalMapping(xmlElem))
+                mapping = self.parseSenderReceiverToSignalMapping(xmlElem)
+                if mapping is not None:
+                    dataMapping.senderReceiverToSignal.append(mapping)
             elif xmlElem.tag=='SENDER-RECEIVER-TO-SIGNAL-GROUP-MAPPING':
                 dataMapping.senderReceiverToSignalGroup.append(self.parseSenderReceiverToSignalGroupMapping(xmlElem))
             elif xmlElem.tag=='SENDER-RECEIVER-COMPOSITE-ELEMENT-TO-SIGNAL-MAPPING':
@@ -193,6 +195,8 @@ class SystemParser(EntityParser):
                 return SenderReceiverToSignalMappingV4(dataElemIRef,systemSignalRef)
             elif signalRef is not None:
                 return SenderReceiverToSignalMappingV3(dataElemIRef,signalRef)
+
+        return None
 
 
     def parseSenderReceiverToSignalGroupMapping(self,xmlRoot):
