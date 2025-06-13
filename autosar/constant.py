@@ -189,6 +189,23 @@ class NumericalValue(ValueAR4):
         data['value'] = self.value
         return data
 
+class NumericalRuleBasedValue(ValueAR4):
+    def tag(self, version=None): return "NUMERICAL-RULE-BASED-VALUE-SPECIFICATION"
+
+    def __init__(self, rule, arguments, maxSizeToFill = None, parent = None, adminData = None):
+        super().__init__(None, parent, adminData, None)
+        self.rule = rule
+        self.arguments = arguments
+        self.maxSizeToFill = maxSizeToFill
+
+    def asdict(self):
+        data = super().asdict()
+        data['rule'] = self.rule
+        data['arguments'] = self.arguments
+        if self.maxSizeToFill is not None:
+            data['maxSizeToFill'] = self.maxSizeToFill
+        return data
+
 class ApplicationValue(ValueAR4):
     """
     (AUTOSAR4)
