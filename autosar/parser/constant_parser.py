@@ -122,6 +122,8 @@ class ConstantParser(ElementParser):
                 result.append(self._parseRecordValueSpecification(xmlElem, parent))
             elif xmlElem.tag == 'NUMERICAL-VALUE-SPECIFICATION':
                 result.append(self._parseNumericalValueSpecification(xmlElem, parent))
+            elif xmlElem.tag == 'NUMERICAL-RULE-BASED-VALUE-SPECIFICATION':
+                result.append(self._parseNumericalRuleBasedValueSpecification(xmlElem, parent))
             elif xmlElem.tag == 'ARRAY-VALUE-SPECIFICATION':
                 result.append(self._parseArrayValueSpecification(xmlElem, parent))
             elif xmlElem.tag == 'CONSTANT-REFERENCE':
@@ -161,6 +163,50 @@ class ConstantParser(ElementParser):
             return autosar.constant.NumericalValue(label, value, parent)
         else:
             raise RuntimeError("value must not be None")
+    
+    def _parseNumericalRuleBasedValueSpecification(self, xmlValue, parent):
+        assert(xmlValue.tag == 'NUMERICAL-RULE-BASED-VALUE-SPECIFICATION')  
+
+        (rule, arguments, maxSizeToFill) = (None, None, None)
+        hasRuleBasedValues = False
+        for xmlElem in xmlValue.findall('./*'):
+            if xmlElem.tag == 'RULE-BASED-VALUES':
+                if hasRuleBasedValues:
+                    handleValueError('<NUMERICAL-RULE-BASED-VALUE-SPECIFICATION> must not contain more than one <RULE-BASED-VALUES> element')
+                hasRuleBasedValues = True
+                for xmlChild in xmlElem.findall('./*'):
+                    if xmlChild.tag == 'RULE':
+                        rule = self.parseTextNode(xmlChild)
+                    elif xmlChild.tag == 'ARGUMENTSS':
+                        for xmlGrandchild in xmlChild.findall('./*'):
+                            if xmlGrandchild.tag == 'RULE-ARGUMENTS':
+                                if arguments is not None:
+                                    handleValueError('<NUMERICAL-RULE-BASED-VALUE-SPECIFICATION> must not contain more than one <RULE-ARGUMENTS> element')
+                                arguments = []
+                                for argElem in xmlGrandchild.findall('./*'):
+                                    if argElem.tag == 'V':
+                                        arg = self.parseNumberNode(argElem)
+                                        if arg is not None:
+                                            arguments.append(arg)
+                                        else:
+                                            handleValueError('Argument value must be a number')
+                                    else:
+                                        handleNotImplementedError(argElem.tag)
+                            else:
+                                handleNotImplementedError(xmlGrandchild.tag)
+                    elif xmlChild.tag == 'MAX-SIZE-TO-FILL':
+                        maxSizeToFill = self.parseNumberNode(xmlChild)
+                    else:
+                        handleNotImplementedError(xmlChild.tag)
+            else:
+                handleNotImplementedError(xmlElem.tag)
+        
+        if rule is None:
+            raise RuntimeError("missing required <RULE> within <NUMERICAL-RULE-BASED-VALUE-SPECIFICATION>")
+        if arguments is None:
+            raise RuntimeError("missing required <ARGUMENTS> within <NUMERICAL-RULE-BASED-VALUE-SPECIFICATION>")
+        
+        return autosar.constant.NumericalRuleBasedValue(rule, arguments, maxSizeToFill, parent=parent)
 
     @parseElementUUID
     def _parseRecordValueSpecification(self, xmlValue, parent):
