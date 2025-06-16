@@ -165,12 +165,14 @@ class ConstantParser(ElementParser):
             raise RuntimeError("value must not be None")
     
     def _parseNumericalRuleBasedValueSpecification(self, xmlValue, parent):
+        assert(xmlValue.tag == 'NUMERICAL-RULE-BASED-VALUE-SPECIFICATION')  
+
         (rule, arguments, maxSizeToFill) = (None, None, None)
         hasRuleBasedValues = False
         for xmlElem in xmlValue.findall('./*'):
             if xmlElem.tag == 'RULE-BASED-VALUES':
                 if hasRuleBasedValues:
-                    handleValueError('NumericalRuleBasedValueSpecification must not contain more than one <RULE-BASED-VALUES> element')
+                    handleValueError('<NUMERICAL-RULE-BASED-VALUE-SPECIFICATION> must not contain more than one <RULE-BASED-VALUES> element')
                 hasRuleBasedValues = True
                 for xmlChild in xmlElem.findall('./*'):
                     if xmlChild.tag == 'RULE':
@@ -179,7 +181,7 @@ class ConstantParser(ElementParser):
                         for xmlGrandchild in xmlChild.findall('./*'):
                             if xmlGrandchild.tag == 'RULE-ARGUMENTS':
                                 if arguments is not None:
-                                    handleValueError('NumericalRuleBasedValueSpecification must not contain more than one <RULE-ARGUMENTS> element')
+                                    handleValueError('<NUMERICAL-RULE-BASED-VALUE-SPECIFICATION> must not contain more than one <RULE-ARGUMENTS> element')
                                 arguments = []
                                 for argElem in xmlGrandchild.findall('./*'):
                                     if argElem.tag == 'V':
@@ -187,7 +189,7 @@ class ConstantParser(ElementParser):
                                         if arg is not None:
                                             arguments.append(arg)
                                         else:
-                                            handleValueError('Argument value must not be None')
+                                            handleValueError('Argument value must be a number')
                                     else:
                                         handleNotImplementedError(argElem.tag)
                             else:
@@ -200,9 +202,9 @@ class ConstantParser(ElementParser):
                 handleNotImplementedError(xmlElem.tag)
         
         if rule is None:
-            raise RuntimeError("Rule must not be None")
+            raise RuntimeError("missing required <RULE> within <NUMERICAL-RULE-BASED-VALUE-SPECIFICATION>")
         if arguments is None:
-            raise RuntimeError("Arguments must not be None")
+            raise RuntimeError("missing required <ARGUMENTS> within <NUMERICAL-RULE-BASED-VALUE-SPECIFICATION>")
         
         return autosar.constant.NumericalRuleBasedValue(rule, arguments, maxSizeToFill, parent=parent)
 
