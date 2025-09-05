@@ -265,17 +265,13 @@ class SystemParser(EntityParser):
         recordElementRef=None
         signalRef=None
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag=='RECORD-ELEMENT-REF': #minOccurs="0" maxOccurs="1"
+            if xmlElem.tag==('APPLICATION-RECORD-ELEMENT-REF' if self.version >= 4.0 else 'RECORD-ELEMENT-REF'): #minOccurs="0" maxOccurs="1"
                 recordElementRef=parseTextNode(xmlElem)
-            elif xmlElem.tag=='APPLICATION-RECORD-ELEMENT-REF': #minOccurs="0" maxOccurs="1"
-                applicationRecordElementRef=parseTextNode(xmlElem)
-            elif xmlElem.tag=='SYSTEM-SIGNAL-REF': #minOccurs="0" maxOccurs="1"
-                systemSignalRef=parseTextNode(xmlElem)
-            elif xmlElem.tag=='SIGNAL-REF': #minOccurs="0" maxOccurs="1"
+            elif xmlElem.tag==('SYSTEM-SIGNAL-REF' if self.version >= 4.0 else 'SIGNAL-REF'): #minOccurs="0" maxOccurs="1"
                 signalRef=parseTextNode(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        return SenderRecRecordElementMapping(recordElementRef,applicationRecordElementRef,systemSignalRef,signalRef)
+        return (SenderRecRecordElementMappingV4 if self.version >= 4.0 else SenderRecRecordElementMapping)(recordElementRef,signalRef)
 
     def parseSenderRecArrayElementMapping(self,xmlRoot):
         """parses <'SENDER-REC-RECORD-ELEMENT-MAPPING'>"""
