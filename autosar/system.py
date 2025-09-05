@@ -143,8 +143,10 @@ class RecordElementMapping(TypeMapping):
         super().__init__()
 
 class SenderRecRecordElementMapping:
-    def __init__(self,recordElementRef,signalRef):
+    def __init__(self,recordElementRef,applicationRecordElementRef,systemSignalRef,signalRef):
         self.recordElementRef=recordElementRef
+        self.applicationRecordElementRef=applicationRecordElementRef
+        self.systemSignalRef=systemSignalRef
         self.signalRef=signalRef
 
 class RootSwCompositionPrototype(Element):
