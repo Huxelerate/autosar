@@ -267,11 +267,15 @@ class SystemParser(EntityParser):
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='RECORD-ELEMENT-REF': #minOccurs="0" maxOccurs="1"
                 recordElementRef=parseTextNode(xmlElem)
+            elif xmlElem.tag=='APPLICATION-RECORD-ELEMENT-REF': #minOccurs="0" maxOccurs="1"
+                applicationRecordElementRef=parseTextNode(xmlElem)
+            elif xmlElem.tag=='SYSTEM-SIGNAL-REF': #minOccurs="0" maxOccurs="1"
+                systemSignalRef=parseTextNode(xmlElem)
             elif xmlElem.tag=='SIGNAL-REF': #minOccurs="0" maxOccurs="1"
                 signalRef=parseTextNode(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
-        return SenderRecRecordElementMapping(recordElementRef,signalRef)
+        return SenderRecRecordElementMapping(recordElementRef,applicationRecordElementRef,systemSignalRef,signalRef)
 
     def parseSenderRecArrayElementMapping(self,xmlRoot):
         """parses <'SENDER-REC-RECORD-ELEMENT-MAPPING'>"""
