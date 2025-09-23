@@ -12,11 +12,18 @@ from functools import wraps
 from autosar.util.errorHandler import handleNotImplementedError, handleValueError
 
 def _parseBoolean(value):
+    """
+    Parse an autosar boolean value following the xsd spec:
+        A Boolean value denotes a logical condition that is either 'true' or 'false'. It can be one of "0", "1", "true", "false"
+    """
     if value is None:
         return None
-    if isinstance(value,str):
-        if value == 'true': return True
-        elif value =='false': return False
+    if isinstance(value, str):
+        if value == 'true' or value == '1': return True
+        elif value =='false' or value == '0': return False
+    if isinstance(value, int):
+        if value == 1: return False
+        elif value == 0: return False
     handleValueError(value)
 
 def parseElementUUID(parser_func):
