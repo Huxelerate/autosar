@@ -20,9 +20,9 @@ def _parseBoolean(value):
         return None
     if isinstance(value, str):
         if value == 'true' or value == '1': return True
-        elif value =='false' or value == '0': return False
+        elif value == 'false' or value == '0': return False
     if isinstance(value, int):
-        if value == 1: return False
+        if value == 1: return True
         elif value == 0: return False
     handleValueError(value)
 
