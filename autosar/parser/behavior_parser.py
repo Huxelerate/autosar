@@ -1211,6 +1211,7 @@ class BehaviorParser(EntityParser):
         xmlDiagnosticCommunicationManagerNeeds = None
         xmlFunctionInhibitionNeeds = None
         xmlIndicatorStatusNeeds = None
+        xmlDiagnosticValueNeeds = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
@@ -1224,6 +1225,8 @@ class BehaviorParser(EntityParser):
                 xmlFunctionInhibitionNeeds = xmlElem
             elif xmlElem.tag == 'INDICATOR-STATUS-NEEDS':
                 xmlIndicatorStatusNeeds = xmlElem
+            elif xmlElem.tag == 'DIAGNOSTIC-VALUE-NEEDS':
+                xmlDiagnosticValueNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
         serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
@@ -1239,6 +1242,8 @@ class BehaviorParser(EntityParser):
             serviceNeeds.functionInhibitionNeeds = self.parseFunctionInhibitionNeeds(xmlElem, serviceNeeds)
         if xmlIndicatorStatusNeeds is not None:
             serviceNeeds.indicatorStatusNeeds = self.parseIndicatorStatusNeeds(xmlElem, serviceNeeds)
+        if xmlDiagnosticValueNeeds is not None:
+            serviceNeeds.diagnosticValueNeeds = self.parseDiagnosticValueNeeds(xmlElem, serviceNeeds)
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1419,6 +1424,36 @@ class BehaviorParser(EntityParser):
         if self.name is None:
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
         obj = autosar.behavior.IndicatorStatusNeeds(self.name, indicatorType=indicatorType, parent=parent, adminData=self.adminData)
+        self.pop(obj)
+        return obj
+
+    def parseDiagnosticValueNeeds(self, xmlRoot, parent = None):
+        """parses <DIAGNOSTIC-VALUE-NEEDS> (AUTOSAR 4)"""
+        self.push()
+        dataLength = None
+        diagnosticValueAccess = None
+        didNumber = None
+        fixedLength = None
+        processingStyle = None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'DATA-LENGTH':
+                dataLength = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'DIAGNOSTIC-VALUE-ACCESS':
+                diagnosticValueAccess = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DID-NUMBER':
+                didNumber = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'FIXED-LENGTH':
+                fixedLength = self.parseBooleanNode(xmlElem)
+            elif xmlElem.tag == 'PROCESSING-STYLE':
+                processingStyle = self.parseTextNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        obj = autosar.behavior.DiagnosticValueNeeds(self.name, dataLength=dataLength, diagnosticValueAccess=diagnosticValueAccess,
+                                                     didNumber=didNumber, fixedLength=fixedLength, processingStyle=processingStyle,
+                                                     parent=parent, adminData=self.adminData)
         self.pop(obj)
         return obj
 

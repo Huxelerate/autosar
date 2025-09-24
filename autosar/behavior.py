@@ -914,6 +914,39 @@ class IndicatorStatusNeeds(Element):
 
     def tag(self, version=None):
         return 'INDICATOR-STATUS-NEEDS'
+    
+class DiagnosticValueNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-VALUE-NEEDS
+    """
+    def __init__(self, name, dataLength=None, diagnosticValueAccess=None,
+                didNumber=None, fixedLength=None, processingStyle=None, 
+                parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+        self.dataLength = dataLength
+        self.diagnosticValueAccess = diagnosticValueAccess
+        self.didNumber = didNumber
+        self.fixedLength = fixedLength
+        self.processingStyle = processingStyle
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        if self.dataLength is not None:
+            data['dataLength']=self.dataLength
+        if self.diagnosticValueAccess is not None:
+            data['diagnosticValueAccess']=self.diagnosticValueAccess
+        if self.didNumber is not None:
+            data['didNumber']=self.didNumber
+        if self.fixedLength is not None:
+            data['fixedLength']=self.fixedLength
+        if self.processingStyle is not None:
+            data['processingStyle']=self.processingStyle
+        return data
+
+    def tag(self, version=None):
+        return 'DIAGNOSTIC-VALUE-NEEDS'
 
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
@@ -1865,7 +1898,8 @@ class ServiceNeeds(Element):
 
     def __init__(self, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
-                 functionInhibitionNeeds = None, indicatorStatusNeeds = None, parent=None, adminData = None):
+                 functionInhibitionNeeds = None, indicatorStatusNeeds = None,
+                 diagnosticValueNeeds = None, parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
@@ -1873,6 +1907,7 @@ class ServiceNeeds(Element):
         self.diagnosticCommunicationManagerNeeds = diagnosticCommunicationManagerNeeds
         self.functionInhibitionNeeds = functionInhibitionNeeds
         self.indicatorStatusNeeds = indicatorStatusNeeds
+        self.diagnosticValueNeeds = diagnosticValueNeeds
 
 class SwcServiceDependency(Element):
     """
