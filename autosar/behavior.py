@@ -880,6 +880,22 @@ class DiagnosticCommunicationManagerNeeds(Element):
 
     def tag(self, version): return 'DIAGNOSTIC-COMMUNICATION-MANAGER-NEEDS'
 
+class FunctionInhibitionNeeds(Element):
+    """
+    AUTOSAR 4 representation of FUNCTION-INHIBITION-NEEDS
+    """
+    def __init__(self, name, parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        return data
+
+    def tag(self, version=None):
+        return 'FUNCTION-INHIBITION-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
@@ -1830,12 +1846,13 @@ class ServiceNeeds(Element):
 
     def __init__(self, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
-                 parent=None, adminData = None):
+                 functionInhibitionNeeds = None, parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
         self.diagnosticEventManagerNeeds = diagnosticEventManagerNeeds
         self.diagnosticCommunicationManagerNeeds = diagnosticCommunicationManagerNeeds
+        self.functionInhibitionNeeds = functionInhibitionNeeds
 
 class SwcServiceDependency(Element):
     """

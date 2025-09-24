@@ -1205,7 +1205,11 @@ class BehaviorParser(EntityParser):
     def parseServiceNeeds(self, xmlRoot, parent = None):
         """parses <SERVICE-NEEDS> (AUTOSAR 4)"""
         assert(xmlRoot.tag == 'SERVICE-NEEDS')
-        (xmlNvBlockNeeds, xmlDiagnosticEventNeeds, xmlDiagnosticEventManagerNeeds, xmlDiagnosticCommunicationManagerNeeds) = (None, None, None, None)
+        xmlNvBlockNeeds = None
+        xmlDiagnosticEventNeeds = None
+        xmlDiagnosticEventManagerNeeds = None
+        xmlDiagnosticCommunicationManagerNeeds = None
+        xmlFunctionInhibitionNeeds = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
@@ -1215,6 +1219,8 @@ class BehaviorParser(EntityParser):
                 xmlDiagnosticEventManagerNeeds = xmlElem
             elif xmlElem.tag == 'DIAGNOSTIC-COMMUNICATION-MANAGER-NEEDS':
                 xmlDiagnosticCommunicationManagerNeeds = xmlElem
+            elif xmlElem.tag == 'FUNCTION-INHIBITION-NEEDS':
+                xmlFunctionInhibitionNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
         serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
@@ -1226,6 +1232,8 @@ class BehaviorParser(EntityParser):
             serviceNeeds.diagnosticEventManagerNeeds = self.parseDiagnosticEventManagerNeeds(xmlElem, serviceNeeds)
         if xmlDiagnosticCommunicationManagerNeeds is not None:
             serviceNeeds.diagnosticCommunicationManagerNeeds = self.parseDiagnosticCommunicationManagerNeeds(xmlElem, serviceNeeds)
+        if xmlFunctionInhibitionNeeds is not None:
+            serviceNeeds.functionInhibitionNeeds = self.parseFunctionInhibitionNeeds(xmlElem, serviceNeeds)
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1378,6 +1386,18 @@ class BehaviorParser(EntityParser):
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
         config.check()
         obj = autosar.behavior.DiagnosticCommunicationManagerNeeds(self.name, config = config, parent = parent, adminData = self.adminData)
+        self.pop(obj)
+        return obj
+
+    def parseFunctionInhibitionNeeds(self, xmlRoot, parent = None):
+        """parses <FUNCTION-INHIBITION-NEEDS> (AUTOSAR 4)"""
+        self.push()
+        for xmlElem in xmlRoot.findall('./*'):
+            self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        obj = autosar.behavior.FunctionInhibitionNeeds(self.name, parent = parent, adminData = self.adminData)
         self.pop(obj)
         return obj
 
