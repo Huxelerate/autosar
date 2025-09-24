@@ -948,6 +948,26 @@ class DiagnosticValueNeeds(Element):
     def tag(self, version=None):
         return 'DIAGNOSTIC-VALUE-NEEDS'
 
+class DiagnosticOperationCycleNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-OPERATION-CYCLE-NEEDS
+    """
+    def __init__(self, name, operationCycle=None, operationCycleAutomaticEnd=None,
+                operationCycleAutosart=None, parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+        self.operationCycle = operationCycle
+        self.operationCycleAutomaticEnd = operationCycleAutomaticEnd
+        self.operationCycleAutosart = operationCycleAutosart
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        return data
+
+    def tag(self, version=None):
+        return 'DIAGNOSTIC-OPERATION-CYCLE-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
@@ -1899,7 +1919,8 @@ class ServiceNeeds(Element):
     def __init__(self, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
                  functionInhibitionNeeds = None, indicatorStatusNeeds = None,
-                 diagnosticValueNeeds = None, parent=None, adminData = None):
+                 diagnosticValueNeeds = None, diagnosticOperationCycleNeeds = None, 
+                 parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
@@ -1908,6 +1929,7 @@ class ServiceNeeds(Element):
         self.functionInhibitionNeeds = functionInhibitionNeeds
         self.indicatorStatusNeeds = indicatorStatusNeeds
         self.diagnosticValueNeeds = diagnosticValueNeeds
+        self.diagnosticOperationCycleNeeds = diagnosticOperationCycleNeeds
 
 class SwcServiceDependency(Element):
     """
