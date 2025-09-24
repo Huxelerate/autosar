@@ -294,6 +294,8 @@ class BehaviorParser(EntityParser):
         xmlLocalDataReadAccess = None
         xmlLocalDataWriteAccess = None
 
+        xmlSwAddrMethodRef = None
+
         self.push()
 
         if self.version < 4.0:
@@ -360,6 +362,8 @@ class BehaviorParser(EntityParser):
                     xmlRunsInsideExclusiveAreaRefs = xmlElem
                 elif xmlElem.tag == 'RUNS-INSIDES':
                     xmlRunsInsides = xmlElem
+                elif xmlElem.tag == 'SW-ADDR-METHOD-REF':
+                    xmlSwAddrMethodRef = self.parseTextNode(xmlElem)
                 else:
                     self.defaultHandler(xmlElem)
         if name is None:
@@ -507,6 +511,9 @@ class BehaviorParser(EntityParser):
                         runnableEntity.runsInsidesExclusiveAreas.append(exclusiveAreaRefConditional)
                 else:
                     handleNotImplementedError(xmlElem.tag)
+        
+        if xmlSwAddrMethodRef is not None:
+            runnableEntity.swAddrMethodRef = xmlSwAddrMethodRef
 
         if runnableEntity is not None:
             runnableEntity.adminData = adminData

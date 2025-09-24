@@ -262,6 +262,8 @@ class RunnableEntity(Element):
         self.externalTriggeringPoints = [] #AUTOSAR4 only
         self.runsInsidesExclusiveAreas = [] #AUTOSAR4 only #type: List[Union[ExclusiveAreaRefConditional, str]]
 
+        self.swAddrMethodRef = None #AUTOSAR4 only
+
     def tag(self,version=None):
         return 'RUNNABLE-ENTITY'
 
