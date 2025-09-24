@@ -1213,6 +1213,7 @@ class BehaviorParser(EntityParser):
         xmlIndicatorStatusNeeds = None
         xmlDiagnosticValueNeeds = None
         xmlDiagnosticOperationCycleNeeds = None
+        xmlDiagnosticIoControlNeeds = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
@@ -1230,6 +1231,8 @@ class BehaviorParser(EntityParser):
                 xmlDiagnosticValueNeeds = xmlElem
             elif xmlElem.tag == 'DIAGNOSTIC-OPERATION-CYCLE-NEEDS':
                 xmlDiagnosticOperationCycleNeeds = xmlElem
+            elif xmlElem.tag == 'DIAGNOSTIC-IO-CONTROL-NEEDS':
+                xmlDiagnosticIoControlNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
         serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
@@ -1249,6 +1252,8 @@ class BehaviorParser(EntityParser):
             serviceNeeds.diagnosticValueNeeds = self.parseDiagnosticValueNeeds(xmlElem, serviceNeeds)
         if xmlDiagnosticOperationCycleNeeds is not None:
             serviceNeeds.diagnosticOperationCycleNeeds = self.parseDiagnosticOperationCycleNeeds(xmlElem, serviceNeeds)
+        if xmlDiagnosticIoControlNeeds is not None:
+            serviceNeeds.diagnosticIoControlNeeds = self.parseDiagnosticIoControlNeeds(xmlElem, serviceNeeds)
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1484,6 +1489,38 @@ class BehaviorParser(EntityParser):
                                                               operationCycleAutomaticEnd=operationCycleAutomaticEnd,
                                                               operationCycleAutosart=operationCycleAutosart,
                                                               parent=parent, adminData=self.adminData)
+        self.pop(obj)
+        return obj
+
+    def parseDiagnosticIoControlNeeds(self, xmlRoot, parent = None):
+        """parses <DIAGNOSTIC-IO-CONTROL-NEEDS> (AUTOSAR 4)"""
+        self.push()
+        currentValueRef = None
+        didNumber = None
+        freezeCurrentStateSupported = None
+        resetToDefaultSupported = None
+        shortTermAdjustmentSupported = None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'CURRENT-VALUE-REF':
+                currentValueRef = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DID-NUMBER':
+                didNumber = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'FREEZE-CURRENT-STATE-SUPPORTED':
+                freezeCurrentStateSupported = self.parseBooleanNode(xmlElem)
+            elif xmlElem.tag == 'RESET-TO-DEFAULT-SUPPORTED':
+                resetToDefaultSupported = self.parseBooleanNode(xmlElem)
+            elif xmlElem.tag == 'SHORT-TERM-ADJUSTMENT-SUPPORTED':
+                shortTermAdjustmentSupported = self.parseBooleanNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        obj = autosar.behavior.DiagnosticIoControlNeeds(self.name, currentValueRef=currentValueRef, didNumber=didNumber,
+                                                         freezeCurrentStateSupported=freezeCurrentStateSupported,
+                                                         resetToDefaultSupported=resetToDefaultSupported,
+                                                         shortTermAdjustmentSupported=shortTermAdjustmentSupported,
+                                                         parent=parent, adminData=self.adminData)
         self.pop(obj)
         return obj
 

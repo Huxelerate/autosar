@@ -968,6 +968,38 @@ class DiagnosticOperationCycleNeeds(Element):
     def tag(self, version=None):
         return 'DIAGNOSTIC-OPERATION-CYCLE-NEEDS'
 
+class DiagnosticIoControlNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-IO-CONTROL-NEEDS
+    """
+    def __init__(self, name, currentValueRef=None, didNumber=None, freezeCurrentStateSupported=None,
+                 resetToDefaultSupported=None, shortTermAdjustmentSupported=None, parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+        self.currentValueRef = currentValueRef
+        self.didNumber = didNumber
+        self.freezeCurrentStateSupported = freezeCurrentStateSupported
+        self.resetToDefaultSupported = resetToDefaultSupported
+        self.shortTermAdjustmentSupported = shortTermAdjustmentSupported
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        if self.currentValueRef is not None:
+            data['currentValueRef']=self.currentValueRef
+        if self.didNumber is not None:
+            data['didNumber']=self.didNumber
+        if self.freezeCurrentStateSupported is not None:
+            data['freezeCurrentStateSupported']=self.freezeCurrentStateSupported
+        if self.resetToDefaultSupported is not None:
+            data['resetToDefaultSupported']=self.resetToDefaultSupported
+        if self.shortTermAdjustmentSupported is not None:
+            data['shortTermAdjustmentSupported']=self.shortTermAdjustmentSupported
+        return data
+
+    def tag(self, version=None):
+        return 'DIAGNOSTIC-IO-CONTROL-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
@@ -1919,8 +1951,8 @@ class ServiceNeeds(Element):
     def __init__(self, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
                  functionInhibitionNeeds = None, indicatorStatusNeeds = None,
-                 diagnosticValueNeeds = None, diagnosticOperationCycleNeeds = None, 
-                 parent=None, adminData = None):
+                 diagnosticValueNeeds = None, diagnosticOperationCycleNeeds = None,
+                 diagnosticIoControlNeeds = None, parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
@@ -1930,6 +1962,7 @@ class ServiceNeeds(Element):
         self.indicatorStatusNeeds = indicatorStatusNeeds
         self.diagnosticValueNeeds = diagnosticValueNeeds
         self.diagnosticOperationCycleNeeds = diagnosticOperationCycleNeeds
+        self.diagnosticIoControlNeeds = diagnosticIoControlNeeds
 
 class SwcServiceDependency(Element):
     """
