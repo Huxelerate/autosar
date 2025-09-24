@@ -1210,6 +1210,7 @@ class BehaviorParser(EntityParser):
         xmlDiagnosticEventManagerNeeds = None
         xmlDiagnosticCommunicationManagerNeeds = None
         xmlFunctionInhibitionNeeds = None
+        xmlIndicatorStatusNeeds = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
@@ -1221,6 +1222,8 @@ class BehaviorParser(EntityParser):
                 xmlDiagnosticCommunicationManagerNeeds = xmlElem
             elif xmlElem.tag == 'FUNCTION-INHIBITION-NEEDS':
                 xmlFunctionInhibitionNeeds = xmlElem
+            elif xmlElem.tag == 'INDICATOR-STATUS-NEEDS':
+                xmlIndicatorStatusNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
         serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
@@ -1234,6 +1237,8 @@ class BehaviorParser(EntityParser):
             serviceNeeds.diagnosticCommunicationManagerNeeds = self.parseDiagnosticCommunicationManagerNeeds(xmlElem, serviceNeeds)
         if xmlFunctionInhibitionNeeds is not None:
             serviceNeeds.functionInhibitionNeeds = self.parseFunctionInhibitionNeeds(xmlElem, serviceNeeds)
+        if xmlIndicatorStatusNeeds is not None:
+            serviceNeeds.indicatorStatusNeeds = self.parseIndicatorStatusNeeds(xmlElem, serviceNeeds)
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1398,6 +1403,22 @@ class BehaviorParser(EntityParser):
         if self.name is None:
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
         obj = autosar.behavior.FunctionInhibitionNeeds(self.name, parent = parent, adminData = self.adminData)
+        self.pop(obj)
+        return obj
+
+    def parseIndicatorStatusNeeds(self, xmlRoot, parent = None):
+        """parses <INDICATOR-STATUS-NEEDS> (AUTOSAR 4)"""
+        indicatorType = None
+        self.push()
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'TYPE':
+                indicatorType = self.parseTextNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        obj = autosar.behavior.IndicatorStatusNeeds(self.name, indicatorType=indicatorType, parent=parent, adminData=self.adminData)
         self.pop(obj)
         return obj
 

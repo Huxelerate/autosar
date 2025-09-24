@@ -896,6 +896,25 @@ class FunctionInhibitionNeeds(Element):
     def tag(self, version=None):
         return 'FUNCTION-INHIBITION-NEEDS'
 
+class IndicatorStatusNeeds(Element):
+    """
+    AUTOSAR 4 representation of INDICATOR-STATUS-NEEDS
+    """
+    def __init__(self, name, indicatorType=None, parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+        self.type = indicatorType
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        if self.type is not None:
+            data['type']=self.type
+        return data
+
+    def tag(self, version=None):
+        return 'INDICATOR-STATUS-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
@@ -1846,13 +1865,14 @@ class ServiceNeeds(Element):
 
     def __init__(self, nvmBlockNeeds = None, diagnosticEventNeeds = None, 
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
-                 functionInhibitionNeeds = None, parent=None, adminData = None):
+                 functionInhibitionNeeds = None, indicatorStatusNeeds = None, parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
         self.diagnosticEventManagerNeeds = diagnosticEventManagerNeeds
         self.diagnosticCommunicationManagerNeeds = diagnosticCommunicationManagerNeeds
         self.functionInhibitionNeeds = functionInhibitionNeeds
+        self.indicatorStatusNeeds = indicatorStatusNeeds
 
 class SwcServiceDependency(Element):
     """
