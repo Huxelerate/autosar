@@ -902,14 +902,14 @@ class IndicatorStatusNeeds(Element):
     """
     def __init__(self, name, indicatorType=None, parent=None, adminData=None):
         super().__init__(name, parent, adminData)
-        self.type = indicatorType
+        self.indicatorType = indicatorType
 
     def asdict(self):
         data={'type': self.__class__.__name__,'name':self.name}
         if self.adminData is not None:
             data['adminData']=self.adminData.asdict()
-        if self.type is not None:
-            data['type']=self.type
+        if self.indicatorType is not None:
+            data['indicatorType']=self.indicatorType
         return data
 
     def tag(self, version=None):
