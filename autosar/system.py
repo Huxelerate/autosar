@@ -80,9 +80,10 @@ class SenderReceiverToSignalMappingV3:
     """
     <SENDER-RECEIVER-TO-SIGNAL-MAPPING>
     """
-    def __init__(self,dataElemInstanceRef,signalRef):
+    def __init__(self,dataElemInstanceRef,signalRef,variationPoint):
         self.dataElemInstanceRef=dataElemInstanceRef
         self.signalRef=signalRef
+        self.variationPoint=variationPoint
 
 class SignalDataElementInstanceRefV3:
     """
@@ -102,9 +103,10 @@ class SenderReceiverToSignalMappingV4:
     """
     <SENDER-RECEIVER-TO-SIGNAL-MAPPING>
     """
-    def __init__(self,dataElemInstanceRef,systemSignalRef):
+    def __init__(self,dataElemInstanceRef,systemSignalRef,variationPoint):
         self.dataElemInstanceRef=dataElemInstanceRef
         self.systemSignalRef=systemSignalRef
+        self.variationPoint=variationPoint
 
 class SignalDataElementInstanceRefV4:
     """

@@ -386,6 +386,11 @@ class ComponentTypeParser(EntityParser):
         """
         assert xmlRoot.tag == 'ASSEMBLY-SW-CONNECTOR'
         mappingRef = None
+        providerComponentRef = None
+        providerPortRef = None
+        requesterComponentRef = None
+        requesterPortRef = None
+        variationPoint = None
         name=self.parseTextNode(xmlRoot.find('SHORT-NAME'))
         for xmlChild in xmlRoot.findall('./*'):
             if xmlChild.tag == 'SHORT-NAME':
@@ -398,6 +403,8 @@ class ComponentTypeParser(EntityParser):
                 requesterPortRef=self.parseTextNode(xmlChild.find('./TARGET-R-PORT-REF'))
             elif xmlChild.tag == 'MAPPING-REF':
                 mappingRef = self.parseTextNode(xmlChild)
+            elif xmlChild.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlChild)
             else:
                 self.defaultHandler(xmlChild)
         if providerComponentRef is None:
@@ -418,6 +425,7 @@ class ComponentTypeParser(EntityParser):
             autosar.component.ProviderInstanceRef(providerComponentRef,providerPortRef),
             autosar.component.RequesterInstanceRef(requesterComponentRef,requesterPortRef),
             mappingRef,
+            variationPoint,
             parent=parent)
 
     @parseElementUUID

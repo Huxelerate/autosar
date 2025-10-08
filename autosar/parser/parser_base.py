@@ -643,10 +643,26 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
         return specializedAutosarDataPrototype
         
 
+    def parsePostBuildVariantCondition(self, xmlRoot):
+        assert (xmlRoot.tag == 'POST-BUILD-VARIANT-CONDITION')
+        value = None
+        matchingCriterionRef = None
+        for itemXML in xmlRoot.findall("./*"):
+            tag = itemXML.tag
+            if tag == "VALUE":
+                value = self.parseTextNode(itemXML)
+            elif tag == "MATCHING-CRITERION-REF":
+                matchingCriterionRef = self.parseTextNode(itemXML)
+            else:
+                handleNotImplementedError(tag)
+
+        return autosar.behavior.PostBuildVariantCondition(value, matchingCriterionRef)
+
     @parseElementUUID
     def parseVariationPoint(self, xmlRoot):
         assert(xmlRoot.tag == 'VARIATION-POINT')
         (shortLabel, swSysCond, desc, bindingTime) = (None, None, None, None)
+        postBuildVariantConditions = []
 
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'SHORT-LABEL':
@@ -661,11 +677,19 @@ class EntityParser(ElementParser, metaclass=abc.ABCMeta):
                 pass #implement later (related to external tools)
             elif xmlElem.tag == 'BLUEPRINT-CONDITION':
                 pass #implement later (documentation related)
+            elif xmlElem.tag == 'POST-BUILD-VARIANT-CONDITIONS':
+                for xmlChild in xmlElem.findall('./*'):
+                    if xmlChild.tag == 'POST-BUILD-VARIANT-CONDITION':
+                        tmp = self.parsePostBuildVariantCondition(xmlChild)
+                        if tmp is not None:
+                            postBuildVariantConditions.append(tmp)
+                    else:
+                        handleNotImplementedError(xmlChild.tag)
             else:
-                # TODO: handle FORMAL-BLUEPRINT-CONDITION, POST-BUILD-VARIANT-CONDITIONS and FORMAL-BLUEPRINT-GENERATOR
+                # TODO: handle FORMAL-BLUEPRINT-CONDITION and FORMAL-BLUEPRINT-GENERATOR
                 handleNotImplementedError(xmlElem)
 
-        return autosar.behavior.VariationPoint(shortLabel, swSysCond, desc, bindingTime)
+        return autosar.behavior.VariationPoint(shortLabel, swSysCond, desc, bindingTime, postBuildVariantConditions)
     
     def _parseAr4InitValue(self, xmlElem):
         (initValue, initValueRef) = (None, None)
