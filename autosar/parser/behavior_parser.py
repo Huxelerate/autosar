@@ -1214,6 +1214,7 @@ class BehaviorParser(EntityParser):
         xmlDiagnosticValueNeeds = None
         xmlDiagnosticOperationCycleNeeds = None
         xmlDiagnosticIoControlNeeds = None
+        xmlDiagnosticRoutineNeeds = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
@@ -1233,6 +1234,8 @@ class BehaviorParser(EntityParser):
                 xmlDiagnosticOperationCycleNeeds = xmlElem
             elif xmlElem.tag == 'DIAGNOSTIC-IO-CONTROL-NEEDS':
                 xmlDiagnosticIoControlNeeds = xmlElem
+            elif xmlElem.tag == 'DIAGNOSTIC-ROUTINE-NEEDS':
+                xmlDiagnosticRoutineNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
         serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
@@ -1254,6 +1257,8 @@ class BehaviorParser(EntityParser):
             serviceNeeds.diagnosticOperationCycleNeeds = self.parseDiagnosticOperationCycleNeeds(xmlElem, serviceNeeds)
         if xmlDiagnosticIoControlNeeds is not None:
             serviceNeeds.diagnosticIoControlNeeds = self.parseDiagnosticIoControlNeeds(xmlElem, serviceNeeds)
+        if xmlDiagnosticRoutineNeeds is not None:
+            serviceNeeds.diagnosticRoutineNeeds = self.parseDiagnosticRoutineNeeds(xmlElem, serviceNeeds) 
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1440,13 +1445,22 @@ class BehaviorParser(EntityParser):
     def parseDiagnosticValueNeeds(self, xmlRoot, parent = None):
         """parses <DIAGNOSTIC-VALUE-NEEDS> (AUTOSAR 4)"""
         self.push()
+        audiences = None
+        diagRequirement = None
+        securityAccessLevel = None
         dataLength = None
         diagnosticValueAccess = None
         didNumber = None
         fixedLength = None
         processingStyle = None
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'DATA-LENGTH':
+            if xmlElem.tag == 'AUDIENCES':
+                audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'DATA-LENGTH':
                 dataLength = self.parseIntNode(xmlElem)
             elif xmlElem.tag == 'DIAGNOSTIC-VALUE-ACCESS':
                 diagnosticValueAccess = self.parseTextNode(xmlElem)
@@ -1461,7 +1475,9 @@ class BehaviorParser(EntityParser):
 
         if self.name is None:
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
-        obj = autosar.behavior.DiagnosticValueNeeds(self.name, dataLength=dataLength, diagnosticValueAccess=diagnosticValueAccess,
+        obj = autosar.behavior.DiagnosticValueNeeds(self.name, audiences=audiences, diagRequirement=diagRequirement, 
+                                                     securityAccessLevel=securityAccessLevel,
+                                                     dataLength=dataLength, diagnosticValueAccess=diagnosticValueAccess,
                                                      didNumber=didNumber, fixedLength=fixedLength, processingStyle=processingStyle,
                                                      parent=parent, adminData=self.adminData)
         self.pop(obj)
@@ -1470,11 +1486,20 @@ class BehaviorParser(EntityParser):
     def parseDiagnosticOperationCycleNeeds(self, xmlRoot, parent = None):
         """parses <DIAGNOSTIC-OPERATION-CYCLE-NEEDS> (AUTOSAR 4)"""
         self.push()
+        audiences = None
+        diagRequirement = None
+        securityAccessLevel = None
         operationCycle = None
         operationCycleAutomaticEnd = None
         operationCycleAutosart = None
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'OPERATION-CYCLE':
+            if xmlElem.tag == 'AUDIENCES':
+                audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'OPERATION-CYCLE':
                 operationCycle = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'OPERATION-CYCLE-AUTOMATIC-END':
                 operationCycleAutomaticEnd = self.parseBooleanNode(xmlElem)
@@ -1485,7 +1510,9 @@ class BehaviorParser(EntityParser):
 
         if self.name is None:
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
-        obj = autosar.behavior.DiagnosticOperationCycleNeeds(self.name, operationCycle=operationCycle,
+        obj = autosar.behavior.DiagnosticOperationCycleNeeds(self.name, audiences=audiences, diagRequirement=diagRequirement, 
+                                                              securityAccessLevel=securityAccessLevel,
+                                                              operationCycle=operationCycle,
                                                               operationCycleAutomaticEnd=operationCycleAutomaticEnd,
                                                               operationCycleAutosart=operationCycleAutosart,
                                                               parent=parent, adminData=self.adminData)
@@ -1495,13 +1522,22 @@ class BehaviorParser(EntityParser):
     def parseDiagnosticIoControlNeeds(self, xmlRoot, parent = None):
         """parses <DIAGNOSTIC-IO-CONTROL-NEEDS> (AUTOSAR 4)"""
         self.push()
+        audiences = None
+        diagRequirement = None
+        securityAccessLevel = None
         currentValueRef = None
         didNumber = None
         freezeCurrentStateSupported = None
         resetToDefaultSupported = None
         shortTermAdjustmentSupported = None
         for xmlElem in xmlRoot.findall('./*'):
-            if xmlElem.tag == 'CURRENT-VALUE-REF':
+            if xmlElem.tag == 'AUDIENCES':
+                audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'CURRENT-VALUE-REF':
                 currentValueRef = self.parseTextNode(xmlElem)
             elif xmlElem.tag == 'DID-NUMBER':
                 didNumber = self.parseIntNode(xmlElem)
@@ -1513,14 +1549,48 @@ class BehaviorParser(EntityParser):
                 shortTermAdjustmentSupported = self.parseBooleanNode(xmlElem)
             else:
                 self.baseHandler(xmlElem)
-
         if self.name is None:
             raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
-        obj = autosar.behavior.DiagnosticIoControlNeeds(self.name, currentValueRef=currentValueRef, didNumber=didNumber,
+        obj = autosar.behavior.DiagnosticIoControlNeeds(self.name, audiences=audiences, diagRequirement=diagRequirement, 
+                                                         securityAccessLevel=securityAccessLevel, 
+                                                         currentValueRef=currentValueRef, didNumber=didNumber,
                                                          freezeCurrentStateSupported=freezeCurrentStateSupported,
                                                          resetToDefaultSupported=resetToDefaultSupported,
                                                          shortTermAdjustmentSupported=shortTermAdjustmentSupported,
                                                          parent=parent, adminData=self.adminData)
+        self.pop(obj)
+        return obj
+
+
+    def parseDiagnosticRoutineNeeds(self, xmlRoot, parent = None):
+        """parses <DIAGNOSTIC-ROUTINE-NEEDS> (AUTOSAR 4)"""
+        self.push()
+        audiences = None
+        diagRequirement = None
+        securityAccessLevel = None
+        ridNumber = None
+        diagRoutineType = None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'AUDIENCES':
+                audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'RID-NUMBER':
+                ridNumber = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-ROUTINE-TYPE':
+                diagRoutineType = self.parseTextNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        obj = autosar.behavior.DiagnosticRoutineNeeds(self.name, audiences=audiences, diagRequirement=diagRequirement,
+                                                       securityAccessLevel=securityAccessLevel,
+                                                       ridNumber=ridNumber,
+                                                       diagRoutineType=diagRoutineType,
+                                                       parent=parent, adminData=self.adminData)
         self.pop(obj)
         return obj
 
@@ -1660,6 +1730,15 @@ class BehaviorParser(EntityParser):
                     if timingEvent is None:
                         handleValueError('Cannot find timing event {0}'.format(timingRef))
                     descriptor.timingEventRef = timingEvent.name
+                elif xmlElem.tag == 'CLIENT-SERVER-PORTS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'ROLE-BASED-PORT-ASSIGNMENT':
+                            tmp = self._parseRoleBasedPortAssignment(xmlChild)
+                            if tmp is not None:
+                                descriptor.clientServerPorts.append(tmp)
+                        else:
+                            handleNotImplementedError(xmlElem.tag)
+
                 else:
                     handleNotImplementedError(xmlElem.tag)
             return descriptor

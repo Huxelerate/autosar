@@ -919,10 +919,14 @@ class DiagnosticValueNeeds(Element):
     """
     AUTOSAR 4 representation of DIAGNOSTIC-VALUE-NEEDS
     """
-    def __init__(self, name, dataLength=None, diagnosticValueAccess=None,
+    def __init__(self, name, audiences=None, diagRequirement=None, securityAccessLevel=None,
+                dataLength=None, diagnosticValueAccess=None,
                 didNumber=None, fixedLength=None, processingStyle=None, 
                 parent=None, adminData=None):
         super().__init__(name, parent, adminData)
+        self.audiences = audiences
+        self.diagRequirement = diagRequirement
+        self.securityAccessLevel = securityAccessLevel
         self.dataLength = dataLength
         self.diagnosticValueAccess = diagnosticValueAccess
         self.didNumber = didNumber
@@ -933,6 +937,12 @@ class DiagnosticValueNeeds(Element):
         data={'type': self.__class__.__name__,'name':self.name}
         if self.adminData is not None:
             data['adminData']=self.adminData.asdict()
+        if self.audiences is not None:
+            data['audiences']=self.audiences
+        if self.diagRequirement is not None:
+            data['diagRequirement']=self.diagRequirement
+        if self.securityAccessLevel is not None:
+            data['securityAccessLevel']=self.securityAccessLevel
         if self.dataLength is not None:
             data['dataLength']=self.dataLength
         if self.diagnosticValueAccess is not None:
@@ -952,9 +962,13 @@ class DiagnosticOperationCycleNeeds(Element):
     """
     AUTOSAR 4 representation of DIAGNOSTIC-OPERATION-CYCLE-NEEDS
     """
-    def __init__(self, name, operationCycle=None, operationCycleAutomaticEnd=None,
-                operationCycleAutosart=None, parent=None, adminData=None):
+    def __init__(self, name, audiences=None, diagRequirement=None, securityAccessLevel=None,
+                 operationCycle=None, operationCycleAutomaticEnd=None,
+                 operationCycleAutosart=None, parent=None, adminData=None):
         super().__init__(name, parent, adminData)
+        self.audiences = audiences
+        self.diagRequirement = diagRequirement
+        self.securityAccessLevel = securityAccessLevel
         self.operationCycle = operationCycle
         self.operationCycleAutomaticEnd = operationCycleAutomaticEnd
         self.operationCycleAutosart = operationCycleAutosart
@@ -963,6 +977,12 @@ class DiagnosticOperationCycleNeeds(Element):
         data={'type': self.__class__.__name__,'name':self.name}
         if self.adminData is not None:
             data['adminData']=self.adminData.asdict()
+        if self.audiences is not None:
+            data['audiences']=self.audiences
+        if self.diagRequirement is not None:
+            data['diagRequirement']=self.diagRequirement
+        if self.securityAccessLevel is not None:
+            data['securityAccessLevel']=self.securityAccessLevel
         return data
 
     def tag(self, version=None):
@@ -972,9 +992,13 @@ class DiagnosticIoControlNeeds(Element):
     """
     AUTOSAR 4 representation of DIAGNOSTIC-IO-CONTROL-NEEDS
     """
-    def __init__(self, name, currentValueRef=None, didNumber=None, freezeCurrentStateSupported=None,
+    def __init__(self, name, audiences=None, diagRequirement=None, securityAccessLevel=None,
+                 currentValueRef=None, didNumber=None, freezeCurrentStateSupported=None,
                  resetToDefaultSupported=None, shortTermAdjustmentSupported=None, parent=None, adminData=None):
         super().__init__(name, parent, adminData)
+        self.audiences=audiences
+        self.diagRequirement=diagRequirement
+        self.securityAccessLevel=securityAccessLevel
         self.currentValueRef = currentValueRef
         self.didNumber = didNumber
         self.freezeCurrentStateSupported = freezeCurrentStateSupported
@@ -985,6 +1009,12 @@ class DiagnosticIoControlNeeds(Element):
         data={'type': self.__class__.__name__,'name':self.name}
         if self.adminData is not None:
             data['adminData']=self.adminData.asdict()
+        if self.audiences is not None:
+            data['audiences']=self.audiences
+        if self.diagRequirement is not None:
+            data['diagRequirement']=self.diagRequirement
+        if self.securityAccessLevel is not None:
+            data['securityAccessLevel']=self.securityAccessLevel
         if self.currentValueRef is not None:
             data['currentValueRef']=self.currentValueRef
         if self.didNumber is not None:
@@ -999,6 +1029,39 @@ class DiagnosticIoControlNeeds(Element):
 
     def tag(self, version=None):
         return 'DIAGNOSTIC-IO-CONTROL-NEEDS'
+
+
+class DiagnosticRoutineNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-ROUTINE-NEEDS
+    """
+    def __init__(self, name, audiences=None, diagRequirement=None, securityAccessLevel=None, ridNumber=None, 
+                 diagRoutineType=None, parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+        self.audiences = audiences
+        self.diagRequirement = diagRequirement
+        self.securityAccessLevel = securityAccessLevel
+        self.ridNumber = ridNumber
+        self.diagRoutineType = diagRoutineType
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        if self.audiences is not None:
+            data['audiences']=self.audiences
+        if self.diagRequirement is not None:
+            data['diagRequirement']=self.diagRequirement
+        if self.securityAccessLevel is not None:
+            data['securityAccessLevel']=self.securityAccessLevel
+        if self.ridNumber is not None:
+            data['ridNumber']=self.ridNumber
+        if self.diagRoutineType is not None:
+            data['diagRoutineType']=self.diagRoutineType
+        return data
+
+    def tag(self, version=None):
+        return 'DIAGNOSTIC-ROUTINE-NEEDS'
 
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
@@ -1952,7 +2015,7 @@ class ServiceNeeds(Element):
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
                  functionInhibitionNeeds = None, indicatorStatusNeeds = None,
                  diagnosticValueNeeds = None, diagnosticOperationCycleNeeds = None,
-                 diagnosticIoControlNeeds = None, parent=None, adminData = None):
+                 diagnosticIoControlNeeds = None, diagnosticRoutineNeeds = None, parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
@@ -1963,6 +2026,7 @@ class ServiceNeeds(Element):
         self.diagnosticValueNeeds = diagnosticValueNeeds
         self.diagnosticOperationCycleNeeds = diagnosticOperationCycleNeeds
         self.diagnosticIoControlNeeds = diagnosticIoControlNeeds
+        self.diagnosticRoutineNeeds = diagnosticRoutineNeeds
 
 class SwcServiceDependency(Element):
     """
@@ -2316,6 +2380,7 @@ class NvBlockDescriptor(Element):
         self.romBlock = None
         self.supportDirtyFlag = False
         self.timingEventRef = None
+        self.clientServerPorts = []
 
     def find(self, ref):
         parts=ref.partition('/')
@@ -2434,13 +2499,25 @@ class VariationPoint:
     Represents <VARIATION-POINT> (AUTOSAR 4)
     """
 
-    def __init__(self, shortLabel = None, swSysCond = None, desc = None, bindingTime = None):
+    def __init__(self, shortLabel = None, swSysCond = None, desc = None, bindingTime = None, postBuildVariantConditions = None):
         self.shortLabel = shortLabel
         self.swSysCond = swSysCond
         self.desc = desc
         self.bindingTime = bindingTime
+        self.postBuildVariantConditions = postBuildVariantConditions
 
     def tag(self, version): return 'VARIATION-POINT'
+
+class PostBuildVariantCondition:
+    """
+    Represents <POST-BUILD-VARIANT-CONDITION> (AUTOSAR 4)
+    """
+
+    def __init__(self, value = None, matchingCriterionRef = None):
+        self.value = value
+        self.matchingCriterionRef = matchingCriterionRef
+
+    def tag(self, version): return 'POST-BUILD-VARIANT-CONDITION'
 
 class ExclusiveAreaRefConditional:
     """

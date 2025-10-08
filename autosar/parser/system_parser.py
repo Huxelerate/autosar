@@ -180,6 +180,7 @@ class SystemParser(EntityParser):
         dataElemIRef=None
         signalRef=None
         systemSignalRef=None
+        variationPoint=None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag=='DATA-ELEMENT-IREF':
                 dataElemIRef=self.parseDataElemInstanceRef(xmlElem)
@@ -187,14 +188,16 @@ class SystemParser(EntityParser):
                 signalRef=parseTextNode(xmlElem)
             elif xmlElem.tag=='SYSTEM-SIGNAL-REF' and self.version >= 4.0:
                 systemSignalRef=parseTextNode(xmlElem)
+            elif xmlElem.tag=='VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
             else:
                 handleNotImplementedError(xmlElem.tag)
 
         if dataElemIRef is not None:
             if self.version >= 4.0 and systemSignalRef is not None:
-                return SenderReceiverToSignalMappingV4(dataElemIRef,systemSignalRef)
+                return SenderReceiverToSignalMappingV4(dataElemIRef,systemSignalRef,variationPoint)
             elif signalRef is not None:
-                return SenderReceiverToSignalMappingV3(dataElemIRef,signalRef)
+                return SenderReceiverToSignalMappingV3(dataElemIRef,signalRef,variationPoint)
 
         return None
 
