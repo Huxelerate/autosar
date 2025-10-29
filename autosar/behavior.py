@@ -288,12 +288,15 @@ class RunnableEntity(Element):
             self.activationReasons,
             self.externalTriggeringPoints
         ):
+            # To identify an entity either SHORT-NAME or IDENT/SHORT-NAME can be used
             if hasattr(elem, 'name') and elem.name == name:
+                # SHORT-NAME matches
                 foundElem = elem
                 break
             if hasattr(elem, 'ident'):
                 ident = elem.ident
                 if hasattr(ident, 'name') and ident.name == name:
+                    # SHORT-NAME within IDENT matches
                     foundElem = elem
                     break
         if foundElem is not None:
