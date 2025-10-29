@@ -288,9 +288,17 @@ class RunnableEntity(Element):
             self.activationReasons,
             self.externalTriggeringPoints
         ):
-            if elem.name == name:
+            # To identify an entity either SHORT-NAME or IDENT/SHORT-NAME can be used
+            if hasattr(elem, 'name') and elem.name == name:
+                # SHORT-NAME matches
                 foundElem = elem
                 break
+            if hasattr(elem, 'ident'):
+                ident = elem.ident
+                if hasattr(ident, 'name') and ident.name == name:
+                    # SHORT-NAME within IDENT matches
+                    foundElem = elem
+                    break
         if foundElem is not None:
             if len(ref[2])>0:
                 return foundElem.find(ref[2])
@@ -2053,13 +2061,24 @@ class SwcServiceDependency(Element):
         self._serviceNeeds = elem
 
 
+class ExternalTriggeringPointIdent:
+    """
+    Represents <IDENT> as aggregated by <EXTERNAL-TRIGGERING-POINT> (AUTODSAR 4)
+    """
+    def __init__(self, name, returnValueProvision):
+        self.name = name
+        self.returnValueProvision = returnValueProvision
+    
+    def tag(self, version): return 'IDENT'
+
 class ExternalTriggeringPoint:
     """
     Represents <EXTERNAL-TRIGGERING-POINT> (AUTODSAR 4)
     """
-    def __init__(self, triggerIref, variationPoint):
+    def __init__(self, triggerIref, variationPoint, ident = None):
         self.triggerIref = triggerIref
         self.variationPoint = variationPoint
+        self.ident = ident if ident is not None else ExternalTriggeringPointIdent(None, None)
     
     def tag(self, version): return 'EXTERNAL-TRIGGERING-POINT'
 
