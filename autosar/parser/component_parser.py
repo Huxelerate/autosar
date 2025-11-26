@@ -162,6 +162,17 @@ class ComponentTypeParser(EntityParser):
                             hardwareElementRef = self.parseTextNode(xmlChild)
                             if hardwareElementRef is not None:
                                 componentType.hardwareElementRefs.append(hardwareElementRef)
+                elif xmlElem.tag == 'INSTANTIATION-DATA-DEF-PROPSS':
+                    if not isinstance(componentType, autosar.component.ParameterComponent):
+                        handleValueError(f"INSTANTIATION-DATA-DEF-PROPSS cannot appear directly inside {xmlRoot.tag}")
+                    else:
+                        for xmlChild in xmlElem.findall('./*'):
+                            if xmlChild.tag == 'INSTANTIATION-DATA-DEF-PROPS':
+                                tmp = self.behavior_parser.parseInstantiationDataDefProps(xmlChild, componentType)
+                                if tmp is not None:
+                                    componentType.instantiationDataDefPropss.append(tmp)
+                            else:
+                                handleNotImplementedError(xmlElem.tag)
                 else:
                     print('Unhandled tag: '+xmlElem.tag, file=sys.stderr)
         return componentType
