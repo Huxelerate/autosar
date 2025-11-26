@@ -2548,3 +2548,13 @@ class ExclusiveAreaRefConditional:
         self.variationPoint = variationPoint
 
     def tag(self, version): return 'EXCLUSIVE-AREA-REF-CONDITIONAL'
+
+class InstantiationDataDefProps:
+    """
+    Represents <INSTANTIATION-DATA-DEF-PROPS> (AUTOSAR 4)
+    """
+
+    def __init__(self):
+        ...
+
+    def tag(self, version): return 'INSTANTIATION-DATA-DEF-PROPS'
