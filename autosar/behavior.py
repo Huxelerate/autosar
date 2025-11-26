@@ -2554,7 +2554,10 @@ class InstantiationDataDefProps:
     Represents <INSTANTIATION-DATA-DEF-PROPS> (AUTOSAR 4)
     """
 
-    def __init__(self):
-        ...
+    def __init__(self, parameterInstance, variableInstance, swDataDefProps, variationPoint):
+        self.parameterInstance = parameterInstance
+        self.variableInstance = variableInstance
+        self.swDataDefProps = swDataDefProps
+        self.variationPoint = variationPoint
 
     def tag(self, version): return 'INSTANTIATION-DATA-DEF-PROPS'
