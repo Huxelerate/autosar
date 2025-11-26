@@ -529,13 +529,7 @@ class BaseParser:
                 # TODO: from specification, the <AR-PARAMETER> tag should also be supported
                 #       for the <SW-DATA-DEPENDENCY-ARGS> element which is defined as a descendent
                 #       of <SW-DATA-DEF-PROPS>
-                for xmlChild in itemXML.findall('./*'):
-                    if xmlChild.tag == 'AUTOSAR-PARAMETER-IREF':
-                        accessedParameter = self.parseParameterInstanceRef(xmlChild)
-                    elif xmlChild.tag == 'LOCAL-PARAMETER-REF':
-                        accessedParameter = autosar.behavior.LocalParameterRef(self.parseTextNode(xmlChild))
-                    else:
-                        handleNotImplementedError(xmlChild.tag)
+                accessedParameter = self.parseAutosarParameterRef(itemXML)
             else:
                 raise RuntimeError(f"ERROR: Tag {tag} not recognized")
 
@@ -544,6 +538,22 @@ class BaseParser:
             swAxisIndex=swAxisIndex,
             accessedParameter=accessedParameter
         )
+    
+    def parseAutosarParameterRef(self, xmlRoot):
+        parameterRef = None
+        for xmlChild in xmlRoot.findall('./*'):
+            if xmlChild.tag == 'AUTOSAR-PARAMETER-IREF':
+                if parameterRef is not None:
+                    handleValueError("Only one of AUTOSAR-PARAMETER-IREF or LOCAL-PARAMETER-REF is allowed")
+                parameterRef = self.parseParameterInstanceRef(xmlChild)
+            elif xmlChild.tag == 'LOCAL-PARAMETER-REF':
+                if parameterRef is not None:
+                    handleValueError("Only one of AUTOSAR-PARAMETER-IREF or LOCAL-PARAMETER-REF is allowed")
+                parameterRef = autosar.behavior.LocalParameterRef(self.parseTextNode(xmlChild))
+            else:
+                handleNotImplementedError(xmlChild.tag)
+        
+        return parameterRef
 
     def parseSwPointerTargetProps(self, rootXML, parent = None):
         assert (rootXML.tag == 'SW-POINTER-TARGET-PROPS')

@@ -1758,6 +1758,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         self.variationPointProxies = [] #list of VariationPointProxy objects
         self.constantValueMappingRefs = [] #list of strings
         self.exclusiveAreaPolicys=[] #list of SwcExclusiveAreaPolicy
+        self.instantiationDataDefPropss = [] #list of InstantiationDataDefProps objects
 
     def tag(self, version): return "SWC-INTERNAL-BEHAVIOR"
 
@@ -2400,6 +2401,7 @@ class NvBlockDescriptor(Element):
         self.supportDirtyFlag = False
         self.timingEventRef = None
         self.clientServerPorts = []
+        self.instantiationDataDefPropss = []
 
     def find(self, ref):
         parts=ref.partition('/')
@@ -2554,10 +2556,27 @@ class InstantiationDataDefProps:
     Represents <INSTANTIATION-DATA-DEF-PROPS> (AUTOSAR 4)
     """
 
-    def __init__(self, parameterInstance, variableInstance, swDataDefProps, variationPoint):
+    def __init__(self, parameterInstance = None, variableInstance = None, swDataDefProps = None, variationPoint = None):
         self.parameterInstance = parameterInstance
         self.variableInstance = variableInstance
         self.swDataDefProps = swDataDefProps
         self.variationPoint = variationPoint
 
     def tag(self, version): return 'INSTANTIATION-DATA-DEF-PROPS'
+
+class VariableInstanceRef:
+    """
+    Represents VARIABLE-IN-ATOMIC-SWC-TYPE-REF (AUTOSAR 4)
+    """
+    def __init__(self, portPrototypeRef = None, rootVariableDataPrototypeRef = None, contextDataRef = None, targetDataPrototypeRef = None):
+        self.portPrototypeRef = portPrototypeRef
+        self.rootVariableDataPrototypeRef = rootVariableDataPrototypeRef
+        self.contextDataRef = contextDataRef
+        self.targetDataPrototypeRef = targetDataPrototypeRef
+
+class LocalVariableRef:
+    """
+    Represents LOCAL-VARIABLE-REF (AUTOSAR 4)
+    """
+    def __init__(self, variableDataPrototypeRef):
+        self.variableDataPrototypeRef = variableDataPrototypeRef

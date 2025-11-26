@@ -266,6 +266,7 @@ class ParameterComponent(AtomicSoftwareComponent):
         super().__init__(name,parent)
         self.dataTypeMappingRefs = [] # list of strings
         self.constantValueMappingRefs = [] # list of strings
+        self.instantiationDataDefPropss = [] # list of InstantiationDataDefProps objects
 
     def appendDataTypeMappingRef(self, dataTypeMappingRef):
         """

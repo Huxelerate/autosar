@@ -261,6 +261,14 @@ class BehaviorParser(EntityParser):
                             internalBehavior.variationPointProxies.append(variationPointProxy)
                         else:
                             handleNotImplementedError(xmlChild.tag)
+                elif xmlElem.tag == 'INSTANTIATION-DATA-DEF-PROPSS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'INSTANTIATION-DATA-DEF-PROPS':
+                            tmp = self.parseInstantiationDataDefProps(xmlChild, internalBehavior)
+                            if tmp is not None:
+                                internalBehavior.instantiationDataDefPropss.append(tmp)
+                        else:
+                            handleNotImplementedError(xmlChild.tag)
                 else:
                     self.defaultHandler(xmlElem)
             
@@ -1655,7 +1663,46 @@ class BehaviorParser(EntityParser):
             return autosar.behavior.RoleBasedPortAssignment(portRef, role)
         return None
 
+    def parseAutosarVariableRef(self, xmlRoot):
+        variableRef = None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'AUTOSAR-VARIABLE-IN-IMPL-DATATYPE' or xmlElem.tag == 'AUTOSAR-VARIABLE-IREF':
+                if variableRef is not None:
+                    handleValueError('Multiple AUTOSAR-VARIABLE-IREF, AUTOSAR-VARIABLE-IN-IMPL-DATATYPE or LOCAL-VARIABLE-REF found in variable reference')
+                variableRef = self.parseVariableInstanceRef(xmlElem)
+            elif xmlElem.tag == 'LOCAL-VARIABLE-REF':
+                if variableRef is not None:
+                    handleValueError('Multiple AUTOSAR-VARIABLE-IREF, AUTOSAR-VARIABLE-IN-IMPL-DATATYPE or LOCAL-VARIABLE-REF found in variable reference')
+                variableRef = autosar.behavior.LocalVariableRef(self.parseTextNode(xmlElem))
+        
+        return variableRef
+    
+    def parseVariableInstanceRef(self, xmlRoot):
+        (portPrototypeRef, rootVariableDataPrototypeRef, contextDataRef, targetDataPrototypeRef) = (None, None, None, None)
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'PORT-PROTOTYPE-REF':
+                portPrototypeRef = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'ROOT-VARIABLE-DATA-PROTOTYPE-REF':
+                rootVariableDataPrototypeRef = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'CONTEXT-DATA-REF':
+                contextDataRef = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'TARGET-DATA-PROTOTYPE-REF':
+                targetDataPrototypeRef = self.parseTextNode(xmlElem)
+            else:
+                handleNotImplementedError(xmlElem.tag)
+        if portPrototypeRef is not None and targetDataPrototypeRef is not None:
+            return autosar.behavior.VariableInstanceRef(
+                portPrototypeRef=portPrototypeRef,
+                rootVariableDataPrototypeRef=rootVariableDataPrototypeRef,
+                contextDataRef=contextDataRef,
+                targetDataPrototypeRef=targetDataPrototypeRef
+            )
+        else:
+            handleValueError('Incomplete AUTOSAR-VARIABLE-IREF or AUTOSAR-VARIABLE-IN-IMPL-DATATYPE found in variable reference')
+            return None
+
     def parseAutosarVariableRefXML(self, xmlRoot):
+        # TODO: Converge with parseAutosarVariableRef
         (localVariableRef, portPrototypeRef, targetDataPrototypeRef) = (None, None, None)
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'LOCAL-VARIABLE-REF':
@@ -1758,7 +1805,14 @@ class BehaviorParser(EntityParser):
                                 descriptor.clientServerPorts.append(tmp)
                         else:
                             handleNotImplementedError(xmlElem.tag)
-
+                elif xmlElem.tag == 'INSTANTIATION-DATA-DEF-PROPSS':
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'INSTANTIATION-DATA-DEF-PROPS':
+                            tmp = self.parseInstantiationDataDefProps(xmlChild, descriptor)
+                            if tmp is not None:
+                                descriptor.instantiationDataDefPropss.append(tmp)
+                        else:
+                            handleNotImplementedError(xmlElem.tag)
                 else:
                     handleNotImplementedError(xmlElem.tag)
             return descriptor
@@ -1851,3 +1905,22 @@ class BehaviorParser(EntityParser):
                 handleNotImplementedError(xmlElem.tag)
 
         return autosar.behavior.ExclusiveAreaRefConditional(exclusiveAreaRef, variationPoint)
+
+    def parseInstantiationDataDefProps(self, xmlRoot, parent):
+        """parses <INSTANTIATION-DATA-DEF-PROPS>"""
+        assert(xmlRoot.tag == 'INSTANTIATION-DATA-DEF-PROPS')
+        (parameterInstance, variableInstance, swDataDefProps, variationPoint) = (None, None, None, None)
+
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'PARAMETER-INSTANCE':
+                parameterInstance = self.parseAutosarParameterRef(xmlElem)
+            elif xmlElem.tag == 'VARIABLE-INSTANCE':
+                variableInstance = self.parseVariableInstanceRef(xmlElem)
+            elif xmlElem.tag == 'SW-DATA-DEF-PROPS':
+                swDataDefProps = self.parseSwDataDefProps(xmlElem, parent)
+            elif xmlElem.tag == 'VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(xmlElem)
+            else:
+                handleNotImplementedError(xmlElem.tag)
+
+        return autosar.behavior.InstantiationDataDefProps(parameterInstance=parameterInstance, variableInstance=variableInstance, swDataDefProps=swDataDefProps, variationPoint=variationPoint)
