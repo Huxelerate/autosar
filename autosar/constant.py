@@ -111,7 +111,10 @@ class RecordValue(Value):
     """
     typeRef is only necessary for AUTOSAR 3 constants
     """
-    def tag(self,version=None): return "RECORD-VALUE-SPECIFICATION" if version >= 4.0 else "RECORD-SPECIFICATION"
+    def tag(self,version=None):
+        if version is not None and (version < 3.0 or version >= 4.0):
+            raise RuntimeError(f"RecordValue is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 3")
+        return "RECORD-SPECIFICATION"
 
     def __init__(self, name, typeRef=None, elements=None, parent=None):
         super().__init__(name, parent)
@@ -126,7 +129,10 @@ class ArrayValue(Value):
     """
     name and typeRef is only necessary for AUTOSAR 3 constants
     """
-    def tag(self,version=None): return "ARRAY-VALUE-SPECIFICATION" if version >= 4.0 else "ARRAY-SPECIFICATION"
+    def tag(self,version=None): 
+        if version is not None and (version < 3.0 or version >= 4.0):
+            raise RuntimeError(f"ArrayValue is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 3")
+        return "ARRAY-SPECIFICATION"
 
     def __init__(self, name=None, typeRef=None, elements=None, parent=None):
         super().__init__(name, parent)
@@ -139,7 +145,10 @@ class ArrayValue(Value):
 
 #AUTOSAR 4 constant values
 class TextValue(ValueAR4):
-    def tag(self, version=None): return "TEXT-VALUE-SPECIFICATION"
+    def tag(self, version=None):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"TextValue is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return "TEXT-VALUE-SPECIFICATION"
 
     def __init__(self, label, value=None, category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
@@ -165,7 +174,10 @@ class TextValue(ValueAR4):
 
 class NumericalValue(ValueAR4):
 
-    def tag(self, version=None): return "NUMERICAL-VALUE-SPECIFICATION"
+    def tag(self, version=None):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"NumericalValue is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return "NUMERICAL-VALUE-SPECIFICATION"
 
     def __init__(self, label = None, value = None, category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
@@ -190,7 +202,10 @@ class NumericalValue(ValueAR4):
         return data
 
 class NumericalRuleBasedValue(ValueAR4):
-    def tag(self, version=None): return "NUMERICAL-RULE-BASED-VALUE-SPECIFICATION"
+    def tag(self, version=None):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"NumericalRuleBasedValue is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return "NUMERICAL-RULE-BASED-VALUE-SPECIFICATION"
 
     def __init__(self, rule, arguments, maxSizeToFill = None, parent = None, adminData = None):
         super().__init__(None, parent, adminData, None)
@@ -211,7 +226,10 @@ class ApplicationValue(ValueAR4):
     (AUTOSAR4)
     Implements <APPLICATION-VALUE-SPECIFICATION>
     """
-    def tag(self, version=None): return "APPLICATION-VALUE-SPECIFICATION"
+    def tag(self, version=None):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"ApplicationValue is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return "APPLICATION-VALUE-SPECIFICATION"
 
     def __init__(self, label = None, swValueCont = None, swAxisConts = [], category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
@@ -235,7 +253,10 @@ class ConstantReference(ValueAR4):
     Container class for <CONSTANT-REFERENCE> (AUTOSAR 4)
     """
 
-    def tag(self, version): return 'CONSTANT-REFERENCE'
+    def tag(self, version):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"ConstantReference is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return 'CONSTANT-REFERENCE'
 
     def __init__(self, label=None, value=None, category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
@@ -247,7 +268,10 @@ class ConstantReference(ValueAR4):
         return data
 
 class RecordValueAR4(ValueAR4):
-    def tag(self,version=None): return "RECORD-VALUE-SPECIFICATION"
+    def tag(self,version=None):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"RecordValueAR4 is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return "RECORD-VALUE-SPECIFICATION"
 
     def __init__(self, label, typeRef=None, elements=None, category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
@@ -265,7 +289,10 @@ class RecordValueAR4(ValueAR4):
 
 
 class ArrayValueAR4(ValueAR4):
-    def tag(self,version=None): return "ARRAY-VALUE-SPECIFICATION"
+    def tag(self,version=None):
+        if version is not None and (version < 4.0 or version >= 5.0):
+            raise RuntimeError(f"ArrayValueAR4 is not supported in AUTOSAR version {version}, it is only supported in AUTOSAR version 4")
+        return "ARRAY-VALUE-SPECIFICATION"
 
     def __init__(self, label=None, typeRef=None, elements=None, category = None, parent = None, adminData = None):
         super().__init__(label, parent, adminData, category)
