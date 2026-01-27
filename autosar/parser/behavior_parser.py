@@ -1917,7 +1917,7 @@ class BehaviorParser(EntityParser):
             elif xmlElem.tag == 'VARIABLE-INSTANCE':
                 variableInstance = self.parseVariableInstanceRef(xmlElem)
             elif xmlElem.tag == 'SW-DATA-DEF-PROPS':
-                swDataDefProps = self.parseSwDataDefProps(xmlElem, parent)
+                swDataDefProps = self.parseSwDataDefProps(xmlElem)
             elif xmlElem.tag == 'VARIATION-POINT':
                 variationPoint = self.parseVariationPoint(xmlElem)
             else:
