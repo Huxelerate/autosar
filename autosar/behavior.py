@@ -1071,6 +1071,34 @@ class DiagnosticRoutineNeeds(Element):
     def tag(self, version=None):
         return 'DIAGNOSTIC-ROUTINE-NEEDS'
 
+class DiagnosticEnableConditionNeeds(Element):
+    """
+    AUTOSAR 4 representation of DIAGNOSTIC-ENABLE-CONDITION-NEEDS
+    """
+    def __init__(self, name, audiences=None, diagRequirement=None, securityAccessLevel=None, initialStatus = None, parent=None, adminData=None):
+        super().__init__(name, parent, adminData)
+        self.audiences = audiences
+        self.diagRequirement = diagRequirement
+        self.securityAccessLevel = securityAccessLevel
+        self.initialStatus = initialStatus
+
+    def asdict(self):
+        data={'type': self.__class__.__name__,'name':self.name}
+        if self.adminData is not None:
+            data['adminData']=self.adminData.asdict()
+        if self.audiences is not None:
+            data['audiences']=self.audiences
+        if self.diagRequirement is not None:
+            data['diagRequirement']=self.diagRequirement
+        if self.securityAccessLevel is not None:
+            data['securityAccessLevel']=self.securityAccessLevel
+        if self.initialStatus is not None:
+            data['initialStatus']=self.initialStatus
+        return data
+
+    def tag(self, version=None):
+        return 'DIAGNOSTIC-ENABLE-CONDITION-NEEDS'
+
 class RoleBasedRPortAssignment(object):
     def __init__(self,portRef,role):
         self.portRef=portRef
@@ -2024,7 +2052,8 @@ class ServiceNeeds(Element):
                  diagnosticEventManagerNeeds = None, diagnosticCommunicationManagerNeeds = None, 
                  functionInhibitionNeeds = None, indicatorStatusNeeds = None,
                  diagnosticValueNeeds = None, diagnosticOperationCycleNeeds = None,
-                 diagnosticIoControlNeeds = None, diagnosticRoutineNeeds = None, parent=None, adminData = None):
+                 diagnosticIoControlNeeds = None, diagnosticRoutineNeeds = None, xmlDiagnosticEnableConditionNeeds = None,
+                 parent=None, adminData = None):
         super().__init__(None, parent, adminData)
         self.nvmBlockNeeds = nvmBlockNeeds
         self.diagnosticEventNeeds = diagnosticEventNeeds
@@ -2036,6 +2065,7 @@ class ServiceNeeds(Element):
         self.diagnosticOperationCycleNeeds = diagnosticOperationCycleNeeds
         self.diagnosticIoControlNeeds = diagnosticIoControlNeeds
         self.diagnosticRoutineNeeds = diagnosticRoutineNeeds
+        self.xmlDiagnosticEnableConditionNeeds = xmlDiagnosticEnableConditionNeeds
 
 class SwcServiceDependency(Element):
     """
