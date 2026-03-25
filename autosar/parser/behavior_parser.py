@@ -1243,6 +1243,7 @@ class BehaviorParser(EntityParser):
         xmlDiagnosticOperationCycleNeeds = None
         xmlDiagnosticIoControlNeeds = None
         xmlDiagnosticRoutineNeeds = None
+        xmlDiagnosticEnableConditionNeeds = None
         for xmlElem in xmlRoot.findall('./*'):
             if xmlElem.tag == 'NV-BLOCK-NEEDS':
                 xmlNvBlockNeeds = xmlElem
@@ -1264,6 +1265,8 @@ class BehaviorParser(EntityParser):
                 xmlDiagnosticIoControlNeeds = xmlElem
             elif xmlElem.tag == 'DIAGNOSTIC-ROUTINE-NEEDS':
                 xmlDiagnosticRoutineNeeds = xmlElem
+            elif xmlElem.tag == 'DIAGNOSTIC-ENABLE-CONDITION-NEEDS':
+                xmlDiagnosticEnableConditionNeeds = xmlElem
             else:
                 handleNotImplementedError(xmlElem.tag)
         serviceNeeds = autosar.behavior.ServiceNeeds(parent = parent)
@@ -1287,6 +1290,8 @@ class BehaviorParser(EntityParser):
             serviceNeeds.diagnosticIoControlNeeds = self.parseDiagnosticIoControlNeeds(xmlElem, serviceNeeds)
         if xmlDiagnosticRoutineNeeds is not None:
             serviceNeeds.diagnosticRoutineNeeds = self.parseDiagnosticRoutineNeeds(xmlElem, serviceNeeds) 
+        if xmlDiagnosticEnableConditionNeeds is not None:
+            serviceNeeds.xmlDiagnosticEnableConditionNeeds = self.parseDiagnosticEnableConditionNeeds(xmlElem, serviceNeeds) 
         return serviceNeeds
 
     def parseNvmBlockNeeds(self, xmlRoot, parent = None):
@@ -1618,6 +1623,34 @@ class BehaviorParser(EntityParser):
                                                        securityAccessLevel=securityAccessLevel,
                                                        ridNumber=ridNumber,
                                                        diagRoutineType=diagRoutineType,
+                                                       parent=parent, adminData=self.adminData)
+        self.pop(obj)
+        return obj
+    
+    def parseDiagnosticEnableConditionNeeds(self, xmlRoot, parent = None):
+        """parses <DIAGNOSTIC-ENABLE-CONDITION-NEEDS> (AUTOSAR 4)"""
+        self.push()
+        audiences = None
+        diagRequirement = None
+        securityAccessLevel = None
+        initialStatus = None
+        for xmlElem in xmlRoot.findall('./*'):
+            if xmlElem.tag == 'AUDIENCES':
+                audiences = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'DIAG-REQUIREMENT':
+                diagRequirement = self.parseTextNode(xmlElem)
+            elif xmlElem.tag == 'SECURITY-ACCESS-LEVEL':
+                securityAccessLevel = self.parseIntNode(xmlElem)
+            elif xmlElem.tag == 'INITIAL-STATUS':
+                initialStatus = self.parseTextNode(xmlElem)
+            else:
+                self.baseHandler(xmlElem)
+
+        if self.name is None:
+            raise RuntimeError('<SHORT-NAME> is missing or incorrectly formatted')
+        obj = autosar.behavior.DiagnosticEnableConditionNeeds(self.name, audiences=audiences, diagRequirement=diagRequirement,
+                                                       securityAccessLevel=securityAccessLevel,
+                                                       initialStatus=initialStatus,
                                                        parent=parent, adminData=self.adminData)
         self.pop(obj)
         return obj
