@@ -25,10 +25,11 @@ class AdminData:
     def __ne__(self, other): return not (self == other)
 
 class SpecialDataGroup(object):
-    def __init__(self,SDG_GID,SD=None,SD_GID=None,children=[]):
+    def __init__(self,SDG_GID,SD=None,SD_GID=None,children=[],ref_children=[]):
         self.SDG_GID=SDG_GID
         self.SD = []
         self.children = children
+        self.ref_children = ref_children
         if SD is not None or SD_GID is not None:
             self.SD.append(SpecialData(SD, SD_GID))
 
