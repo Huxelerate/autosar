@@ -299,7 +299,7 @@ class BaseParser:
 
     def parseSpecialDataGroup(self, xmlElem):
         SDG_GID=xmlElem.attrib['GID']
-        specialDataGroup = SpecialDataGroup(SDG_GID)
+        specialDataGroup = SpecialDataGroup(SDG_GID, children=[], ref_children=[])
         for xmlChild in xmlElem.findall('./*'):
             if xmlChild.tag == 'SD':
                 SD_GID = None
