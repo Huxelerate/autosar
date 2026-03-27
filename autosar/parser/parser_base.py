@@ -312,6 +312,8 @@ class BaseParser:
                 childSpecialDataGroup = self.parseSpecialDataGroup(xmlChild)
                 if childSpecialDataGroup is not None:
                     specialDataGroup.children.append(childSpecialDataGroup)
+            elif xmlChild.tag == 'SDX-REF':
+                specialDataGroup.ref_children.append(self.parseTextNode(xmlChild))
             else:
                 handleNotImplementedError(xmlChild.tag)
         
