@@ -36,7 +36,7 @@ class ModeSwitchEvent(Event):
 class TimingEvent(Event):
     def __init__(self,name,startOnEventRef=None, period=0, parent=None):
         super().__init__(name, startOnEventRef, parent)
-        self.period=period
+        self.period=float(period)
 
     def tag(self, version=None):
         return 'TIMING-EVENT'
