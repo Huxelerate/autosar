@@ -240,7 +240,13 @@ class BehaviorParser(EntityParser):
                 elif xmlElem.tag == 'HANDLE-TERMINATION-AND-RESTART':
                     pass #implement later
                 elif xmlElem.tag == 'STATIC-MEMORYS':
-                    pass #implement later
+                    for xmlChild in xmlElem.findall('./*'):
+                        if xmlChild.tag == 'VARIABLE-DATA-PROTOTYPE':
+                            tmp = self.parseAutosarDataPrototype(xmlChild, internalBehavior)
+                            if tmp is not None:
+                                internalBehavior.staticMemories.append(tmp)
+                        else:
+                            handleNotImplementedError(xmlChild.tag)
                 elif xmlElem.tag == 'INCLUDED-DATA-TYPE-SETS':
                     for xmlChild in xmlElem.findall('./*'):
                         if xmlChild.tag == 'INCLUDED-DATA-TYPE-SET':

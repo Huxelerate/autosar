@@ -118,6 +118,11 @@ class XMLBehaviorWriter(ElementWriter):
             for variationPointProxy in internalBehavior.variationPointProxies:
                 lines.extend(self.indent(self._writeVariationPointProxyXML(ws, variationPointProxy),2))
             lines.append(self.indent('</VARIATION-POINT-PROXYS>',1))
+        if isinstance(internalBehavior, autosar.behavior.SwcInternalBehavior) and len(internalBehavior.staticMemories)>0:
+            lines.append(self.indent('<STATIC-MEMORYS>',1))
+            for elem in internalBehavior.staticMemories:
+                lines.extend(self.indent(self._writeAutosarDataPrototype(ws, elem),2))
+            lines.append(self.indent('</STATIC-MEMORYS>',1))
         lines.append('</%s>'%internalBehavior.tag(self.version))
         return lines
 
