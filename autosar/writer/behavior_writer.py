@@ -122,7 +122,7 @@ class XMLBehaviorWriter(ElementWriter):
             lines.append(self.indent('<STATIC-MEMORYS>',1))
             for elem in internalBehavior.staticMemories:
                 lines.extend(self.indent(self._writeAutosarDataPrototype(ws, elem),2))
-            lines.append(self.indent('</SSTATIC-MEMORYS>',1))
+            lines.append(self.indent('</STATIC-MEMORYS>',1))
         lines.append('</%s>'%internalBehavior.tag(self.version))
         return lines
 
