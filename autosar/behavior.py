@@ -1787,6 +1787,7 @@ class SwcInternalBehavior(InternalBehaviorCommon):
         self.constantValueMappingRefs = [] #list of strings
         self.exclusiveAreaPolicys=[] #list of SwcExclusiveAreaPolicy
         self.instantiationDataDefPropss = [] #list of InstantiationDataDefProps objects
+        self.staticMemories = [] #list of VariableDataPrototype objects
 
     def tag(self, version): return "SWC-INTERNAL-BEHAVIOR"
 
@@ -1803,7 +1804,8 @@ class SwcInternalBehavior(InternalBehaviorCommon):
                 self.sharedParameterDataPrototype,
                 self.perInstanceParameterDataPrototype,
                 self.constantMemories,
-                self.variationPointProxies):
+                self.variationPointProxies,
+                self.staticMemories):
                 if elem.name == name:
                     foundElem = elem
                     break
