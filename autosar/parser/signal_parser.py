@@ -134,6 +134,7 @@ class ISignalParser(EntityParser):
         props = None
         iSignalType = None
         initValue = None
+        initValueRef = None
         length = None
         networkRepresentationProps = None
         systemSignalRef = None
@@ -155,14 +156,11 @@ class ISignalParser(EntityParser):
             elif elem.tag=='I-SIGNAL-PROPS':
                 props = self.parseISignalProps(elem)
             elif elem.tag=='I-SIGNAL-TYPE':
-                # TODO: add implementation to parse this tag
-                pass
+                iSignalType = self.parseTextNode(elem)
             elif elem.tag=='INIT-VALUE':
-                # TODO: add implementation to parse this tag
-                pass
+                initValue, initValueRef = self._parseAr4InitValue(elem)
             elif elem.tag=='LENGTH':
-                # TODO: add implementation to parse this tag
-                pass
+                length = self.parseIntNode(elem)
             elif elem.tag=='NETWORK-REPRESENTATION-PROPS':
                 # TODO: add implementation to parse this tag
                 pass
@@ -202,6 +200,7 @@ class ISignalParser(EntityParser):
             props=props,
             iSignalType=iSignalType,
             initValue=initValue,
+            initValueRef=initValueRef,
             length=length,
             networkRepresentationProps=networkRepresentationProps,
             systemSignalRef=systemSignalRef,

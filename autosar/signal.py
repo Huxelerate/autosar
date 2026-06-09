@@ -50,6 +50,7 @@ class ISignalV4(Element):
         props=None,
         iSignalType=None,
         initValue=None,
+        initValueRef=None,
         length=None,
         networkRepresentationProps=None,
         systemSignalRef=None,
@@ -66,6 +67,7 @@ class ISignalV4(Element):
         self.props = props
         self.type = iSignalType
         self.initValue = initValue
+        self.initValueRef = initValueRef
         self.length = length
         self.networkRepresentationProps = networkRepresentationProps
         self.systemSignalRef = systemSignalRef
