@@ -139,6 +139,7 @@ class ISignalParser(EntityParser):
         networkRepresentationProps = None
         systemSignalRef = None
         timeoutSubstitutionValue = None
+        timeoutSubstitutionValueRef = None
         transformationISignalPropss = None
 
         self.push()
@@ -164,11 +165,9 @@ class ISignalParser(EntityParser):
             elif elem.tag=='NETWORK-REPRESENTATION-PROPS':
                 networkRepresentationProps = self.parseSwDataDefProps(elem)
             elif elem.tag=='SYSTEM-SIGNAL-REF':
-                # TODO: add implementation to parse this tag
-                pass
+                systemSignalRef = self.parseTextNode(elem)
             elif elem.tag=='TIMEOUT-SUBSTITUTION-VALUE':
-                # TODO: add implementation to parse this tag
-                pass
+                timeoutSubstitutionValue, timeoutSubstitutionValueRef = self._parseAr4InitValue(elem)
             elif elem.tag=='TRANSFORMATION-I-SIGNAL-PROPSS':
                 transformationISignalPropss = []
                 for childElem in elem.findall('./*'):
@@ -204,6 +203,7 @@ class ISignalParser(EntityParser):
             networkRepresentationProps=networkRepresentationProps,
             systemSignalRef=systemSignalRef,
             timeoutSubstitutionValue=timeoutSubstitutionValue,
+            timeoutSubstitutionValueRef=timeoutSubstitutionValueRef,
             transformationISignalPropss=transformationISignalPropss,
             parent=parent
         )

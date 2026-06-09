@@ -55,6 +55,7 @@ class ISignalV4(Element):
         networkRepresentationProps=None,
         systemSignalRef=None,
         timeoutSubstitutionValue=None,
+        timeoutSubstitutionValueRef=None,
         transformationISignalPropss=None
     ):
         super().__init__(
@@ -72,6 +73,7 @@ class ISignalV4(Element):
         self.networkRepresentationProps = networkRepresentationProps
         self.systemSignalRef = systemSignalRef
         self.timeoutSubstitutionValue = timeoutSubstitutionValue
+        self.timeoutSubstitutionValueRef = timeoutSubstitutionValueRef
         self.transformationISignalPropss = transformationISignalPropss
 
 class ISignalGroup(Element):
