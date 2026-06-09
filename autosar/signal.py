@@ -32,12 +32,19 @@ class SystemSignalV4(Element):
         return data
 
 class SystemSignalGroup(Element):
-    def __init__(self, name, systemSignalRefs=None,parent=None):
+    def __init__(
+        self,
+        name,
+        systemSignalRefs=None,
+        transformingSystemSignalRef=None,
+        parent=None
+    ):
         super().__init__(name,parent)
         if isinstance(systemSignalRefs,list):
             self.systemSignalRefs=systemSignalRefs
         else:
             self.systemSignalRefs=[]
+        self.transformingSystemSignalRef=transformingSystemSignalRef
 
 class ISignalV4(Element):
     def __init__(

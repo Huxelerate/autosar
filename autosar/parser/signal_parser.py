@@ -80,7 +80,7 @@ class SignalParser(EntityParser):
 
     @parseElementUUID
     def parseSystemSignalGroup(self, xmlRoot, parent=None):
-        name,systemSignalRefs=None,None
+        name,systemSignalRefs,transformingSystemSignalRef=None,None,None
         for elem in xmlRoot.findall('./*'):
             if elem.tag=='SHORT-NAME':
                 name=parseTextNode(elem)
@@ -91,11 +91,18 @@ class SignalParser(EntityParser):
                         systemSignalRefs.append(parseTextNode(childElem))
                     else:
                         handleNotImplementedError(childElem.tag)
+            elif elem.tag=='TRANSFORMING-SYSTEM-SIGNAL-REF':
+                transformingSystemSignalRef = parseTextNode(elem)
             else:
                 handleNotImplementedError(elem.tag)
 
         if (name is not None) and (isinstance(systemSignalRefs,list)):
-            return SystemSignalGroup(name,systemSignalRefs)
+            return SystemSignalGroup(
+                name=name,
+                systemSignalRefs=systemSignalRefs,
+                transformingSystemSignalRef=transformingSystemSignalRef,
+                parent=parent
+            )
         else:
             raise RuntimeError('failed to parse %s'%xmlRoot.tag)
 
