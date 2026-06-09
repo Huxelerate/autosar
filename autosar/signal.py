@@ -97,3 +97,7 @@ class DataTransformationRefConditional():
     def __init__(self, dataTransformationRef=None, variationPoint=None):
         self.dataTransformationRef = dataTransformationRef
         self.variationPoint = variationPoint
+
+class ISignalProps():
+    def __init__(self, handleOutOfRange=None):
+        self.handleOutOfRange = handleOutOfRange

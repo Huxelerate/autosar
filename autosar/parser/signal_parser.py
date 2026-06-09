@@ -153,8 +153,7 @@ class ISignalParser(EntityParser):
             elif elem.tag=='DATA-TYPE-POLICY':
                 dataTypePolicy = self.parseTextNode(elem)
             elif elem.tag=='I-SIGNAL-PROPS':
-                # TODO: add implementation to parse this tag
-                pass
+                props = self.parseISignalProps(elem)
             elif elem.tag=='I-SIGNAL-TYPE':
                 # TODO: add implementation to parse this tag
                 pass
@@ -299,3 +298,18 @@ class ISignalParser(EntityParser):
                 handleNotImplementedError(elem.tag)
         
         return DataTransformationRefConditional(dataTransformationRef, variationPoint)
+    
+    def parseISignalProps(self, xmlRoot):
+        """
+        parses <I-SIGNAL-PROPS> (Autosar 4 standard)
+        """
+        assert(xmlRoot.tag=='I-SIGNAL-PROPS')
+        handleOutOfRange = None
+
+        for elem in xmlRoot.findall('./*'):
+            if elem.tag=='HANDLE-OUT-OF-RANGE':
+                handleOutOfRange = self.parseTextNode(elem)
+            else:
+                handleNotImplementedError(elem.tag)
+        
+        return ISignalProps(handleOutOfRange)
