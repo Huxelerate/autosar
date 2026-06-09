@@ -1,6 +1,4 @@
-from autosar.base import splitRef
 from autosar.element import Element
-import sys
 
 class SystemSignalV3(Element):
     def __init__(self,name,dataTypeRef,initValueRef,length,desc=None,parent=None):
@@ -40,3 +38,32 @@ class SystemSignalGroup(Element):
             self.systemSignalRefs=systemSignalRefs
         else:
             self.systemSignalRefs=[]
+
+class ISignalV4(Element):
+    def __init__(
+        self,
+        name,
+        parent,
+        adminData=None,
+        dataTransformations=None,
+        dataTypePolicy=None,
+        props=None,
+        iSignalType=None,
+        initValue=None,
+        length=None,
+        networkRepresentationProps=None,
+        systemSignalRef=None,
+        timeoutSubstitutionValue=None,
+        transformationISignalPropss=None
+    ):
+        super().__init__(name,parent,adminData)
+        self.dataTransformations = dataTransformations
+        self.dataTypePolicy = dataTypePolicy
+        self.props = props
+        self.type = iSignalType
+        self.initValue = initValue
+        self.length = length
+        self.networkRepresentationProps = networkRepresentationProps
+        self.systemSignalRef = systemSignalRef
+        self.timeoutSubstitutionValue = timeoutSubstitutionValue
+        self.transformationISignalPropss = transformationISignalPropss

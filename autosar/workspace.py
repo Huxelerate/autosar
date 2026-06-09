@@ -15,7 +15,7 @@ from autosar.parser.constant_parser import ConstantParser
 from autosar.parser.behavior_parser import BehaviorParser
 from autosar.parser.component_parser import ComponentTypeParser
 from autosar.parser.system_parser import SystemParser
-from autosar.parser.signal_parser import SignalParser
+from autosar.parser.signal_parser import ISignalParser, SignalParser
 from autosar.parser.mode_parser import ModeDeclarationParser
 from autosar.parser.swc_implementation_parser import SwcImplementationParser
 from autosar.parser.ecu_configuration_parser import EcuConfigurationParser
@@ -493,6 +493,7 @@ class Workspace:
         parser.registerElementParser(BehaviorParser(self.version))
         parser.registerElementParser(SystemParser(self.version))
         parser.registerElementParser(SignalParser(self.version))
+        parser.registerElementParser(ISignalParser(self.version))
         parser.registerElementParser(SwcImplementationParser(self.version))
         parser.registerElementParser(EcuConfigurationParser(self.version))
 
