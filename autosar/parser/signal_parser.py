@@ -1,4 +1,4 @@
-from autosar.base import parseXMLFile,splitRef,parseTextNode,parseIntNode
+from autosar.base import parseTextNode,parseIntNode
 from autosar.signal import *
 from autosar.parser.parser_base import EntityParser, parseElementUUID
 from autosar.util.errorHandler import handleNotImplementedError
@@ -109,8 +109,7 @@ class ISignalParser(EntityParser):
         elif self.version >= 4.0:
             self.switcher = {
                 'I-SIGNAL': self.parseISignalV4,
-                # TODO: add support for I-SIGNAL-GROUP when needed
-                #'I-SIGNAL-GROUP': self.parseISignalGroupV4
+                'I-SIGNAL-GROUP': self.parseISignalGroupV4
             }
 
     def getSupportedTags(self):
@@ -217,3 +216,71 @@ class ISignalParser(EntityParser):
         self.pop(iSignal)
 
         return iSignal
+    
+    @parseElementUUID
+    def parseISignalGroupV4(self, xmlRoot, parent=None):
+        """
+        parses <I-SIGNAL-GROUP> (Autosar 4 standard)
+        """
+        assert(xmlRoot.tag=='I-SIGNAL-GROUP')
+        comBasedSignalGroupTransformations = None
+        iSignalRefs = None
+        systemSignalGroupRef = None
+        transformationISignalPropss = None
+        
+        self.push()
+        
+        for elem in xmlRoot.findall('./*'):
+            if elem.tag=='COM-BASED-SIGNAL-GROUP-TRANSFORMATIONS':
+                comBasedSignalGroupTransformations = []
+                for childElem in elem.findall('./*'):
+                    if childElem.tag=='DATA-TRANSFORMATION-REF-CONDITIONAL':
+                        # TODO: add implementation to parse this tag
+                        pass
+                    else:
+                        handleNotImplementedError(childElem.tag)
+            elif elem.tag=='I-SIGNAL-REFS':
+                iSignalRefs = []
+                for childElem in elem.findall('./*'):
+                    if childElem.tag=='I-SIGNAL-REF':
+                        # TODO: add implementation to parse this tag
+                        pass
+                    else:
+                        handleNotImplementedError(childElem.tag)
+            elif elem.tag=='SYSTEM-SIGNAL-GROUP-REF':
+                # TODO: add implementation to parse this tag
+                pass
+            elif elem.tag=='TRANSFORMATION-I-SIGNAL-PROPSS':
+                transformationISignalPropss = []
+                for childElem in elem.findall('./*'):
+                    if childElem.tag=='END-TO-END-TRANSFORMATION-I-SIGNAL-PROPS':
+                        # TODO: add implementation to parse this tag
+                        pass
+                    elif childElem.tag=='SOMEIP-TRANSFORMATION-I-SIGNAL-PROPS':
+                        # TODO: add implementation to parse this tag
+                        pass
+                    elif childElem.tag=='USER-DEFINED-TRANSFORMATION-I-SIGNAL-PROPS':
+                        # TODO: add implementation to parse this tag
+                        pass
+                    else:
+                        handleNotImplementedError(childElem.tag)
+            else:
+                self.defaultHandler(elem)
+        
+        if self.name is None:
+            raise RuntimeError(f'Error in TAG {xmlRoot.tag}: SHORT-NAME must not be None')
+        
+        adminData = ad if (ad := self.adminData) is not None else None
+
+        iSignalGroup = ISignalGroup(
+            name=self.name,
+            adminData=adminData,
+            comBasedSignalGroupTransformations=comBasedSignalGroupTransformations,
+            iSignalRefs=iSignalRefs,
+            systemSignalGroupRef=systemSignalGroupRef,
+            transformationISignalPropss=transformationISignalPropss,
+            parent=parent
+        )
+
+        self.pop(iSignalGroup)
+        return iSignalGroup

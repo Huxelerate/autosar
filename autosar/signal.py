@@ -56,7 +56,11 @@ class ISignalV4(Element):
         timeoutSubstitutionValue=None,
         transformationISignalPropss=None
     ):
-        super().__init__(name,parent,adminData)
+        super().__init__(
+            name=name,
+            parent=parent,
+            adminData=adminData
+        )
         self.dataTransformations = dataTransformations
         self.dataTypePolicy = dataTypePolicy
         self.props = props
@@ -66,4 +70,25 @@ class ISignalV4(Element):
         self.networkRepresentationProps = networkRepresentationProps
         self.systemSignalRef = systemSignalRef
         self.timeoutSubstitutionValue = timeoutSubstitutionValue
+        self.transformationISignalPropss = transformationISignalPropss
+
+class ISignalGroup(Element):
+    def __init__(
+            self,
+            name,
+            parent,
+            adminData=None,
+            comBasedSignalGroupTransformations=None,
+            iSignalRefs=None,
+            systemSignalGroupRef=None,
+            transformationISignalPropss=None
+    ):
+        super().__init__(
+            name=name,
+            parent=parent,
+            adminData=adminData
+        )
+        self.comBasedSignalGroupTransformations = comBasedSignalGroupTransformations
+        self.iSignalRefs = iSignalRefs
+        self.systemSignalGroupRef = systemSignalGroupRef
         self.transformationISignalPropss = transformationISignalPropss
