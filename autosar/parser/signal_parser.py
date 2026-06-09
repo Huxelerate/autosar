@@ -147,8 +147,7 @@ class ISignalParser(EntityParser):
                 dataTransformations = []
                 for childElem in elem.findall('./*'):
                     if childElem.tag=='DATA-TRANSFORMATION-REF-CONDITIONAL':
-                        # TODO: add implementation to parse this tag
-                        pass
+                        dataTransformations.append(self.parseDataTransformationRefConditional(childElem))
                     else:
                         handleNotImplementedError(childElem.tag)
             elif elem.tag=='DATA-TYPE-POLICY':
@@ -235,8 +234,7 @@ class ISignalParser(EntityParser):
                 comBasedSignalGroupTransformations = []
                 for childElem in elem.findall('./*'):
                     if childElem.tag=='DATA-TRANSFORMATION-REF-CONDITIONAL':
-                        # TODO: add implementation to parse this tag
-                        pass
+                        comBasedSignalGroupTransformations.append(self.parseDataTransformationRefConditional(childElem))
                     else:
                         handleNotImplementedError(childElem.tag)
             elif elem.tag=='I-SIGNAL-REFS':
@@ -284,3 +282,21 @@ class ISignalParser(EntityParser):
 
         self.pop(iSignalGroup)
         return iSignalGroup
+    
+    def parseDataTransformationRefConditional(self, xmlRoot):
+        """
+        parses <DATA-TRANSFORMATION-REF-CONDITIONAL> (Autosar 4 standard)
+        """
+        assert(xmlRoot.tag=='DATA-TRANSFORMATION-REF-CONDITIONAL')
+        dataTransformationRef = None
+        variationPoint = None
+
+        for elem in xmlRoot.findall('./*'):
+            if elem.tag=='DATA-TRANSFORMATION-REF':
+                dataTransformationRef = self.parseTextNode(elem)
+            elif elem.tag=='VARIATION-POINT':
+                variationPoint = self.parseVariationPoint(elem)
+            else:
+                handleNotImplementedError(elem.tag)
+        
+        return DataTransformationRefConditional(dataTransformationRef, variationPoint)

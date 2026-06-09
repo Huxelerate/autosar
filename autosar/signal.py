@@ -92,3 +92,8 @@ class ISignalGroup(Element):
         self.iSignalRefs = iSignalRefs
         self.systemSignalGroupRef = systemSignalGroupRef
         self.transformationISignalPropss = transformationISignalPropss
+
+class DataTransformationRefConditional():
+    def __init__(self, dataTransformationRef=None, variationPoint=None):
+        self.dataTransformationRef = dataTransformationRef
+        self.variationPoint = variationPoint
