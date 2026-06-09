@@ -151,8 +151,7 @@ class ISignalParser(EntityParser):
                     else:
                         handleNotImplementedError(childElem.tag)
             elif elem.tag=='DATA-TYPE-POLICY':
-                # TODO: add implementation to parse this tag
-                pass
+                dataTypePolicy = self.parseTextNode(elem)
             elif elem.tag=='I-SIGNAL-PROPS':
                 # TODO: add implementation to parse this tag
                 pass
