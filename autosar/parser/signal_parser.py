@@ -227,13 +227,11 @@ class ISignalParser(EntityParser):
                 iSignalRefs = []
                 for childElem in elem.findall('./*'):
                     if childElem.tag=='I-SIGNAL-REF':
-                        # TODO: add implementation to parse this tag
-                        pass
+                        iSignalRefs.append(self.parseTextNode(childElem))
                     else:
                         handleNotImplementedError(childElem.tag)
             elif elem.tag=='SYSTEM-SIGNAL-GROUP-REF':
-                # TODO: add implementation to parse this tag
-                pass
+                systemSignalGroupRef = self.parseTextNode(elem)
             elif elem.tag=='TRANSFORMATION-I-SIGNAL-PROPSS':
                 transformationISignalPropss = []
                 for childElem in elem.findall('./*'):
