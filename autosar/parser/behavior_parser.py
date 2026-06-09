@@ -161,14 +161,21 @@ class BehaviorParser(EntityParser):
                 elif xmlElem.tag == 'PORT-API-OPTIONS':
                     for xmlOption in xmlElem.findall('./PORT-API-OPTION'):
                         enableTakeAddress = self.parseBooleanNode(xmlOption.find('ENABLE-TAKE-ADDRESS'))
-                        indirectApi = self.parseBooleanNode(xmlOption.find('INDIRECT-API'))
+                        indirectAPI = self.parseBooleanNode(xmlOption.find('INDIRECT-API'))
                         portRef = self.parseTextNode(xmlOption.find('PORT-REF'))
+                        errorHandling = self.parseTextNode(xmlOption.find('ERROR-HANDLING'))
                         
                         portArgValues = []
                         for xmlPortDefinedArgumentValue in xmlOption.findall('./PORT-ARG-VALUES/PORT-DEFINED-ARGUMENT-VALUE'):
                             portArgValues.append(self.constantParser.parsePortDefinedArgumentValue(xmlPortDefinedArgumentValue))
 
-                        portAPIOption = autosar.behavior.PortAPIOption(portRef, enableTakeAddress, indirectApi, portArgValues)
+                        portAPIOption = autosar.behavior.PortAPIOption(
+                            portRef = portRef,
+                            takeAddress = enableTakeAddress,
+                            indirectAPI = indirectAPI,
+                            portArgValues = portArgValues,
+                            errorHandling = errorHandling
+                        )
                         
                         if portAPIOption is not None: internalBehavior.portAPIOptions.append(portAPIOption)
                 elif xmlElem.tag == 'RUNNABLES':

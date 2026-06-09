@@ -199,17 +199,19 @@ class ProvideModeGroupInstanceRef(ModeGroupInstanceRef):
             raise RuntimeError('Not supported in v%.1f'%version)
 
 class PortAPIOption():
-    def __init__(self,portRef,takeAddress=False,indirectAPI=False,portArgValues=None):
+    def __init__(self,portRef,takeAddress=False,indirectAPI=False,portArgValues=None,errorHandling=None):
         self.portRef = portRef
         self.takeAddress = bool(takeAddress)
         self.indirectAPI = bool(indirectAPI)
         self.portArgValues = portArgValues
+        self.errorHandling = errorHandling
     def asdict(self):
         data={
             'type': self.__class__.__name__,
             'takeAddress':self.takeAddress,
             'indirectAPI':self.indirectAPI,
             'portRef':self.portRef,
+            'errorHandling':self.errorHandling
         }
         if self.portArgValues is not None:
             data['portArgValues']=[x.asdict() for x in self.portArgValues]
