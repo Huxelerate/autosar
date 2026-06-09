@@ -162,8 +162,7 @@ class ISignalParser(EntityParser):
             elif elem.tag=='LENGTH':
                 length = self.parseIntNode(elem)
             elif elem.tag=='NETWORK-REPRESENTATION-PROPS':
-                # TODO: add implementation to parse this tag
-                pass
+                networkRepresentationProps = self.parseSwDataDefProps(elem)
             elif elem.tag=='SYSTEM-SIGNAL-REF':
                 # TODO: add implementation to parse this tag
                 pass

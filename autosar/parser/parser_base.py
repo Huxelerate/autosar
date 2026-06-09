@@ -332,7 +332,7 @@ class BaseParser:
         return adminData
 
     def parseSwDataDefProps(self, xmlRoot):
-        assert (xmlRoot.tag == 'SW-DATA-DEF-PROPS')
+        assert (xmlRoot.tag in ('SW-DATA-DEF-PROPS', 'NETWORK-REPRESENTATION-PROPS'))
         variants = []
         for itemXML in xmlRoot.findall('./*'):
             if itemXML.tag == 'SW-DATA-DEF-PROPS-VARIANTS':
