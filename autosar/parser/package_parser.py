@@ -1,7 +1,6 @@
 import autosar.package
 import autosar.element
 import autosar.parser.parser_base
-import sys
 from autosar.base import parseTextNode
 from autosar.util.errorHandler import handleValueError
 
