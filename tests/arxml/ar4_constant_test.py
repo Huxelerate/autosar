@@ -174,6 +174,27 @@ class ARXML4ConstantTest(ARXMLTestClass):
         expected_file = os.path.join( 'expected_gen', 'constant', file_name)
         self.save_and_check(ws, expected_file, generated_file, ['/Constants'])
 
+    def test_parse_record_value_specification_as_ar4(self):
+        for file_name, constant_ref in [
+            ('ar4_record_constant1.arxml', '/Constants/Record1_IV'),
+            ('ar4_array_of_records.arxml', '/Constants/CDiagNv_NvMServiceRequestType'),
+        ]:
+            with self.subTest(file_name=file_name):
+                expected_file = os.path.join('expected_gen', 'constant', file_name)
+                ws = autosar.workspace(version="4.2.2")
+                ws.loadXML(os.path.join(os.path.dirname(__file__), expected_file))
+                constant = ws.find(constant_ref)
+                self.assertIsInstance(constant, autosar.constant.Constant)
+                self._assert_ar4_values_only(constant.value)
+                # Parsed AR4 records must be writable again by the AR4 writer
+                generated_file = os.path.join(self.output_dir, file_name)
+                self.save_and_check(ws, expected_file, generated_file, ['/Constants'])
+
+    def _assert_ar4_values_only(self, value):
+        self.assertIsInstance(value, autosar.constant.ValueAR4)
+        for element in getattr(value, 'elements', []):
+            self._assert_ar4_values_only(element)
+
     def test_create_application_value1(self):
         ws = autosar.workspace(version="4.2.2")
         _init_ws(ws)
